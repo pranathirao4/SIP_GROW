@@ -521,10 +521,17 @@ elif st.session_state.current_view == "chat":
                         system_prompt = f"""You are the senior Groww Product & Retention Discovery AI Bot.
 Your primary mission is to explain empirically why first-time mutual fund investors stop, pause, or abandon their SIPs on the Groww platform before 12 months, and how Groww can increase 12-month active SIP retention.
 
+CRITICAL SCOPE GUARDRAIL:
+You must strictly answer ONLY questions directly related to Groww, mutual funds, SIP retention, drop-off causes, auto-pay/mandates, 12-month retention, and retail investor behavior in India.
+If the query is out of scope (such as sports like 'who is best cricketer', personal questions like 'when is my birthday', general trivia, entertainment, weather, politics, etc.):
+You MUST decline to answer and respond with:
+"This is out of scope. I am the Groww SIP Retention Discovery Agent and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandate issues, and first-time investor behavior."
+Do NOT answer out-of-scope topics under any circumstances.
+
 Evidence Context from Real Investor Discussions (including Groww app reviews & investor forums):
 {context_str}
 
-How to Format Your Answer:
+How to Format In-Scope Answers:
 - **Direct Summary (1-2 sentences):** Give the direct, bottom-line answer immediately in plain, everyday language explaining what Groww users experience.
 - **Key Reasons on Groww (2 to 4 bullet points):**
   - Use bold, everyday titles (e.g. **Groww AutoPay Confusion**, **Salary Delay vs Debit Date**, **Panic When Returns Dipped**).
@@ -533,7 +540,7 @@ How to Format Your Answer:
 - **Actionable Takeaway for Groww (1 simple sentence):** What the Groww Product/Growth team should implement to retain users past 12 months.
 
 Important Rules:
-- Always frame the analysis specifically around Groww's product, user flows, and 12-month retention goal.
+- Always frame in-scope analysis specifically around Groww's product, user flows, and 12-month retention goal.
 - Speak like a friendly human explaining things to a colleague.
 - NO corporate jargon, no academic speak, and no dense walls of text.
 - Strictly NEVER recommend specific mutual funds or stocks (SEBI compliance).
@@ -550,13 +557,21 @@ Important Rules:
 
                         choice = completion.choices[0].message
                         raw_answer = choice.content or "No textual response generated."
-                        formatted_answer = linkify_citations(raw_answer, records_lookup)
+                        
+                        is_out_of_scope = "out of scope" in raw_answer.lower()
+                        if is_out_of_scope:
+                            formatted_answer = raw_answer
+                            final_references = []
+                            st.session_state.active_references = []
+                        else:
+                            formatted_answer = linkify_citations(raw_answer, records_lookup)
+                            final_references = retrieved_docs
 
                         st.markdown(formatted_answer)
                         st.session_state.messages.append({
                             "role": "assistant",
                             "content": formatted_answer,
-                            "references": retrieved_docs
+                            "references": final_references
                         })
                         st.rerun()
 
