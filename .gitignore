@@ -1,0 +1,19 @@
+# Environment Variables & Secret API Keys (STRICTLY EXCLUDED)
+.env
+*.env
+.env.*
+*.secret
+
+# Python Virtual Environments & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Streamlit temporary data
+.streamlit/*.json
+
+# Scratch debug utilities
+scratch/

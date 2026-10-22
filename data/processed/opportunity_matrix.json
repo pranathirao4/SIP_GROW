@@ -1,0 +1,82 @@
+[
+  {
+    "opportunity_id": "OPP-01",
+    "title": "Bank ECS Bounce Penalty Shield (Salary Date Alignment)",
+    "ops_score": 4.71,
+    "prevalence_pct": 3.9,
+    "evidence_count": 3,
+    "denominator": 77,
+    "scores": {
+      "retention_link": 5.0,
+      "evidence_strength": 4.5,
+      "problem_severity": 5.0,
+      "groww_addressability": 4.8,
+      "unmet_need": 4.5,
+      "prevalence": 4.0,
+      "source_diversity": 4.5,
+      "low_assumptions": 4.2
+    },
+    "hypothesis": "Users experience unexpected bank penalties (₹450-₹590) when monthly SIP debit precedes delayed salary credits, prompting proactive mandate cancellations to stop recurring fines.",
+    "solution_direction": "Salary-synced debit date picker, smart balance pre-check notification 24 hours prior, and automated auto-pause before bank bounce."
+  },
+  {
+    "opportunity_id": "OPP-02",
+    "title": "Flexible Emergency 'Smart Pause' vs Permanent Cancellation",
+    "ops_score": 4.6,
+    "prevalence_pct": 0.0,
+    "evidence_count": 0,
+    "denominator": 77,
+    "scores": {
+      "retention_link": 4.8,
+      "evidence_strength": 4.5,
+      "problem_severity": 4.0,
+      "groww_addressability": 5.0,
+      "unmet_need": 4.8,
+      "prevalence": 4.5,
+      "source_diversity": 4.5,
+      "low_assumptions": 4.5
+    },
+    "hypothesis": "First-time investors facing temporary liquidity crunches (medical, festivals, exams) cannot easily locate or configure a multi-month pause, defaulting to hard mandate cancellation.",
+    "solution_direction": "Prominent 'Pause for 1-3 Months' flow placed right alongside cancellation, with calendar resume reminders."
+  },
+  {
+    "opportunity_id": "OPP-03",
+    "title": "First-Year Volatility Shock Absorber (Negative XIRR Reassurance)",
+    "ops_score": 4.17,
+    "prevalence_pct": 16.9,
+    "evidence_count": 13,
+    "denominator": 77,
+    "scores": {
+      "retention_link": 4.5,
+      "evidence_strength": 4.2,
+      "problem_severity": 4.2,
+      "groww_addressability": 4.0,
+      "unmet_need": 3.8,
+      "prevalence": 4.2,
+      "source_diversity": 4.0,
+      "low_assumptions": 3.8
+    },
+    "hypothesis": "Beginners who encounter negative returns or portfolio drawdowns in months 3-6 panic due to lack of compounding perspective and comparison to guaranteed bank FDs.",
+    "solution_direction": "Contextual educational visualizer during market dips showing unit accumulation benefits ('rupee-cost averaging in action') without FOMO."
+  },
+  {
+    "opportunity_id": "OPP-04",
+    "title": "Student & Irregular Income Micro-SIP Adjuster",
+    "ops_score": 4.0,
+    "prevalence_pct": 2.6,
+    "evidence_count": 2,
+    "denominator": 77,
+    "scores": {
+      "retention_link": 4.2,
+      "evidence_strength": 4.0,
+      "problem_severity": 3.8,
+      "groww_addressability": 4.2,
+      "unmet_need": 4.0,
+      "prevalence": 3.8,
+      "source_diversity": 3.8,
+      "low_assumptions": 3.5
+    },
+    "hypothesis": "College students and gig workers with fluctuating cash inflows struggle with rigid fixed monthly commitment amounts, causing abandonment when allowances fluctuate.",
+    "solution_direction": "Dynamic instalment flex (allowing user to temporarily drop from ₹1,000 to ₹500 for a month rather than stopping)."
+  }
+]

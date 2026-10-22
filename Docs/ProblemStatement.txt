@@ -1,0 +1,437 @@
+# PROJECT: AI-Powered SIP Retention Discovery Agent for Groww
+
+## 1. Your role
+
+Act as a senior AI engineer, product discovery researcher, data analyst, and no-code implementation guide.
+
+I am a Product Manager working on the Growth Team at Groww. I do not know how to code and do not want to write code manually.
+
+Your responsibility is to help me build a complete, working AI-powered product discovery agent. You may generate code behind the scenes when necessary, but I should be able to operate the system through a simple interface and follow clear, step-by-step instructions.
+
+Do not merely explain how I could build it. Help me implement, configure, test, and validate the actual project using the tools and integrations available to you.
+
+If you cannot perform an action directly, tell me precisely what I need to do in the relevant interface.
+
+Do not claim that anything has been implemented, tested, scraped, or validated unless it has actually been done.
+
+## 2. Business problem
+
+You are a Product Manager on the Growth Team at Groww.
+
+Our strategic goal is:
+
+Increase the percentage of first-time mutual fund investors who still have an active SIP 12 months after starting their first SIP.
+
+An active SIP means at least one successful instalment in the last 30 days.
+
+Starting a SIP is easy, but users may subsequently reduce, pause, cancel, or discontinue their investments.
+
+We have not been given the underlying user problem. Our task is to discover it through evidence-based research.
+
+The solution must not:
+- Recommend specific mutual funds or stocks.
+- Use fear-based, FOMO-based, or urgency-based nudges.
+- Treat assumptions as validated user problems.
+- Recommend solutions before establishing the problem.
+
+## 3. Primary objective of the agent
+
+Build an AI discovery system that collects, organizes, filters, analyzes, and synthesizes public conversations about SIP investing in India.
+
+It must help answer:
+
+1. Why do people start their first SIP, and what do they expect?
+2. What changes in their behaviour during the months after starting?
+3. What leads investors to reduce, pause, cancel, or discontinue SIPs?
+4. What do investors check, and how frequently, after starting?
+5. What confuses or worries them inside investing apps?
+6. What do they do outside the app when they feel uncertain?
+7. What differentiates investors who continue from those who discontinue?
+8. How do these patterns vary by income stability, age, source of money, investing experience, and social influence?
+9. What unmet needs emerge consistently?
+10. Which potential product opportunities could plausibly improve 12-month SIP retention?
+
+Distinguish between evidence directly observed in conversations, hypotheses inferred from that evidence, and questions that require further research.
+
+## 4. Sources for data collection
+
+Prioritize these sources:
+
+- Reddit posts and comments from Indian investing communities - use cheapest reddit scrapper from Apify. explain me how we can do that.
+- Google Play Store reviews of Groww - tell me if you need any links to be provided
+- Apple App Store reviews where accessible - tell me if you need any links to be provided
+- TradingQ&A - tell me if you need any links to be provided
+
+Start with Reddit because I have been unable to collect data reliably through the Reddit API.
+
+Investigate whether Apify has a suitable, currently available Actor that can collect Reddit posts and comments.
+
+Do not assume Reddit API access is available.USe APIFY ONly for reddit scarpping Do not spend time repeatedly retrying a blocked API when an appropriate alternative exists.Tell me if you need links / APIFY KEY. explain me steps 
+
+For every source:
+- Verify the current collection method and its limitations.
+- Prefer existing no-code scraping tools and integrations.
+- Explain account setup, pricing, quotas, and permissions.
+- Provide exact configuration instructions based on the tool's actual interface.
+- Use public and authorized access only.
+- Do not bypass authentication, access controls, or platform restrictions.
+- Do not fabricate records or source URLs.
+
+If a source cannot be collected, explain why and propose a practical alternative.
+
+## 5. Build a guided data collection workflow
+
+Create a workflow that allows me to collect data without manually copying individual conversations.
+
+For Reddit, start with these search terms:
+
+- stopped SIP
+- cancelled SIP
+- paused SIP
+- why stop investing
+- first SIP experience
+- SIP negative returns
+- SIP affordability
+- mutual fund beginner mistakes
+- SIP mandate problem
+- failed SIP instalment
+- checking mutual fund returns
+- disappointing SIP returns
+- continue SIP during market fall
+- irregular income SIP
+- SIP cancellation reasons
+- mutual fund redemption regret
+- SIP amount reduction
+- mutual fund investor anxiety
+-first time SIP investment 
+-first time SIP investment problems. 
+
+Investigate relevant Indian investing communities, including r/IndiaInvestments, r/personalfinanceindia, and r/IndianStockMarket, subject to current availability and relevance.
+
+Use suitable search terms and source-specific collection methods rather than assuming all platforms accept the same inputs.
+
+Start with a small pilot dataset of approximately 100–200 potentially relevant Reddit records. Expand after validating data quality.
+
+Where supported, collect:
+- Original text.
+- Post title and parent context.
+- Post and comment URLs.
+- Source or subreddit.
+- Publication date.
+- Available engagement metrics.
+- Parent post ID or comment ID.
+- Other useful metadata.
+
+Provide a simple dashboard or guided workflow with:
+- Source selection.
+- Search keywords.
+- Collection limits.
+- Run status.
+- Dataset size.
+- Export to CSV.
+- Clear error messages.
+
+If automatic collection requires API credentials, guide me through secure setup. Do not expose secrets in source code, logs, prompts, or public repositories.
+
+## 6. Build the data processing pipeline
+
+Implement the following stages in order.
+
+### Stage A: Raw data ingestion
+
+- Import Apify datasets and CSV/JSON files.
+- Preserve the original source text and URL.
+- Assign a unique record ID.
+- Record the source, collection date, and available metadata.
+- Retain the original dataset for auditing.
+
+### Stage B: Data cleaning
+
+- Remove empty and malformed records.
+- Normalize text without changing its meaning.
+- Detect exact duplicates.
+- Identify near-duplicates and cross-posts where feasible.
+- Preserve links between comments and parent discussions.
+- Do not incorrectly treat every comment within a thread as an independent conversation.
+- Keep original text immutable.
+
+### Stage C: Relevance filtering
+
+Classify records into:
+
+1. Directly relevant to starting, continuing, reducing, pausing, cancelling, or missing SIP instalments.
+2. Indirectly relevant to first-time investor behaviour, uncertainty, expectations, or decision-making.
+3. Relevant to app usability, mandates, payment failures, portfolio visibility, or investor education.
+4. General investing content with insufficient evidence of a SIP-retention connection.
+5. Irrelevant or unusable content.
+
+Allow records to have multiple relevant categories where appropriate.
+
+For each record, produce:
+- Relevance category.
+- Relevance score.
+- Short explanation.
+- Evidence supporting the classification.
+- Confidence level.
+- Human review flag when uncertain.
+
+Use a configurable threshold and allow me to inspect borderline records before excluding them.
+
+Do not equate an app complaint with a retention problem unless the evidence supports the connection.
+
+### Stage D: AI classification
+
+For every relevant record, classify:
+
+- Investor stage: considering, first-time, continuing, paused, cancelled, or unknown.
+- Reported behaviour: started, continued, increased, reduced, paused, cancelled, failed instalment, or unknown.
+- Stated motivation for starting.
+- Expectations before starting.
+- Trigger or context.
+- Explicitly stated reason for the behaviour.
+- Reported pain point.
+- Underlying user need, if supported.
+- Emotional signal, if explicitly evident.
+- App-specific issue versus broader financial problem.
+- External actions taken to resolve uncertainty.
+- Source of influence, if explicitly mentioned.
+- Income stability, age, and source of money only when supported by evidence.
+- Evidence type: direct, indirect, or speculative.
+- Confidence and rationale.
+- Exact supporting quotation.
+- Source URL and record ID.
+
+Do not invent demographic attributes or infer that someone is a first-time investor without evidence.
+
+### Stage E: Theme discovery and clustering
+
+Create an initial taxonomy that can evolve with the evidence.
+
+Potential starting themes include:
+- Affordability and cash-flow constraints.
+- Competing financial priorities.
+- Expectations versus actual experience.
+- Confusion about investment performance.
+- Market volatility and uncertainty.
+- Low perceived progress.
+- Lack of financial understanding.
+- Missed instalments and forgetfulness.
+- Mandate and payment failures.
+- App usability and information clarity.
+- Social influence and external advice.
+- Trust and customer support.
+- Changes in personal circumstances.
+
+These are starting hypotheses, not predetermined conclusions.
+
+Implement AI-assisted clustering or semantic grouping if practical. Use deterministic rules for straightforward labels and AI for ambiguous text and deeper interpretation.
+
+Allow multiple themes per record.
+
+For every cluster, generate:
+- Theme name.
+- Operational definition.
+- Inclusion and exclusion criteria.
+- Number of matching records.
+- Number of unique posts and conversations.
+- Number of independent sources represented.
+- Relevant investor stages.
+- Verbatim supporting quotes.
+- Source links.
+- Counterexamples.
+- Confidence.
+- Potential retention connection.
+- Open research questions.
+
+Detect emerging themes without forcing all records into the existing taxonomy.
+
+### Stage F: Insight generation
+
+Move beyond sentiment analysis and summaries.
+
+Identify:
+- Recurring user problems.
+- Triggers that precede reported behaviour changes.
+- Unmet needs.
+- Differences between stated motivations and subsequent experiences.
+- Workarounds users employ outside the app.
+- Differences between continuing and discontinuing investors.
+- Conflicting evidence and alternative explanations.
+- Potentially addressable product opportunities.
+
+For each proposed insight, provide:
+
+1. Insight statement.
+2. User problem hypothesis.
+3. Evidence count and denominator.
+4. Unique conversations and sources.
+5. Supporting verbatim quotations.
+6. Counterevidence.
+7. Relevant investor segments.
+8. Strength of the connection to SIP continuation.
+9. Confidence and limitations.
+10. What remains unknown.
+11. Recommended survey or interview question.
+
+Never generate a finding merely because it sounds plausible.
+
+## 7. Compare user segments
+
+Build comparison views where evidence permits.
+
+Compare:
+- First-time investors versus experienced investors.
+- Investors who continue versus those who stop.
+- Fixed-income versus variable-income investors.
+- Different age groups, where explicitly known.
+- Different sources of investment money, where explicitly known.
+- Self-initiated investing versus socially influenced investing.
+- Investors who monitor frequently versus infrequently, where evidenced.
+- Investors reporting app or payment problems versus those without them.
+
+Do not manufacture segment sizes or infer population-level behaviour from self-selected public conversations.
+
+Clearly show when a comparison is inconclusive because the required attributes or denominator are missing.
+
+## 8. Opportunity assessment
+
+Create a transparent opportunity prioritization framework.
+
+Evaluate each candidate opportunity on:
+- Relevance to the 12-month SIP-retention objective.
+- Strength of direct user evidence.
+- Prevalence within the collected sample.
+- Number and diversity of independent sources.
+- Severity of the reported problem.
+- Evidence of an unmet need.
+- Potential addressability by Groww.
+- Confidence and unresolved assumptions.
+
+Keep the scoring dimensions separate and explain the rationale for each score.
+
+Do not use raw frequency as proof of severity or causation.
+
+Do not recommend specific funds or stocks. Do not propose fear, FOMO, urgency, or manipulative nudges.
+
+The output should identify promising problems to validate, not prematurely prescribe a solution.
+
+## 9. AI Evidence Log and validation
+
+Build a persistent AI Evidence Log.
+
+For each analysis run, store:
+- Run ID and timestamp.
+- Research question.
+- Source files and collection period.
+- Prompt or analysis version.
+- Dataset size.
+- Proposed insight.
+- Supporting record IDs.
+- Exact quotations and source URLs.
+- Counterevidence.
+- AI confidence and rationale.
+- Human verification status.
+- Errors discovered.
+- Corrections made.
+- Final status: accepted, revised, rejected, or needs further research.
+
+Provide a manual audit workflow.
+
+Test a sample of AI classifications against the original text. Track misclassification, unsupported inference, duplicate counting, incorrect quotations, and fabricated claims.
+
+Allow me to mark an insight as correct, partially correct, incorrect, or requiring more evidence.
+
+Record these decisions and use them to improve subsequent analyses without silently rewriting past evidence.
+
+## 10. Separate public research from actual retention metrics
+
+Public conversations are qualitative and self-selected.
+
+Do not claim that the research dataset establishes Groww's actual 12-month retention rate.
+
+Build a separate section listing the internal aggregate data needed to validate the business problem, including:
+- First-time mutual fund investors starting their first SIP.
+- Cohort-based SIP continuation over 12 months.
+- Successful instalments and active-SIP status.
+- Pauses, cancellations, missed instalments, and restarts.
+- Relevant segment-level differences.
+
+Use the exact business definition of an active SIP: at least one successful instalment in the last 30 days.
+
+If internal data is unavailable, explicitly identify these metrics as unknown.
+
+## 11. Final user interface
+
+Build a simple, usable research workspace.
+
+Include these sections:
+
+1. **Overview:** collection status, total records, source distribution, and data-quality status.
+2. **Data Collection:** select source, keywords, and collection limits; initiate supported workflows.
+3. **Data Quality:** duplicates, missing fields, irrelevant records, and review queue.
+4. **Conversation Explorer:** search and filter original records, with clickable source URLs.
+5. **Theme Explorer:** clusters, counts, representative quotes, and counterevidence.
+6. **Segment Analysis:** compare investor groups where supported.
+7. **Opportunity Assessment:** evidence-backed problem hypotheses and prioritization.
+8. **AI Evidence Log:** prompts, evidence, validation, and corrections.
+9. **Research Questions:** unresolved questions and suggested surveys/interviews.
+10. **Export:** download clean datasets, classifications, theme tables, evidence logs, and a final research report.
+
+Use clear charts only when their denominators are available and meaningful. Always allow me to inspect the records behind a number.
+
+## 12. Technical and implementation constraints
+
+I do not want to write code manually.
+
+Before implementing:
+1. Inspect the existing project and available tools.
+2. Identify the simplest viable implementation.
+3. Determine which existing integrations can be used.
+4. Verify the actual capabilities of Apify and any other proposed services.
+5. Identify all external credentials, permissions, costs, and setup requirements.
+6. Explain the implementation plan in plain English.
+
+Prefer existing no-code tools, supported integrations, and a simple interface.
+
+If code must be generated, generate it yourself and explain how to run and use the application.
+
+Use secure credential handling, persistent storage, robust error handling, and clear status messages.
+
+Do not build features that are unnecessary to validate the research workflow.
+
+Do not claim an integration works until it has been tested.
+
+## 13. How we will work together
+
+Work in phases:
+
+Phase 1: Inspect tools and identify the simplest architecture.
+
+Phase 2: Set up Apify and collect a small Reddit pilot dataset.
+
+Phase 3: Validate export, data quality, and source links.
+
+Phase 4: Implement cleaning, deduplication, and relevance filtering.
+
+Phase 5: Implement classification, theme discovery, and clustering.
+
+Phase 6: Implement evidence-backed insights and segment comparisons.
+
+Phase 7: Build the AI Evidence Log and validation workflow.
+
+Phase 8: Build the interface, exports, and final report.
+
+Phase 9: Test the complete pipeline on real collected data.
+
+At each phase:
+- Tell me what you are doing and why.
+- Give me the exact steps I need to complete.
+- Ask me only for information or actions you genuinely need.
+- Test each stage before moving forward.
+- Show real outputs rather than mock data.
+- Clearly label anything not yet implemented.
+- Do not fabricate results to make the project look complete.
+
+Start with Phase 1 now. Inspect the tools available to you, determine whether Apify can be integrated directly or must be operated through its website, and guide me through collecting the first small Reddit dataset.
+
+Do not begin by building a large application or generating hypothetical insights. First prove that we can reliably collect and analyze real data.
