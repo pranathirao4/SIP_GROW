@@ -322,12 +322,12 @@ if st.session_state.current_view == "how_it_works":
         <div class="pipeline-card">
             <span class="step-badge step-1">1</span>
             <span class="step-title">Collect</span>
-            <div class="step-desc"><strong>334 raw discussions</strong> from Reddit (r/personalfinanceindia, r/IndiaInvestments), TradingQ&A, and Groww app reviews.</div>
+            <div class="step-desc"><strong>419 raw discussions</strong> from Groww Play Store/App Store reviews, Reddit, and TradingQ&A.</div>
         </div>
         <div class="pipeline-card">
             <span class="step-badge step-2">2</span>
             <span class="step-title">Filter</span>
-            <div class="step-desc"><strong>321 search posts</strong> cleaned, normalized, and MD5 deduplicated across all sources.</div>
+            <div class="step-desc"><strong>406 search posts</strong> cleaned, normalized, and MD5 deduplicated across all sources.</div>
         </div>
         <div class="pipeline-card">
             <span class="step-badge step-3">3</span>
@@ -337,12 +337,12 @@ if st.session_state.current_view == "how_it_works":
         <div class="pipeline-card">
             <span class="step-badge step-4">4</span>
             <span class="step-title">RAG</span>
-            <div class="step-desc"><strong>321 indexed records</strong> queried via BM25 retrieval to ground every answer in real verbatim evidence.</div>
+            <div class="step-desc"><strong>406 indexed records</strong> queried via BM25 retrieval to ground every answer in real Groww evidence.</div>
         </div>
         <div class="pipeline-card">
             <span class="step-badge step-5">5</span>
             <span class="step-title">Ask</span>
-            <div class="step-desc"><strong>AI answers questions</strong> in plain human English with verified clickable references on the right.</div>
+            <div class="step-desc"><strong>AI answers questions</strong> specifically for Groww PMs in plain English with clickable references.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -412,18 +412,18 @@ elif st.session_state.current_view == "chat":
             st.markdown("""
             <div class="hero-container">
                 <div class="goal-badge">🎯 Goal: 12-Month Active SIP Retention</div>
-                <div class="hero-title">Ask what retail investors say about SIP cancellations & retention</div>
-                <div class="hero-subtitle">Discover the underlying root causes why first-time investors stop their SIPs before 12 months. Answers come only from verified Reddit, TradingQ&A, and Groww reviews.</div>
+                <div class="hero-title">Ask what retail investors say about Groww SIP cancellations & retention</div>
+                <div class="hero-subtitle">Empirical discovery uncovering root causes to increase 12-month active SIP retention specifically on Groww. Grounded in verified Groww app reviews, Reddit discussions, and Indian retail forums.</div>
             </div>
             """, unsafe_allow_html=True)
 
-            # The 5 Core Strategic Retention Questions
+            # The 5 Core Strategic Retention Questions specifically for Groww
             curated_questions = [
-                ("⏱️", "Why do first-time investors drop out before completing 12 months?"),
-                ("⏸️", "Why do users permanently cancel their SIP instead of using 'Pause'?"),
-                ("🎓", "What causes students and irregular earners to stop their monthly investments?"),
-                ("📉", "How does seeing negative returns in months 3–6 cause investors to panic?"),
-                ("🛡️", "What product changes would help first-time investors stay active for 12+ months?")
+                ("⏱️", "Why do first-time Groww investors drop out before completing 12 months?"),
+                ("⏸️", "Why do users permanently delete Groww AutoPay instead of using 'Pause'?"),
+                ("🎓", "What causes students and gig workers on Groww to stop their monthly SIPs?"),
+                ("📉", "How does seeing negative returns on the Groww dashboard cause users to panic?"),
+                ("🛡️", "What product features should Groww build to keep first-time investors active for 12+ months?")
             ]
 
             st.markdown("<div class='chip-grid'>", unsafe_allow_html=True)
@@ -441,7 +441,7 @@ elif st.session_state.current_view == "chat":
         # Execute query if triggered by Button or Chat Input
         user_query = st.session_state.input_query
         if not user_query:
-            user_query = st.chat_input("Ask a question about 12-month retention, drop-off reasons, or pause habits...")
+            user_query = st.chat_input("Ask a question about 12-month retention, drop-off reasons, or pause habits on Groww...")
 
         if user_query:
             # Clear input query from state
@@ -457,7 +457,7 @@ elif st.session_state.current_view == "chat":
                 st.markdown(user_query)
 
             # Step 4: RAG Retrieval
-            with st.spinner("Searching verified retail investor discussions..."):
+            with st.spinner("Searching verified Groww and retail investor discussions..."):
                 retrieved_docs = retriever.retrieve(user_query, top_k=6)
                 st.session_state.active_references = retrieved_docs
 
@@ -477,21 +477,22 @@ elif st.session_state.current_view == "chat":
                             )
                         context_str = "\n\n".join(context_blocks)
 
-                        system_prompt = f"""You are a helpful, human-friendly AI Discovery Bot for Groww's Product and Growth teams.
-Your primary mission is to identify the root causes of SIP drop-off and help increase the percentage of first-time mutual fund investors who still have an active SIP at 12 months.
+                        system_prompt = f"""You are the senior Groww Product & Retention Discovery AI Bot.
+Your primary mission is to explain empirically why first-time mutual fund investors stop, pause, or abandon their SIPs on the Groww platform before 12 months, and how Groww can increase 12-month active SIP retention.
 
-Evidence Context from Real Investor Discussions:
+Evidence Context from Real Investor Discussions (including Groww app reviews & investor forums):
 {context_str}
 
 How to Format Your Answer:
-- **Direct Summary (1-2 sentences):** Give the direct, bottom-line answer immediately in simple, clear words that anyone can understand in 5 seconds.
-- **Top Reasons (2 to 4 bullet points):**
-  - Use bold, everyday titles (e.g. **Tight Monthly Budgets**, **Hard to Find 'Pause'**, **Panic During First Market Dip**).
-  - Explain what real everyday investors go through in 1-2 easy sentences.
-  - Naturally mention what users actually said, citing their record ID like [REC-00163].
-- **Bottom Line for 12-Month Retention (1 simple sentence):** What product or growth teams can take away to keep users active.
+- **Direct Summary (1-2 sentences):** Give the direct, bottom-line answer immediately in plain, everyday language explaining what Groww users experience.
+- **Key Reasons on Groww (2 to 4 bullet points):**
+  - Use bold, everyday titles (e.g. **Groww AutoPay Confusion**, **Salary Delay vs Debit Date**, **Panic When Returns Dipped**).
+  - Explain what real everyday Groww investors go through in 1-2 easy sentences.
+  - Naturally mention what users actually said, citing their record ID like [REC-00042].
+- **Actionable Takeaway for Groww (1 simple sentence):** What the Groww Product/Growth team should implement to retain users past 12 months.
 
 Important Rules:
+- Always frame the analysis specifically around Groww's product, user flows, and 12-month retention goal.
 - Speak like a friendly human explaining things to a colleague.
 - NO corporate jargon, no academic speak, and no dense walls of text.
 - Strictly NEVER recommend specific mutual funds or stocks (SEBI compliance).
@@ -534,9 +535,22 @@ Important Rules:
             st.caption("When you ask a question, the exact supporting quotes from Reddit, TradingQ&A, and Groww reviews will appear here.")
         else:
             for r in refs:
-                source = r.get("source", "other")
-                badge_class = "badge-reddit" if "reddit" in source else ("badge-tradingqna" if "tradingqna" in source else "badge-reviews")
-                badge_label = "Reddit" if "reddit" in source else ("TradingQ&A" if "tradingqna" in source else "App Review")
+                source = r.get("source", "other").lower()
+                if "play_store" in source:
+                    badge_class = "badge-reviews"
+                    badge_label = "Groww Play Store"
+                elif "app_store" in source:
+                    badge_class = "badge-reviews"
+                    badge_label = "Groww App Store"
+                elif "groww" in source:
+                    badge_class = "badge-tradingqna"
+                    badge_label = "TradingQ&A (Groww)"
+                elif "reddit" in source:
+                    badge_class = "badge-reddit"
+                    badge_label = "Reddit (Groww/MF)"
+                else:
+                    badge_class = "badge-tradingqna"
+                    badge_label = "Investor Forum"
                 
                 quote = r.get("classification", {}).get("verbatim_quote") or r.get("raw_text", "")[:180]
                 url = r.get("url", "#")

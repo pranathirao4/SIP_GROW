@@ -98,7 +98,21 @@
     ]
   },
   {
-    "record_id": "REC-00210",
+    "record_id": "REC-00132",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1vw35nb/22f_with_salary_20k_how_to_invest/p7xp8nr/",
+    "title": "",
+    "snippet": "Hi, just saw this. So since youre living with parents id actually use this phase to build a proper emergency fund first, even if your expenses are low rn,after that you can keep the investing part sim",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "emergency fund"
+    ]
+  },
+  {
+    "record_id": "REC-00216",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/coin-50rs-monthly-charges-deduction/31336",
     "title": "COIN 50Rs Monthly Charges Deduction",
@@ -112,7 +126,7 @@
     ]
   },
   {
-    "record_id": "REC-00243",
+    "record_id": "REC-00249",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/instruments-in-sip/56182",
     "title": "Instruments in SIP",
@@ -126,7 +140,7 @@
     ]
   },
   {
-    "record_id": "REC-00244",
+    "record_id": "REC-00250",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/small-cap-funds/54748",
     "title": "Small cap funds",
@@ -140,7 +154,7 @@
     ]
   },
   {
-    "record_id": "REC-00258",
+    "record_id": "REC-00264",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/where-to-invest-my-5l-to-pay-emis-of-the-loan/57440",
     "title": "Where to invest my 5L to pay EMIs of the loan",
@@ -154,7 +168,7 @@
     ]
   },
   {
-    "record_id": "REC-00261",
+    "record_id": "REC-00267",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/is-smallcase-rebalance-burning-a-hole-in-your-pocket/39490",
     "title": "Is Smallcase Rebalance burning a hole in your pocket?",
@@ -168,7 +182,7 @@
     ]
   },
   {
-    "record_id": "REC-00312",
+    "record_id": "REC-00397",
     "source": "apple_app_store",
     "url": "https://apps.apple.com/in/app/groww-stocks-mutual-funds/id=1404871703",
     "title": "One of the most pathetic experiences I have ever had with a financial platform.",

@@ -39,7 +39,9 @@ def compute_hash(text: str) -> str:
 def run_cleaner(
     reddit_path="data/raw/reddit_pilot.json",
     reddit_ext_path="data/raw/reddit_comprehensive.json",
+    reddit_groww_path="data/raw/reddit_groww.json",
     tradingqna_path="data/raw/tradingqna.json",
+    tradingqna_groww_path="data/raw/tradingqna_groww.json",
     reviews_path="data/raw/app_reviews.json",
     output_path="data/processed/cleaned_records.json"
 ):
@@ -55,8 +57,6 @@ def run_cleaner(
             r_data = json.load(f)
             print(f"• Loaded {len(r_data)} records from {reddit_path}")
             raw_records.extend(r_data)
-    else:
-        print(f"• [INFO] {reddit_path} not found yet (will include once collected).")
 
     # 1b. Load Reddit extended scenario records
     r_ext_file = Path(reddit_ext_path)
@@ -66,6 +66,19 @@ def run_cleaner(
             print(f"• Loaded {len(r_ext_data)} records from {reddit_ext_path}")
             raw_records.extend(r_ext_data)
 
+    # 1c. Load Reddit Groww-specific records
+    r_gr_file = Path(reddit_groww_path)
+    if r_gr_file.exists():
+        with open(r_gr_file, "r", encoding="utf-8") as f:
+            r_gr_data = json.load(f)
+            for item in r_gr_data:
+                if "raw_text" not in item:
+                    item["raw_text"] = item.get("body") or item.get("text") or ""
+                if "source" not in item:
+                    item["source"] = f"reddit/{item.get('communityName', 'Groww')}"
+            print(f"• Loaded {len(r_gr_data)} records from {reddit_groww_path}")
+            raw_records.extend(r_gr_data)
+
     # 2. Load TradingQ&A records
     t_file = Path(tradingqna_path)
     if t_file.exists():
@@ -73,6 +86,14 @@ def run_cleaner(
             t_data = json.load(f)
             print(f"• Loaded {len(t_data)} records from {tradingqna_path}")
             raw_records.extend(t_data)
+
+    # 2b. Load TradingQ&A Groww records
+    t_gr_file = Path(tradingqna_groww_path)
+    if t_gr_file.exists():
+        with open(t_gr_file, "r", encoding="utf-8") as f:
+            t_gr_data = json.load(f)
+            print(f"• Loaded {len(t_gr_data)} records from {tradingqna_groww_path}")
+            raw_records.extend(t_gr_data)
 
     # 3. Load App Reviews
     rev_file = Path(reviews_path)

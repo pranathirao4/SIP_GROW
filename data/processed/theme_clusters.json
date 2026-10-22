@@ -4,13 +4,13 @@
     "theme_name": "Market Volatility Panic & Negative Returns",
     "definition": "Investor panics during market corrections or drawdowns when portfolio turns red, violating buy-and-hold intent.",
     "record_count": 13,
-    "denominator": 77,
-    "prevalence_percentage": 16.9,
+    "denominator": 80,
+    "prevalence_percentage": 16.2,
     "unique_sources_count": 3,
     "sources_represented": [
+      "reddit/r/IndianStockMarket",
       "reddit/r/personalfinanceindia",
-      "tradingqna",
-      "reddit/r/IndianStockMarket"
+      "tradingqna"
     ],
     "retention_connection": "Very High. Month 3-6 drawdowns break investor confidence before compounding is understood.",
     "representative_verbatims": [
@@ -52,13 +52,13 @@
     "theme_name": "Customer Support & Trust Gaps",
     "definition": "Money deducted from bank but mutual fund units not reflected in portfolio for days, causing panic and ticket logs.",
     "record_count": 7,
-    "denominator": 77,
-    "prevalence_percentage": 9.1,
+    "denominator": 80,
+    "prevalence_percentage": 8.8,
     "unique_sources_count": 3,
     "sources_represented": [
       "apple_app_store",
-      "reddit/r/IndiaInvestments",
-      "tradingqna"
+      "tradingqna",
+      "reddit/r/IndiaInvestments"
     ],
     "retention_connection": "High. Trust erosion regarding safety of investor capital.",
     "representative_verbatims": [
@@ -69,25 +69,25 @@
         "url": "https://www.reddit.com/r/IndiaInvestments/comments/1rfv3xe/sip_cancellation_requested_but_amount_still/"
       },
       {
-        "record_id": "REC-00136",
+        "record_id": "REC-00142",
         "source": "tradingqna",
         "quote": "The SIP for Mirae Asset Emerging Bluechip Fund is AMC SIP, this cannot be modified, you can cancel the SIP and start another one, there are no charges for canceling your SIP.",
         "url": "https://tradingqna.com/t/increasing-sip-amount-for-mirae-asset-emerging-new-fund/97366"
       },
       {
-        "record_id": "REC-00143",
+        "record_id": "REC-00149",
         "source": "tradingqna",
         "quote": "If you uncheck the options would be different image Also Refer : https://support.zerodha.com/category/mutual-funds/coin-app/sip-coin-app/articles/modify-cancel-sip-coin-app How do I modif...",
         "url": "https://tradingqna.com/t/coin-sip-vs-amc-sip/127618"
       },
       {
-        "record_id": "REC-00145",
+        "record_id": "REC-00151",
         "source": "tradingqna",
         "quote": "AMC SIP amount modify.",
         "url": "https://tradingqna.com/t/amc-sip-amount-modify/111660"
       },
       {
-        "record_id": "REC-00166",
+        "record_id": "REC-00172",
         "source": "tradingqna",
         "quote": "For a total of 5000 SIP, it has deducted 13500.",
         "url": "https://tradingqna.com/t/introducing-upi-autopay-for-sip-payments/173064"
@@ -100,8 +100,8 @@
     "theme_name": "Life Event Shocks (Job Loss & Emergencies)",
     "definition": "Unplanned structural life disruption: tech layoffs, career gaps, medical hospitalizations, or relocations.",
     "record_count": 5,
-    "denominator": 77,
-    "prevalence_percentage": 6.5,
+    "denominator": 80,
+    "prevalence_percentage": 6.2,
     "unique_sources_count": 1,
     "sources_represented": [
       "reddit/r/personalfinanceindia"
@@ -146,8 +146,8 @@
     "theme_name": "Competing Financial Priorities",
     "definition": "Cash diverted away from SIPs to service car/home EMIs, wedding expenses, insurance premiums, or festive shopping.",
     "record_count": 4,
-    "denominator": 77,
-    "prevalence_percentage": 5.2,
+    "denominator": 80,
+    "prevalence_percentage": 5.0,
     "unique_sources_count": 2,
     "sources_represented": [
       "reddit/r/personalfinanceindia",
@@ -174,7 +174,7 @@
         "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tght4m/comment/omggtpd/"
       },
       {
-        "record_id": "REC-00258",
+        "record_id": "REC-00264",
         "source": "tradingqna",
         "quote": "Then for the 1 year I would say you start investing the same emi ( 11 K) into a equity MF via SIP.",
         "url": "https://tradingqna.com/t/where-to-invest-my-5l-to-pay-emis-of-the-loan/57440"
@@ -187,13 +187,13 @@
     "theme_name": "Low Perceived Progress on Small SIPs",
     "definition": "Feeling that small monthly contributions (₹500–₹1,000) are not creating noticeable wealth, leading to apathy.",
     "record_count": 3,
-    "denominator": 77,
-    "prevalence_percentage": 3.9,
+    "denominator": 80,
+    "prevalence_percentage": 3.8,
     "unique_sources_count": 3,
     "sources_represented": [
       "reddit/r/personalfinanceindia",
-      "reddit/r/IndiaInvestments",
-      "tradingqna"
+      "tradingqna",
+      "reddit/r/IndiaInvestments"
     ],
     "retention_connection": "Moderate. Lack of milestone celebration makes small contributors discontinue.",
     "representative_verbatims": [
@@ -210,7 +210,7 @@
         "url": "https://www.reddit.com/r/IndiaInvestments/comments/bjhee4/can_you_do_a_single_sip_then_cancel_it_after_the/"
       },
       {
-        "record_id": "REC-00144",
+        "record_id": "REC-00150",
         "source": "tradingqna",
         "quote": "I'm Willing to Do a Small Sip for Next 4 Months in ICICI Pru Tech or Tata Digital Ind Fund I'm seeing AMC Sip's Minimum amount is 100/150rs Can i Please Know How Many Number of Amc sips should be Done in Order to Cancel/pause The Sip after 4 months And I'm finding On Amc website That sip can be D...",
         "url": "https://tradingqna.com/t/amc-sip-minimum-time/139340"
@@ -223,12 +223,12 @@
     "theme_name": "Missed Instalments & Bank ECS Bounce Penalties",
     "definition": "Bank debits fail due to low balance, triggering ₹450-₹590 penalty charges that induce proactive cancellation.",
     "record_count": 3,
-    "denominator": 77,
-    "prevalence_percentage": 3.9,
+    "denominator": 80,
+    "prevalence_percentage": 3.8,
     "unique_sources_count": 2,
     "sources_represented": [
-      "reddit/r/IndiaInvestments",
-      "tradingqna"
+      "tradingqna",
+      "reddit/r/IndiaInvestments"
     ],
     "retention_connection": "Severe. Users cancel mandates explicitly to protect bank accounts from repeated penalty fees.",
     "representative_verbatims": [
@@ -245,7 +245,7 @@
         "url": "https://www.reddit.com/r/IndiaInvestments/comments/muhq07/autopay_in_groww_sip_is_getting_failed/"
       },
       {
-        "record_id": "REC-00163",
+        "record_id": "REC-00169",
         "source": "tradingqna",
         "quote": "11:19PM - 07 April 2020 https://www.livemint.com/money/personal-finance/why-you-should-stop-or-pause-your-sip-if-you-can-t-service-it-11586281310692.html mint - 7 Apr 20 https://...",
         "url": "https://tradingqna.com/t/penalty-over-missed-sip/120657"
@@ -258,8 +258,8 @@
     "theme_name": "Affordability & Cash-Flow Constraints",
     "definition": "Investor stops or pauses SIP due to lack of liquid funds, salary delays, student allowance depletion, or general affordability.",
     "record_count": 2,
-    "denominator": 77,
-    "prevalence_percentage": 2.6,
+    "denominator": 80,
+    "prevalence_percentage": 2.5,
     "unique_sources_count": 1,
     "sources_represented": [
       "reddit/r/IndianStockMarket"
@@ -286,12 +286,12 @@
     "theme_name": "Confusion Over XIRR & Performance Metrics",
     "definition": "Inability to interpret annualized XIRR versus absolute returns, causing false belief of massive capital loss.",
     "record_count": 2,
-    "denominator": 77,
-    "prevalence_percentage": 2.6,
+    "denominator": 80,
+    "prevalence_percentage": 2.5,
     "unique_sources_count": 2,
     "sources_represented": [
-      "tradingqna",
-      "reddit/r/IndianStockMarket"
+      "reddit/r/IndianStockMarket",
+      "tradingqna"
     ],
     "retention_connection": "Moderate. Psychological anxiety driven by confusing FinTech return metrics.",
     "representative_verbatims": [
@@ -302,7 +302,7 @@
         "url": "https://www.reddit.com/r/IndianStockMarket/comments/1vndcll/sips_compound/"
       },
       {
-        "record_id": "REC-00137",
+        "record_id": "REC-00143",
         "source": "tradingqna",
         "quote": "I dont want to cancel my SIP in this fund now as the exit load term is another 6 months away.",
         "url": "https://tradingqna.com/t/how-does-an-amc-calculate-exit-load-and-do-all-mutual-funds-have-exit-loads/12588"
@@ -315,8 +315,8 @@
     "theme_name": "Lack of Foundational Compounding Literacy",
     "definition": "Misunderstanding the 5-7 year horizon required for equity compounding; treating mutual funds like short-term trading.",
     "record_count": 2,
-    "denominator": 77,
-    "prevalence_percentage": 2.6,
+    "denominator": 80,
+    "prevalence_percentage": 2.5,
     "unique_sources_count": 2,
     "sources_represented": [
       "reddit/r/personalfinanceindia",
@@ -331,7 +331,7 @@
         "url": "https://www.reddit.com/r/personalfinanceindia/comments/1hccklz/what_if_i_cancel_my_sip/"
       },
       {
-        "record_id": "REC-00206",
+        "record_id": "REC-00212",
         "source": "tradingqna",
         "quote": "If you want to avoid taxes then I will suggest to stop or pause SIP in particular fund.",
         "url": "https://tradingqna.com/t/is-it-possible-to-rebalance-stock-mf-portfolio-without-realising-profit-from-tax-perspective/115908"
@@ -344,12 +344,12 @@
     "theme_name": "Mandate & Payment Technical Failures",
     "definition": "Technical rejection of UPI Autopay, Netbanking e-mandate, or NPCI authorization during monthly deduction.",
     "record_count": 2,
-    "denominator": 77,
-    "prevalence_percentage": 2.6,
+    "denominator": 80,
+    "prevalence_percentage": 2.5,
     "unique_sources_count": 2,
     "sources_represented": [
-      "reddit/r/IndiaInvestments",
-      "tradingqna"
+      "tradingqna",
+      "reddit/r/IndiaInvestments"
     ],
     "retention_connection": "High. Accidental churn where user intended to continue but gave up after technical friction.",
     "representative_verbatims": [
@@ -360,7 +360,7 @@
         "url": "https://www.reddit.com/r/IndiaInvestments/comments/muhq07/autopay_in_groww_sip_is_getting_failed/"
       },
       {
-        "record_id": "REC-00166",
+        "record_id": "REC-00172",
         "source": "tradingqna",
         "quote": "For a total of 5000 SIP, it has deducted 13500.",
         "url": "https://tradingqna.com/t/introducing-upi-autopay-for-sip-payments/173064"
@@ -373,8 +373,8 @@
     "theme_name": "Social Influence & FinTech Advice Regret",
     "definition": "Starting SIPs based on influencer or peer hype, subsequently regretting fund selections or feeling misled.",
     "record_count": 1,
-    "denominator": 77,
-    "prevalence_percentage": 1.3,
+    "denominator": 80,
+    "prevalence_percentage": 1.2,
     "unique_sources_count": 1,
     "sources_represented": [
       "apple_app_store"
@@ -382,7 +382,7 @@
     "retention_connection": "Moderate. Low initial conviction leads to rapid abandonment at first sign of trouble.",
     "representative_verbatims": [
       {
-        "record_id": "REC-00312",
+        "record_id": "REC-00397",
         "source": "apple_app_store",
         "quote": "One of the most pathetic experiences I have ever had with a financial platform..",
         "url": "https://apps.apple.com/in/app/groww-stocks-mutual-funds/id=1404871703"
@@ -395,7 +395,7 @@
     "theme_name": "Expectations vs Actual Performance",
     "definition": "Disillusionment that 1-year mutual fund returns are lower than expected, failing to beat Fixed Deposits (FDs).",
     "record_count": 0,
-    "denominator": 77,
+    "denominator": 80,
     "prevalence_percentage": 0.0,
     "unique_sources_count": 0,
     "sources_represented": [],
@@ -408,7 +408,7 @@
     "theme_name": "App Usability & Information Clarity (Pause vs Cancel)",
     "definition": "Users wanting a temporary skip or pause are forced into permanent cancellation due to hidden or rigid pause flows.",
     "record_count": 0,
-    "denominator": 77,
+    "denominator": 80,
     "prevalence_percentage": 0.0,
     "unique_sources_count": 0,
     "sources_represented": [],

@@ -1,17 +1,17 @@
 [
   {
     "log_id": "LOG-OPP-01",
-    "timestamp": "2026-10-22T23:07:42.450878",
+    "timestamp": "2026-10-23T00:49:54.439558",
     "opportunity_id": "OPP-01",
     "title": "Bank ECS Bounce Penalty Shield (Salary Date Alignment)",
     "theme_name": "Missed Instalments & Bank ECS Bounce Penalties",
     "user_problem_hypothesis": "Users experience unexpected bank penalties (₹450-₹590) when monthly SIP debit precedes delayed salary credits, prompting proactive mandate cancellations to stop recurring fines.",
     "evidence_count": 3,
-    "denominator": 77,
-    "prevalence_percentage": 3.9,
+    "denominator": 80,
+    "prevalence_percentage": 3.8,
     "sources_represented": [
-      "reddit/r/IndiaInvestments",
-      "tradingqna"
+      "tradingqna",
+      "reddit/r/IndiaInvestments"
     ],
     "citations": [
       {
@@ -27,7 +27,7 @@
         "quote": "Autopay in GROWW SIP is getting failed.."
       },
       {
-        "record_id": "REC-00163",
+        "record_id": "REC-00169",
         "source": "tradingqna",
         "url": "https://tradingqna.com/t/penalty-over-missed-sip/120657",
         "quote": "11:19PM - 07 April 2020 https://www.livemint.com/money/personal-finance/why-you-should-stop-or-pause-your-sip-if-you-can-t-service-it-11586281310692.html mint - 7 Apr 20 https://..."
@@ -40,13 +40,13 @@
   },
   {
     "log_id": "LOG-OPP-02",
-    "timestamp": "2026-10-22T23:07:42.450878",
+    "timestamp": "2026-10-23T00:49:54.440556",
     "opportunity_id": "OPP-02",
     "title": "Flexible Emergency 'Smart Pause' vs Permanent Cancellation",
     "theme_name": "App Usability & Information Clarity (Pause vs Cancel)",
     "user_problem_hypothesis": "First-time investors facing temporary liquidity crunches (medical, festivals, exams) cannot easily locate or configure a multi-month pause, defaulting to hard mandate cancellation.",
     "evidence_count": 0,
-    "denominator": 77,
+    "denominator": 80,
     "prevalence_percentage": 0.0,
     "sources_represented": [],
     "citations": [],
@@ -57,18 +57,18 @@
   },
   {
     "log_id": "LOG-OPP-03",
-    "timestamp": "2026-10-22T23:07:42.450878",
+    "timestamp": "2026-10-23T00:49:54.440556",
     "opportunity_id": "OPP-03",
     "title": "First-Year Volatility Shock Absorber (Negative XIRR Reassurance)",
     "theme_name": "Market Volatility Panic & Negative Returns",
     "user_problem_hypothesis": "Beginners who encounter negative returns or portfolio drawdowns in months 3-6 panic due to lack of compounding perspective and comparison to guaranteed bank FDs.",
     "evidence_count": 13,
-    "denominator": 77,
-    "prevalence_percentage": 16.9,
+    "denominator": 80,
+    "prevalence_percentage": 16.2,
     "sources_represented": [
+      "reddit/r/IndianStockMarket",
       "reddit/r/personalfinanceindia",
-      "tradingqna",
-      "reddit/r/IndianStockMarket"
+      "tradingqna"
     ],
     "citations": [
       {
@@ -103,14 +103,14 @@
   },
   {
     "log_id": "LOG-OPP-04",
-    "timestamp": "2026-10-22T23:07:42.450878",
+    "timestamp": "2026-10-23T00:49:54.440556",
     "opportunity_id": "OPP-04",
     "title": "Student & Irregular Income Micro-SIP Adjuster",
     "theme_name": "Affordability & Cash-Flow Constraints",
     "user_problem_hypothesis": "College students and gig workers with fluctuating cash inflows struggle with rigid fixed monthly commitment amounts, causing abandonment when allowances fluctuate.",
     "evidence_count": 2,
-    "denominator": 77,
-    "prevalence_percentage": 2.6,
+    "denominator": 80,
+    "prevalence_percentage": 2.5,
     "sources_represented": [
       "reddit/r/IndianStockMarket"
     ],

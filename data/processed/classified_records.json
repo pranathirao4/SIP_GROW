@@ -374,8 +374,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (1 occurrences).",
       "matched_keywords": [
-        "pause your sips",
-        "anxiety"
+        "anxiety",
+        "pause your sips"
       ],
       "human_review_required": false
     },
@@ -447,8 +447,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (2 occurrences).",
       "matched_keywords": [
-        "pausing the sip",
-        "pausing my sip"
+        "pausing my sip",
+        "pausing the sip"
       ],
       "human_review_required": false
     },
@@ -482,8 +482,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (2 occurrences).",
       "matched_keywords": [
-        "skip my january sip",
-        "skip my monthly sip"
+        "skip my monthly sip",
+        "skip my january sip"
       ],
       "human_review_required": false
     },
@@ -517,8 +517,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (2 occurrences).",
       "matched_keywords": [
-        "cancel or continue the sip",
-        "pause the instalment"
+        "pause the instalment",
+        "cancel or continue the sip"
       ],
       "human_review_required": false
     },
@@ -552,8 +552,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (3 occurrences).",
       "matched_keywords": [
-        "cancel the sip",
-        "cancel my sip"
+        "cancel my sip",
+        "cancel the sip"
       ],
       "human_review_required": false
     },
@@ -587,8 +587,8 @@
       "confidence": 0.75,
       "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (2 occurrences).",
       "matched_keywords": [
-        "beginner investor",
-        "emergency fund"
+        "emergency fund",
+        "beginner investor"
       ],
       "human_review_required": false
     },
@@ -624,10 +624,10 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (4 occurrences).",
       "matched_keywords": [
-        "cancel a sip",
+        "sip instead of cancelling",
         "stop an upcoming sip",
-        "cancelling sip sometimes canceling a sip",
-        "sip instead of cancelling"
+        "cancel a sip",
+        "cancelling sip sometimes canceling a sip"
       ],
       "human_review_required": false
     },
@@ -767,8 +767,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (1 occurrences).",
       "matched_keywords": [
-        "autopay",
-        "sip is getting failed"
+        "sip is getting failed",
+        "autopay"
       ],
       "human_review_required": false
     },
@@ -840,8 +840,8 @@
       "confidence": 0.75,
       "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (2 occurrences).",
       "matched_keywords": [
-        "student",
-        "pocket money"
+        "pocket money",
+        "student"
       ],
       "human_review_required": false
     },
@@ -950,8 +950,8 @@
       "confidence": 0.75,
       "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (2 occurrences).",
       "matched_keywords": [
-        "emergency fund",
-        "laid off"
+        "laid off",
+        "emergency fund"
       ],
       "human_review_required": false
     },
@@ -1056,8 +1056,8 @@
       "confidence": 0.75,
       "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (2 occurrences).",
       "matched_keywords": [
-        "job loss",
-        "anxiety"
+        "anxiety",
+        "job loss"
       ],
       "human_review_required": false
     },
@@ -1148,6 +1148,42 @@
   },
   {
     "record_id": "REC-00132",
+    "original_id": null,
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1vw35nb/22f_with_salary_20k_how_to_invest/p7xp8nr/",
+    "title": "",
+    "raw_text": "Hi, just saw this. So since youre living with parents id actually use this phase to build a proper emergency fund first, even if your expenses are low rn,after that you can keep the investing part simple, maybe a broad index fund or diversified mutual fund SIP and only look at stocks once you understand what youre buying,for the Parag Parikh funds your dad already bought, id first understand whose folio theyre in and then track them properly, can use groww to keep track on these I do the same.,and imo start managing it yourself gradually, ask your dad or brother for guidance but make sure you understand every investment before putting your money in",
+    "combined_text": "Hi, just saw this. So since youre living with parents id actually use this phase to build a proper emergency fund first, even if your expenses are low rn,after that you can keep the investing part simple, maybe a broad index fund or diversified mutual fund SIP and only look at stocks once you understand what youre buying,for the Parag Parikh funds your dad already bought, id first understand whose folio theyre in and then track them properly, can use groww to keep track on these I do the same.,and imo start managing it yourself gradually, ask your dad or brother for guidance but make sure you understand every investment before putting your money in",
+    "author": "anonymous",
+    "published_at": null,
+    "upvotes_or_likes": 0,
+    "comments_or_replies": 0,
+    "dedup_hash": "ac75370c00de2a420ed673c16bc23a76",
+    "relevance": {
+      "tier": "Tier 2: Indirectly Relevant",
+      "score": 0.6,
+      "confidence": 0.75,
+      "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+      "matched_keywords": [
+        "emergency fund"
+      ],
+      "human_review_required": true
+    },
+    "classification": {
+      "investor_stage": "Unknown",
+      "reported_behaviour": "Unknown",
+      "trigger_context": "Emergency Expense Shock",
+      "all_triggers": [
+        "Emergency Expense Shock"
+      ],
+      "problem_nature": "In-App / Technical Mandate Friction",
+      "evidence_type": "Direct Quote",
+      "verbatim_quote": ".",
+      "classification_confidence": 0.7
+    }
+  },
+  {
+    "record_id": "REC-00138",
     "original_id": "TQNA-00001",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/amc-sip-cancellation/52208",
@@ -1165,9 +1201,9 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (4 occurrences).",
       "matched_keywords": [
+        "amc sip",
         "sip cancellation",
-        "stop a amc sip",
-        "amc sip"
+        "stop a amc sip"
       ],
       "human_review_required": false
     },
@@ -1183,7 +1219,7 @@
     }
   },
   {
-    "record_id": "REC-00133",
+    "record_id": "REC-00139",
     "original_id": "TQNA-00002",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/sip-cancel-on-mf/190338",
@@ -1217,7 +1253,7 @@
     }
   },
   {
-    "record_id": "REC-00135",
+    "record_id": "REC-00141",
     "original_id": "TQNA-00004",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/should-i-cancel-a-sip-to-invest-in-other-mutual-fund/113342",
@@ -1251,7 +1287,7 @@
     }
   },
   {
-    "record_id": "REC-00136",
+    "record_id": "REC-00142",
     "original_id": "TQNA-00005",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/increasing-sip-amount-for-mirae-asset-emerging-new-fund/97366",
@@ -1269,8 +1305,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (3 occurrences).",
       "matched_keywords": [
-        "cancel the sip",
-        "amc sip"
+        "amc sip",
+        "cancel the sip"
       ],
       "human_review_required": false
     },
@@ -1286,7 +1322,7 @@
     }
   },
   {
-    "record_id": "REC-00137",
+    "record_id": "REC-00143",
     "original_id": "TQNA-00006",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/how-does-an-amc-calculate-exit-load-and-do-all-mutual-funds-have-exit-loads/12588",
@@ -1304,8 +1340,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (2 occurrences).",
       "matched_keywords": [
-        "cancel the sip",
-        "cancel my sip"
+        "cancel my sip",
+        "cancel the sip"
       ],
       "human_review_required": false
     },
@@ -1321,7 +1357,7 @@
     }
   },
   {
-    "record_id": "REC-00138",
+    "record_id": "REC-00144",
     "original_id": "TQNA-00007",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/elss-redemption-clarification/133758",
@@ -1355,7 +1391,7 @@
     }
   },
   {
-    "record_id": "REC-00139",
+    "record_id": "REC-00145",
     "original_id": "TQNA-00008",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/whats-the-easiest-way-to-stop-sip-in-regular-fund/47128",
@@ -1389,7 +1425,7 @@
     }
   },
   {
-    "record_id": "REC-00140",
+    "record_id": "REC-00146",
     "original_id": "TQNA-00009",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/exit-load-in-sip/28787",
@@ -1407,8 +1443,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (2 occurrences).",
       "matched_keywords": [
-        "cancel the sip",
-        "cancel my sip"
+        "cancel my sip",
+        "cancel the sip"
       ],
       "human_review_required": false
     },
@@ -1424,7 +1460,7 @@
     }
   },
   {
-    "record_id": "REC-00141",
+    "record_id": "REC-00147",
     "original_id": "TQNA-00010",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/what-is-the-main-use-of-pause-and-play-option-in-mutual-fund-or-sip-on-zerodha-mf-platform/10660",
@@ -1442,8 +1478,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (2 occurrences).",
       "matched_keywords": [
-        "sip is to cancel",
-        "stop an sip"
+        "stop an sip",
+        "sip is to cancel"
       ],
       "human_review_required": false
     },
@@ -1461,7 +1497,7 @@
     }
   },
   {
-    "record_id": "REC-00142",
+    "record_id": "REC-00148",
     "original_id": "TQNA-00011",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/what-will-happen-if-i-dont-have-money-in-my-equity-wallet-and-my-sips-are-active/35749",
@@ -1479,8 +1515,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (2 occurrences).",
       "matched_keywords": [
-        "pause sip",
-        "sip will not be cancelled"
+        "sip will not be cancelled",
+        "pause sip"
       ],
       "human_review_required": false
     },
@@ -1496,7 +1532,7 @@
     }
   },
   {
-    "record_id": "REC-00143",
+    "record_id": "REC-00149",
     "original_id": "TQNA-00012",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/coin-sip-vs-amc-sip/127618",
@@ -1530,7 +1566,7 @@
     }
   },
   {
-    "record_id": "REC-00144",
+    "record_id": "REC-00150",
     "original_id": "TQNA-00013",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/amc-sip-minimum-time/139340",
@@ -1548,8 +1584,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (3 occurrences).",
       "matched_keywords": [
-        "pause the sip",
-        "amc sip"
+        "amc sip",
+        "pause the sip"
       ],
       "human_review_required": false
     },
@@ -1565,7 +1601,7 @@
     }
   },
   {
-    "record_id": "REC-00145",
+    "record_id": "REC-00151",
     "original_id": "TQNA-00014",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/amc-sip-amount-modify/111660",
@@ -1599,7 +1635,7 @@
     }
   },
   {
-    "record_id": "REC-00150",
+    "record_id": "REC-00156",
     "original_id": "TQNA-00019",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/initial-investment-for-sip/21144",
@@ -1633,7 +1669,7 @@
     }
   },
   {
-    "record_id": "REC-00152",
+    "record_id": "REC-00158",
     "original_id": "TQNA-00021",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/refund-for-cancelled-order-in-coin-app/187237",
@@ -1668,7 +1704,7 @@
     }
   },
   {
-    "record_id": "REC-00154",
+    "record_id": "REC-00160",
     "original_id": "TQNA-00023",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/motilal-oswal-temporary-suspension-of-lumpsum-investments/125471",
@@ -1702,7 +1738,7 @@
     }
   },
   {
-    "record_id": "REC-00156",
+    "record_id": "REC-00162",
     "original_id": "TQNA-00025",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/increase-sip-amount/23122",
@@ -1736,7 +1772,7 @@
     }
   },
   {
-    "record_id": "REC-00162",
+    "record_id": "REC-00168",
     "original_id": "TQNA-00031",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/reliance-small-cap-not-to-accept-lump-sum-investments/36083",
@@ -1770,7 +1806,7 @@
     }
   },
   {
-    "record_id": "REC-00163",
+    "record_id": "REC-00169",
     "original_id": "TQNA-00032",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/penalty-over-missed-sip/120657",
@@ -1788,8 +1824,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (3 occurrences).",
       "matched_keywords": [
-        "missed sip",
-        "sip is not paused"
+        "sip is not paused",
+        "missed sip"
       ],
       "human_review_required": false
     },
@@ -1807,7 +1843,7 @@
     }
   },
   {
-    "record_id": "REC-00166",
+    "record_id": "REC-00172",
     "original_id": "TQNA-00035",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/introducing-upi-autopay-for-sip-payments/173064",
@@ -1825,8 +1861,8 @@
       "confidence": 0.85,
       "rationale": "Mentions auto-pay, e-mandates, bank bounce charges, or app friction (2 occurrences).",
       "matched_keywords": [
-        "auto pay",
-        "autopay"
+        "autopay",
+        "auto pay"
       ],
       "human_review_required": false
     },
@@ -1842,7 +1878,7 @@
     }
   },
   {
-    "record_id": "REC-00167",
+    "record_id": "REC-00173",
     "original_id": "TQNA-00036",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/i-accidently-invested-in-regular-than-direct-find/21576",
@@ -1876,7 +1912,7 @@
     }
   },
   {
-    "record_id": "REC-00172",
+    "record_id": "REC-00178",
     "original_id": "TQNA-00041",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/amc-sip-vs-coin-sip-need-some-clarification-on-specific-cases/188123",
@@ -1910,7 +1946,7 @@
     }
   },
   {
-    "record_id": "REC-00183",
+    "record_id": "REC-00189",
     "original_id": "TQNA-00052",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/best-alternative-to-zerodha-coin/136294",
@@ -1944,7 +1980,7 @@
     }
   },
   {
-    "record_id": "REC-00188",
+    "record_id": "REC-00194",
     "original_id": "TQNA-00057",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/trying-to-understand-how-sips-work-in-coin/157984",
@@ -1978,7 +2014,7 @@
     }
   },
   {
-    "record_id": "REC-00204",
+    "record_id": "REC-00210",
     "original_id": "TQNA-00073",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/hit-pause-instead-of-stop-on-your-sip-today-for-a-secure-tomorrow/93649",
@@ -1997,8 +2033,8 @@
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (3 occurrences).",
       "matched_keywords": [
         "pause your sip",
-        "stop on your sip",
-        "pausing your sip"
+        "pausing your sip",
+        "stop on your sip"
       ],
       "human_review_required": false
     },
@@ -2014,7 +2050,7 @@
     }
   },
   {
-    "record_id": "REC-00205",
+    "record_id": "REC-00211",
     "original_id": "TQNA-00074",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/how-will-the-sip-amount-for-future-purchases-of-registered-mutual-funds-be-deducted-through-coin-direct/12086",
@@ -2048,7 +2084,7 @@
     }
   },
   {
-    "record_id": "REC-00206",
+    "record_id": "REC-00212",
     "original_id": "TQNA-00075",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/is-it-possible-to-rebalance-stock-mf-portfolio-without-realising-profit-from-tax-perspective/115908",
@@ -2082,7 +2118,7 @@
     }
   },
   {
-    "record_id": "REC-00209",
+    "record_id": "REC-00215",
     "original_id": "TQNA-00078",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/auto-pause-resume-of-sip/147023",
@@ -2116,7 +2152,7 @@
     }
   },
   {
-    "record_id": "REC-00210",
+    "record_id": "REC-00216",
     "original_id": "TQNA-00079",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/coin-50rs-monthly-charges-deduction/31336",
@@ -2150,7 +2186,7 @@
     }
   },
   {
-    "record_id": "REC-00211",
+    "record_id": "REC-00217",
     "original_id": "TQNA-00080",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/bse-to-launch-e-mandate-facility-on-mutual-fund-platform/34955",
@@ -2184,7 +2220,7 @@
     }
   },
   {
-    "record_id": "REC-00215",
+    "record_id": "REC-00221",
     "original_id": "TQNA-00084",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/how-to-convert-coin-sip-to-coin-amc-sip/43784",
@@ -2202,8 +2238,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (3 occurrences).",
       "matched_keywords": [
-        "sip that cannot be paused",
-        "amc sip"
+        "amc sip",
+        "sip that cannot be paused"
       ],
       "human_review_required": false
     },
@@ -2219,7 +2255,7 @@
     }
   },
   {
-    "record_id": "REC-00217",
+    "record_id": "REC-00223",
     "original_id": "TQNA-00086",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/how-do-i-pause-and-resume-a-sip-on-coin/41314",
@@ -2254,7 +2290,7 @@
     }
   },
   {
-    "record_id": "REC-00218",
+    "record_id": "REC-00224",
     "original_id": "TQNA-00087",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/pathetic-customer-service-motilal-oswal-s-p-500/129260",
@@ -2288,7 +2324,7 @@
     }
   },
   {
-    "record_id": "REC-00220",
+    "record_id": "REC-00226",
     "original_id": "TQNA-00089",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/feature-request-pause-resume-and-amount-changes-for-amc-sips-on-coin/198714",
@@ -2322,7 +2358,7 @@
     }
   },
   {
-    "record_id": "REC-00225",
+    "record_id": "REC-00231",
     "original_id": "TQNA-00094",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/want-to-re-activate-discontinued-sip/38402",
@@ -2356,7 +2392,7 @@
     }
   },
   {
-    "record_id": "REC-00227",
+    "record_id": "REC-00233",
     "original_id": "TQNA-00096",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/can-we-pause-investing-in-coin-sip/47095",
@@ -2374,8 +2410,8 @@
       "confidence": 0.9,
       "rationale": "Explicitly mentions stopping, cancelling, or pausing SIP (3 occurrences).",
       "matched_keywords": [
-        "pause investing in coin sip",
         "discontinue sip investments",
+        "pause investing in coin sip",
         "sip i wish to discontinue"
       ],
       "human_review_required": false
@@ -2392,7 +2428,7 @@
     }
   },
   {
-    "record_id": "REC-00229",
+    "record_id": "REC-00235",
     "original_id": "TQNA-00098",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/mutual-funds-sip/103470",
@@ -2426,7 +2462,7 @@
     }
   },
   {
-    "record_id": "REC-00242",
+    "record_id": "REC-00248",
     "original_id": "TQNA-00111",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/quant-multi-asset-fund-stellar-performance/190623",
@@ -2463,7 +2499,7 @@
     }
   },
   {
-    "record_id": "REC-00243",
+    "record_id": "REC-00249",
     "original_id": "TQNA-00112",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/instruments-in-sip/56182",
@@ -2499,7 +2535,7 @@
     }
   },
   {
-    "record_id": "REC-00244",
+    "record_id": "REC-00250",
     "original_id": "TQNA-00113",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/small-cap-funds/54748",
@@ -2535,7 +2571,7 @@
     }
   },
   {
-    "record_id": "REC-00258",
+    "record_id": "REC-00264",
     "original_id": "TQNA-00127",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/where-to-invest-my-5l-to-pay-emis-of-the-loan/57440",
@@ -2571,7 +2607,7 @@
     }
   },
   {
-    "record_id": "REC-00261",
+    "record_id": "REC-00267",
     "original_id": "TQNA-00130",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/is-smallcase-rebalance-burning-a-hole-in-your-pocket/39490",
@@ -2607,8 +2643,76 @@
     }
   },
   {
-    "record_id": "REC-00282",
-    "original_id": "PLAYSTORE-00001",
+    "record_id": "REC-00297",
+    "original_id": null,
+    "source": "tradingqna/groww",
+    "url": "https://tradingqna.com/t/bse-to-launch-e-mandate-facility-on-mutual-fund-platform/34955",
+    "title": "BSE to launch e-mandate facility on mutual fund platform",
+    "raw_text": "BSE to launch e-mandate facility on mutual fund platform - Discussion regarding groww sip on Groww platform.",
+    "combined_text": "BSE to launch e-mandate facility on mutual fund platform\n\nBSE to launch e-mandate facility on mutual fund platform - Discussion regarding groww sip on Groww platform.",
+    "author": "anonymous",
+    "published_at": "2018-03-09T04:57:38.117Z",
+    "upvotes_or_likes": 0,
+    "comments_or_replies": 9,
+    "dedup_hash": "207be72364679c28093ec936aae46675",
+    "relevance": {
+      "tier": "Tier 3: In-App & Mandate Friction",
+      "score": 0.8,
+      "confidence": 0.85,
+      "rationale": "Mentions auto-pay, e-mandates, bank bounce charges, or app friction (2 occurrences).",
+      "matched_keywords": [
+        "e-mandate"
+      ],
+      "human_review_required": false
+    },
+    "classification": {
+      "investor_stage": "Unknown",
+      "reported_behaviour": "Unknown",
+      "trigger_context": "Unspecified Financial Friction",
+      "all_triggers": [],
+      "problem_nature": "In-App / Technical Mandate Friction",
+      "evidence_type": "Direct Quote",
+      "verbatim_quote": "BSE to launch e-mandate facility on mutual fund platform - Discussion regarding groww sip on Groww platform.",
+      "classification_confidence": 0.7
+    }
+  },
+  {
+    "record_id": "REC-00307",
+    "original_id": null,
+    "source": "tradingqna/groww",
+    "url": "https://tradingqna.com/t/coin-cut-off-time-vs-groww-app-cut-off-time/65375",
+    "title": "COIN Cut-off time vs Groww App Cut off time",
+    "raw_text": "COIN Cut-off time vs Groww App Cut off time - Discussion regarding groww sip on Groww platform.",
+    "combined_text": "COIN Cut-off time vs Groww App Cut off time\n\nCOIN Cut-off time vs Groww App Cut off time - Discussion regarding groww sip on Groww platform.",
+    "author": "anonymous",
+    "published_at": "2019-11-06T03:55:55.038Z",
+    "upvotes_or_likes": 0,
+    "comments_or_replies": 36,
+    "dedup_hash": "3a6dac654158377abd62d5a29c411095",
+    "relevance": {
+      "tier": "Tier 3: In-App & Mandate Friction",
+      "score": 0.8,
+      "confidence": 0.85,
+      "rationale": "Mentions auto-pay, e-mandates, bank bounce charges, or app friction (2 occurrences).",
+      "matched_keywords": [
+        "groww app"
+      ],
+      "human_review_required": false
+    },
+    "classification": {
+      "investor_stage": "Unknown",
+      "reported_behaviour": "Unknown",
+      "trigger_context": "Unspecified Financial Friction",
+      "all_triggers": [],
+      "problem_nature": "In-App / Technical Mandate Friction",
+      "evidence_type": "Direct Quote",
+      "verbatim_quote": "COIN Cut-off time vs Groww App Cut off time - Discussion regarding groww sip on Groww platform.",
+      "classification_confidence": 0.7
+    }
+  },
+  {
+    "record_id": "REC-00368",
+    "original_id": "PLAYSTORE-00002",
     "source": "google_play_store",
     "url": "https://play.google.com/store/apps/details?id=com.nextbillion.groww",
     "title": "Play Store 1★ Review",
@@ -2641,7 +2745,7 @@
     }
   },
   {
-    "record_id": "REC-00312",
+    "record_id": "REC-00397",
     "original_id": "APPSTORE-00031",
     "source": "apple_app_store",
     "url": "https://apps.apple.com/in/app/groww-stocks-mutual-funds/id=1404871703",
@@ -2675,7 +2779,7 @@
     }
   },
   {
-    "record_id": "REC-00315",
+    "record_id": "REC-00400",
     "original_id": "APPSTORE-00034",
     "source": "apple_app_store",
     "url": "https://apps.apple.com/in/app/groww-stocks-mutual-funds/id=1404871703",

@@ -24,7 +24,7 @@ RELEVANT_KEYWORDS = [
 ]
 
 
-def collect_playstore_reviews(app_id=GROWW_PLAYSTORE_APP_ID, count=150):
+def collect_playstore_reviews(app_id=GROWW_PLAYSTORE_APP_ID, count=400):
     """Fetch recent reviews from Google Play Store."""
     print(f"Fetching Google Play Store reviews for '{app_id}'...")
     try:
