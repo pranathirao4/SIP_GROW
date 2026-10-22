@@ -1,6 +1,7 @@
 """
 Groww SIP Retention Discovery Engine
-AI-powered qualitative discovery agent powered by Groq 120B Big Model and empirical retail investor signals.
+A focused, professional qualitative AI discovery agent to uncover root causes
+and increase the percentage of first-time mutual fund investors with an active SIP at 12 months.
 """
 
 import os
@@ -22,51 +23,97 @@ if not GROQ_API_KEY and hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
 
 # Page configuration
 st.set_page_config(
-    page_title="Groww SIP Discovery Engine",
+    page_title="Groww SIP Retention Discovery",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Dark Theme CSS tailored to Groww brand aesthetics and Discovery Agent layout
+# Professional Groww Dark Theme Styling
 st.markdown("""
 <style>
-    /* Global Background & Typography */
+    /* Global Canvas */
     .stApp {
-        background-color: #0B0F17;
+        background-color: #0A0E17;
         color: #F1F5F9;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
     }
     
     /* Left Sidebar */
     section[data-testid="stSidebar"] {
-        background-color: #111827;
-        border-right: 1px solid #1F2937;
+        background-color: #0F1523;
+        border-right: 1px solid #1E293B;
         padding-top: 1rem;
     }
     
     /* Hero Section */
     .hero-container {
         text-align: center;
-        margin-top: 2.5rem;
-        margin-bottom: 2rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.8rem;
     }
     .hero-title {
-        font-size: 2.2rem;
+        font-size: 2.1rem;
         font-weight: 700;
-        color: #F8FAFC;
-        letter-spacing: -0.02em;
-        margin-bottom: 0.5rem;
+        color: #FFFFFF;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.4rem;
+        line-height: 1.25;
     }
     .hero-subtitle {
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: #94A3B8;
-        max-width: 650px;
-        margin: 0 auto 1.5rem auto;
+        max-width: 640px;
+        margin: 0 auto;
         line-height: 1.5;
     }
     
-    /* Pipeline Step Cards (Image 1 Style) */
+    /* Discovery Goal Banner */
+    .goal-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(0, 208, 156, 0.08);
+        border: 1px solid rgba(0, 208, 156, 0.25);
+        color: #00D09C;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        letter-spacing: 0.02em;
+    }
+    
+    /* Prompt Chips Layout */
+    .chip-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-width: 650px;
+        margin: 1.2rem auto 2rem auto;
+    }
+    
+    /* Custom Prompt Buttons */
+    div[data-testid="stButton"] button {
+        background-color: #131A29 !important;
+        border: 1px solid #243046 !important;
+        color: #E2E8F0 !important;
+        border-radius: 10px !important;
+        padding: 10px 16px !important;
+        font-size: 13.5px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+        transition: all 0.15s ease-in-out !important;
+    }
+    div[data-testid="stButton"] button:hover {
+        border-color: #00D09C !important;
+        background-color: #172134 !important;
+        color: #FFFFFF !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 208, 156, 0.08) !important;
+    }
+    
+    /* Pipeline Step Cards (How It Works) */
     .pipeline-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -74,39 +121,37 @@ st.markdown("""
         margin: 1.5rem 0;
     }
     .pipeline-card {
-        background: #162032;
-        border: 1px solid #243247;
+        background: #131A29;
+        border: 1px solid #1E293B;
         border-radius: 10px;
         padding: 14px;
-        transition: transform 0.15s ease;
+        transition: border-color 0.15s ease;
     }
     .pipeline-card:hover {
-        transform: translateY(-2px);
         border-color: #00D09C;
     }
     .step-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         color: #FFFFFF;
-        margin-right: 8px;
+        margin-right: 6px;
     }
     .step-1 { background-color: #2563EB; }
     .step-2 { background-color: #DC2626; }
     .step-3 { background-color: #D97706; }
     .step-4 { background-color: #059669; }
-    .step-5 { background-color: #3B82F6; }
+    .step-5 { background-color: #00D09C; }
     
     .step-title {
-        font-size: 14px;
+        font-size: 13.5px;
         font-weight: 700;
-        color: #F1F5F9;
-        display: inline-block;
+        color: #F8FAFC;
     }
     .step-desc {
         font-size: 12px;
@@ -115,38 +160,40 @@ st.markdown("""
         line-height: 1.4;
     }
     
-    /* Reference Cards */
+    /* Right References Drawer */
     .ref-header {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 700;
-        color: #00D09C;
+        color: #F8FAFC;
         display: flex;
         align-items: center;
-        gap: 6px;
+        justify-content: space-between;
+        padding-bottom: 8px;
         margin-bottom: 12px;
+        border-bottom: 1px solid #1E293B;
     }
     .ref-card {
-        background: #131B2E;
+        background: #111726;
         border: 1px solid #1E293B;
         border-radius: 8px;
         padding: 12px 14px;
         margin-bottom: 10px;
-        font-size: 13px;
+        transition: border-color 0.15s ease;
     }
     .ref-card:hover {
         border-color: #38BDF8;
     }
     .ref-badge {
         display: inline-block;
-        padding: 2px 8px;
+        padding: 2px 7px;
         border-radius: 4px;
-        font-size: 11px;
+        font-size: 10.5px;
         font-weight: 600;
         margin-bottom: 6px;
     }
-    .badge-reddit { background: rgba(255, 69, 0, 0.15); color: #FF4500; border: 1px solid #FF4500; }
-    .badge-tradingqna { background: rgba(56, 189, 248, 0.15); color: #38BDF8; border: 1px solid #38BDF8; }
-    .badge-reviews { background: rgba(0, 208, 156, 0.15); color: #00D09C; border: 1px solid #00D09C; }
+    .badge-reddit { background: rgba(255, 69, 0, 0.12); color: #FF6433; border: 1px solid rgba(255, 69, 0, 0.3); }
+    .badge-tradingqna { background: rgba(56, 189, 248, 0.12); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-reviews { background: rgba(0, 208, 156, 0.12); color: #00D09C; border: 1px solid rgba(0, 208, 156, 0.3); }
     
     .ref-quote {
         color: #CBD5E1;
@@ -155,48 +202,22 @@ st.markdown("""
         padding-left: 8px;
         margin: 6px 0;
         font-size: 12px;
+        line-height: 1.45;
     }
     .ref-link {
         color: #38BDF8;
         text-decoration: none;
-        font-size: 11px;
+        font-size: 11.5px;
         font-weight: 500;
     }
     .ref-link:hover {
         text-decoration: underline;
     }
     
-    /* Prompt Chips */
-    .chip-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 2rem;
-    }
-    
-    /* Bottom Chat Input Bar */
+    /* Clean chat input styling */
     div[data-testid="stChatInput"] {
-        background: #162032;
-        border-radius: 24px;
-    }
-    
-    /* Nav Button Styling */
-    .nav-btn {
-        display: block;
-        width: 100%;
-        text-align: left;
-        background: transparent;
-        color: #94A3B8;
-        border: none;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 14px;
-        cursor: pointer;
-    }
-    .nav-btn:hover {
-        background: #1F2937;
-        color: #F8FAFC;
+        border-radius: 20px !important;
+        border: 1px solid #243046 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -241,16 +262,16 @@ if "input_query" not in st.session_state:
 
 
 # ------------------------------------------------------------------
-# Sidebar: Navigation & Controls (Matches Image 2)
+# Sidebar: Streamlined, Professional Navigation
 # ------------------------------------------------------------------
 with st.sidebar:
-    # App Branding
-    st.image("https://assets-netstorage.groww.in/web-assets/big_logo.png", width=120)
+    # Groww Logo & Title
+    st.image("https://assets-netstorage.groww.in/web-assets/big_logo.png", width=115)
     st.markdown("### **SIP Discovery Engine**")
-    st.caption("AI-Powered Qualitative Retention Agent")
+    st.caption("12-Month Retention Intelligence")
     st.markdown("---")
 
-    # Navigation Actions
+    # Clean Navigation Buttons
     if st.button("✏️ New chat", use_container_width=True):
         st.session_state.messages = []
         st.session_state.active_references = []
@@ -265,8 +286,6 @@ with st.sidebar:
         st.session_state.current_view = "how_it_works"
         st.rerun()
 
-    st.markdown("[⟨⟩ Repository](https://github.com/pranathirao4/SIP_GROW)", unsafe_allow_html=True)
-
     st.markdown("---")
     
     # Recents List
@@ -274,54 +293,41 @@ with st.sidebar:
     if not st.session_state.recents:
         st.caption("Chats you start show up here.")
     else:
-        for idx, recent in enumerate(st.session_state.recents[-6:][::-1]):
-            if st.button(f"💬 {recent[:28]}...", key=f"recent_{idx}", use_container_width=True):
+        for idx, recent in enumerate(st.session_state.recents[-5:][::-1]):
+            if st.button(f"💬 {recent[:26]}...", key=f"recent_{idx}", use_container_width=True):
                 st.session_state.current_view = "chat"
                 st.session_state.input_query = recent
                 st.rerun()
 
     st.markdown("---")
-    
-    # LLM Engine Selector
-    model_choice = st.selectbox(
-        "Groq LLM Engine:",
-        [
-            "openai/gpt-oss-120b (120B Big Model)",
-            "qwen/qwen3.8-27b (27B Fast)",
-            "openai/gpt-oss-20b"
-        ],
-        index=0
-    )
-    selected_model = model_choice.split(" ")[0]
-
+    # Clean Status Indicator (Zero Clutter)
     if GROQ_API_KEY:
-        st.markdown("<span style='color: #00D09C; font-size: 12px;'>🟢 Groq 120B Connected</span>", unsafe_allow_html=True)
+        st.markdown("<span style='color: #00D09C; font-size: 12px; font-weight: 500;'>● 120B Discovery Engine Active</span>", unsafe_allow_html=True)
     else:
-        st.warning("API Key not found in .env")
+        st.warning("API Key needed in .env")
 
-    st.markdown("---")
-    st.caption("Note - Chats are limited to this browser session. Refreshing the page clears them.")
+    st.caption("Chats are saved for this browser session.")
 
 
 # ------------------------------------------------------------------
-# View 1: How It Works (Exact 5-Step Card Banner from Image 1)
+# View 1: How It Works (Exact 5-Step Pipeline Card Banner)
 # ------------------------------------------------------------------
 if st.session_state.current_view == "how_it_works":
     st.title("🔀 How the Discovery Engine Works")
     st.markdown("The 5-stage pipeline transforming unstructured retail investor conversations into audited behavioral retention insights:")
 
-    # 5-step banner cards
+    # 5-Step Pipeline Cards
     st.markdown("""
     <div class="pipeline-grid">
         <div class="pipeline-card">
             <span class="step-badge step-1">1</span>
             <span class="step-title">Collect</span>
-            <div class="step-desc"><strong>334 raw posts</strong> from Reddit (r/personalfinanceindia, r/IndiaInvestments), TradingQ&A, and Groww app reviews.</div>
+            <div class="step-desc"><strong>334 raw discussions</strong> from Reddit (r/personalfinanceindia, r/IndiaInvestments), TradingQ&A, and Groww app reviews.</div>
         </div>
         <div class="pipeline-card">
             <span class="step-badge step-2">2</span>
             <span class="step-title">Filter</span>
-            <div class="step-desc"><strong>321 search posts</strong> cleaned, unicode normalized, and MD5 deduplicated across all sources.</div>
+            <div class="step-desc"><strong>321 search posts</strong> cleaned, normalized, and MD5 deduplicated across all sources.</div>
         </div>
         <div class="pipeline-card">
             <span class="step-badge step-3">3</span>
@@ -331,12 +337,12 @@ if st.session_state.current_view == "how_it_works":
         <div class="pipeline-card">
             <span class="step-badge step-4">4</span>
             <span class="step-title">RAG</span>
-            <div class="step-desc"><strong>321 semantic records</strong> indexed for BM25 retrieval to ground answers in real verbatim evidence.</div>
+            <div class="step-desc"><strong>321 indexed records</strong> queried via BM25 retrieval to ground every answer in real verbatim evidence.</div>
         </div>
         <div class="pipeline-card">
             <span class="step-badge step-5">5</span>
             <span class="step-title">Ask</span>
-            <div class="step-desc"><strong>AI answers questions</strong> with context from real user discussions and verified clickable references.</div>
+            <div class="step-desc"><strong>AI answers questions</strong> in plain human English with verified clickable references on the right.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -345,8 +351,8 @@ if st.session_state.current_view == "how_it_works":
     st.subheader("Ethical & SEBI Compliance Guardrails")
     st.markdown("""
     1. **Strictly Zero Fund Recommendations:** The engine never recommends mutual funds, asset managers, or stock picks.
-    2. **Zero FOMO / Urgency Tactics:** Analysis focuses solely on understanding friction, anxiety, and cash-flow reality.
-    3. **Ground Truth Citations:** Every finding presented by the agent is mapped directly to an immutable record ID (`REC-XXXXX`) and original forum permalink.
+    2. **Zero Manufactured FOMO:** Focuses solely on understanding cash-flow realities, emergency pauses, and product friction.
+    3. **Immutable Verifiable Evidence:** Every insight ties directly to an audited record ID (`REC-XXXXX`) and its original source link.
     """)
     
     if st.button("← Back to Discovery Agent"):
@@ -359,9 +365,9 @@ if st.session_state.current_view == "how_it_works":
 # ------------------------------------------------------------------
 elif st.session_state.current_view == "library":
     st.title("📖 Verified Signals Library")
-    st.markdown(f"Explore the entire database of **{len(cleaned_records)} cleaned records** ({len(relevant_records)} core retention signals).")
+    st.markdown(f"Browse the complete database of **{len(cleaned_records)} cleaned investor conversations** ({len(relevant_records)} core retention signals).")
 
-    search_term = st.text_input("🔍 Search investor verbatims or keywords:", placeholder="e.g. bounce charge, salary delay, student, XIRR...")
+    search_term = st.text_input("🔍 Search investor verbatims or keywords:", placeholder="e.g. salary delay, emergency, student, negative returns...")
     
     col_f1, col_f2 = st.columns(2)
     with col_f1:
@@ -383,7 +389,7 @@ elif st.session_state.current_view == "library":
     for r in filtered[:30]:
         with st.expander(f"[{r['record_id']}] {r.get('title', 'Untitled')} ({r.get('source', '')})"):
             st.markdown(f"**Verbatim Text:**\n> {r.get('raw_text', '')[:400]}...")
-            st.markdown(f"**URL:** [{r.get('url', '#')}]({r.get('url', '#')})")
+            st.markdown(f"**Original Link:** [{r.get('url', '#')}]({r.get('url', '#')})")
             if "classification" in r:
                 c = r["classification"]
                 st.caption(f"Stage: `{c.get('investor_stage')}` | Trigger: `{c.get('trigger_context')}` | Behavior: `{c.get('reported_behaviour')}`")
@@ -394,49 +400,48 @@ elif st.session_state.current_view == "library":
 
 
 # ------------------------------------------------------------------
-# View 3: Main Discovery Agent (Matches Image 2)
+# View 3: Main Discovery Agent (Clean, Professional & Goal-Oriented)
 # ------------------------------------------------------------------
 elif st.session_state.current_view == "chat":
-    # Two-column layout: Left (70%) Chat Agent, Right (30%) References Drawer
+    # Two-column layout: Left (70%) Chat Agent, Right (30%) References Panel
     col_main, col_ref = st.columns([7, 3])
 
     with col_main:
-        # If no messages yet, show Hero Section and Prompt Chips (Image 2)
+        # If no messages yet, show Clean Hero and Core 12-Month Retention Questions
         if len(st.session_state.messages) == 0:
             st.markdown("""
             <div class="hero-container">
+                <div class="goal-badge">🎯 Goal: 12-Month Active SIP Retention</div>
                 <div class="hero-title">Ask what retail investors say about SIP cancellations & retention</div>
-                <div class="hero-subtitle">Answers come only from Reddit, TradingQ&A, and Groww app reviews. References sit on the right.</div>
+                <div class="hero-subtitle">Discover the underlying root causes why first-time investors stop their SIPs before 12 months. Answers come only from verified Reddit, TradingQ&A, and Groww reviews.</div>
             </div>
             """, unsafe_allow_html=True)
 
-            # Suggested Query Chips (Pill Buttons)
-            chips = [
-                "Why do people cancel SIP within 6 months?",
-                "Do users say bank bounce charges make them stop?",
-                "What do students and irregular earners say about SIPs?",
-                "Why do investors panic when XIRR is negative?"
+            # The 5 Core Strategic Retention Questions
+            curated_questions = [
+                ("⏱️", "Why do first-time investors drop out before completing 12 months?"),
+                ("⏸️", "Why do users permanently cancel their SIP instead of using 'Pause'?"),
+                ("🎓", "What causes students and irregular earners to stop their monthly investments?"),
+                ("📉", "How does seeing negative returns in months 3–6 cause investors to panic?"),
+                ("🛡️", "What product changes would help first-time investors stay active for 12+ months?")
             ]
 
-            st.markdown("<div style='max-width: 600px; margin: 0 auto;'>", unsafe_allow_html=True)
-            for c_idx, chip in enumerate(chips):
-                if st.button(chip, key=f"chip_{c_idx}", use_container_width=True):
-                    st.session_state.input_query = chip
+            st.markdown("<div class='chip-grid'>", unsafe_allow_html=True)
+            for idx, (icon, question) in enumerate(curated_questions):
+                if st.button(f"{icon}  {question}", key=f"core_q_{idx}", use_container_width=True):
+                    st.session_state.input_query = question
                     st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
         # Render Active Chat Conversation
         for msg in st.session_state.messages:
             with st.chat_message(msg["role"]):
-                if msg.get("reasoning"):
-                    with st.expander("🧠 View 120B Reasoning Trace", expanded=False):
-                        st.caption(msg["reasoning"])
                 st.markdown(msg["content"])
 
-        # Execute query if triggered by Chip or Input
+        # Execute query if triggered by Button or Chat Input
         user_query = st.session_state.input_query
         if not user_query:
-            user_query = st.chat_input("Ask about retail investor SIP drop-off, pause habits, or bounce penalties...")
+            user_query = st.chat_input("Ask a question about 12-month retention, drop-off reasons, or pause habits...")
 
         if user_query:
             # Clear input query from state
@@ -452,18 +457,18 @@ elif st.session_state.current_view == "chat":
                 st.markdown(user_query)
 
             # Step 4: RAG Retrieval
-            with st.spinner("Retrieving verified investor discussions (BM25 RAG)..."):
+            with st.spinner("Searching verified retail investor discussions..."):
                 retrieved_docs = retriever.retrieve(user_query, top_k=6)
                 st.session_state.active_references = retrieved_docs
 
-            # Step 5: Ask LLM (Groq 120B)
+            # Step 5: Ask LLM (Groq 120B Big Model)
             with st.chat_message("assistant"):
-                with st.spinner(f"Synthesizing answer with {selected_model}..."):
+                with st.spinner("Synthesizing answer from real investor evidence..."):
                     try:
                         from groq import Groq
                         client = Groq(api_key=GROQ_API_KEY)
 
-                        # Context from retrieved references
+                        # Build context from retrieved references
                         context_blocks = []
                         for r in retrieved_docs:
                             quote = r.get("classification", {}).get("verbatim_quote") or r.get("raw_text", "")[:200]
@@ -472,67 +477,61 @@ elif st.session_state.current_view == "chat":
                             )
                         context_str = "\n\n".join(context_blocks)
 
-                        system_prompt = f"""You are a helpful, human-friendly AI Discovery Bot (like Google AI Overviews or a smart search bot).
-Your goal is to answer queries in simple, plain, conversational English that any everyday human being can understand in 10 seconds.
+                        system_prompt = f"""You are a helpful, human-friendly AI Discovery Bot for Groww's Product and Growth teams.
+Your primary mission is to identify the root causes of SIP drop-off and help increase the percentage of first-time mutual fund investors who still have an active SIP at 12 months.
 
-Ground Truth Qualitative Evidence from Database:
+Evidence Context from Real Investor Discussions:
 {context_str}
 
 How to Format Your Answer:
-1. **Direct Answer (1-2 sentences):** Give the direct, bottom-line answer immediately in plain words. No throat-clearing.
-2. **Top Reasons (2 to 4 bullet points):**
-   - Use bold, everyday titles (e.g. **Unexpected Bank Penalties**, **Salary Delay & Tight Budget**, **Panic When Returns Dipped**).
-   - Explain what real everyday investors go through in 1-2 easy sentences.
-   - Mention what real people actually said, citing their record ID like [REC-00163].
-3. **Bottom Line (1 simple sentence):** What this really means for normal people.
+- **Direct Summary (1-2 sentences):** Give the direct, bottom-line answer immediately in simple, clear words that anyone can understand in 5 seconds.
+- **Top Reasons (2 to 4 bullet points):**
+  - Use bold, everyday titles (e.g. **Tight Monthly Budgets**, **Hard to Find 'Pause'**, **Panic During First Market Dip**).
+  - Explain what real everyday investors go through in 1-2 easy sentences.
+  - Naturally mention what users actually said, citing their record ID like [REC-00163].
+- **Bottom Line for 12-Month Retention (1 simple sentence):** What product or growth teams can take away to keep users active.
 
-Important Style Guidelines:
-- Speak like a friendly human explaining things to a friend.
-- NO corporate buzzwords, no complicated financial jargon, and no dense walls of text.
-- Strictly NEVER recommend specific mutual funds, equities, or push artificial FOMO (SEBI compliance).
+Important Rules:
+- Speak like a friendly human explaining things to a colleague.
+- NO corporate jargon, no academic speak, and no dense walls of text.
+- Strictly NEVER recommend specific mutual funds or stocks (SEBI compliance).
 - Always ground every point in the provided evidence context."""
 
                         completion = client.chat.completions.create(
-                            model=selected_model,
+                            model="openai/gpt-oss-120b",
                             messages=[
                                 {"role": "system", "content": system_prompt},
                                 *[{"role": m["role"], "content": m["content"]} for m in st.session_state.messages if m["role"] in ["user", "assistant"]]
                             ],
-                            max_tokens=1200
+                            max_tokens=900
                         )
 
                         choice = completion.choices[0].message
                         answer = choice.content or "No textual response generated."
-                        reasoning = getattr(choice, 'reasoning', None)
-
-                        if reasoning:
-                            with st.expander("🧠 View 120B Reasoning Trace", expanded=False):
-                                st.caption(reasoning)
 
                         st.markdown(answer)
                         st.session_state.messages.append({
                             "role": "assistant",
                             "content": answer,
-                            "reasoning": reasoning,
                             "references": retrieved_docs
                         })
                         st.rerun()
 
                     except Exception as e:
-                        st.error(f"Error connecting to Groq: {e}")
+                        st.error(f"Error querying Groq: {e}")
 
-    # Right Column: References Panel (Matches Image 2 "References >")
+    # Right Column: References Panel (Clean, Professional Drawer)
     with col_ref:
         st.markdown("""
         <div class="ref-header">
             <span>📚 References</span>
-            <span style="font-size: 12px; color: #94A3B8;">(Real Verbatims)</span>
+            <span style="font-size: 11.5px; color: #00D09C; font-weight: 500;">Real Verbatims</span>
         </div>
         """, unsafe_allow_html=True)
 
         refs = st.session_state.active_references
         if not refs:
-            st.caption("When you ask a question, the retrieved investor quotes and sources will appear here.")
+            st.caption("When you ask a question, the exact supporting quotes from Reddit, TradingQ&A, and Groww reviews will appear here.")
         else:
             for r in refs:
                 source = r.get("source", "other")
@@ -545,8 +544,8 @@ Important Style Guidelines:
                 st.markdown(f"""
                 <div class="ref-card">
                     <span class="ref-badge {badge_class}">{badge_label}</span>
-                    <strong style="color: #F8FAFC; display: block; margin-bottom: 4px;">{r['record_id']}</strong>
-                    <div style="font-size: 12px; color: #94A3B8; margin-bottom: 6px;">{r.get('title', '')[:55]}...</div>
+                    <strong style="color: #F8FAFC; display: block; margin-bottom: 3px; font-size: 12.5px;">{r['record_id']}</strong>
+                    <div style="font-size: 12px; color: #94A3B8; margin-bottom: 6px;">{r.get('title', '')[:52]}...</div>
                     <div class="ref-quote">"{quote}..."</div>
                     <a href="{url}" target="_blank" class="ref-link">View original discussion ↗</a>
                 </div>
