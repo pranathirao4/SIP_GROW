@@ -240,6 +240,30 @@ def load_discovery_data():
     return cleaned, relevant
 
 cleaned_records, relevant_records = load_discovery_data()
+records_lookup = {r["record_id"]: r for r in cleaned_records}
+
+def linkify_citations(text: str, records_map: dict) -> str:
+    """Replaces raw tags like [REC-00211] or REC‑00211 with clean clickable discussion links."""
+    import re
+    def repl(match):
+        raw = match.group(0)
+        clean_id = re.sub(r'[\u2010\u2011\u2012\u2013\u2014]', '-', raw).strip('[]')
+        if clean_id in records_map:
+            rec = records_map[clean_id]
+            url = rec.get("url") or "#"
+            src = rec.get("source", "").lower()
+            if "play_store" in src:
+                src_name = "Groww Play Store"
+            elif "app_store" in src:
+                src_name = "Groww App Store"
+            elif "tradingqna" in src:
+                src_name = "TradingQ&A"
+            else:
+                src_name = "Reddit"
+            return f"[[🔗 View {src_name} Discussion ↗]({url})]"
+        return raw
+
+    return re.sub(r'\[?REC[\-\u2010\u2011\u2012\u2013\u2014]\d{5}\]?', repl, text)
 
 # Initialize Retriever
 @st.cache_resource
@@ -437,6 +461,23 @@ elif st.session_state.current_view == "chat":
         for msg in st.session_state.messages:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
+                if msg["role"] == "assistant" and "references" in msg and msg["references"]:
+                    with st.expander(f"💬 Show Specific Investor Concerns & Quotes ({len(msg['references'])} sources)"):
+                        for ref in msg["references"]:
+                            ref_src = ref.get("source", "").lower()
+                            if "play_store" in ref_src:
+                                src_label = "Groww Play Store"
+                            elif "app_store" in ref_src:
+                                src_label = "Groww App Store"
+                            elif "groww" in ref_src:
+                                src_label = "TradingQ&A (Groww)"
+                            else:
+                                src_label = "Reddit (Groww/MF)"
+                            
+                            quote_txt = ref.get("classification", {}).get("verbatim_quote") or ref.get("raw_text", "")[:200]
+                            url = ref.get("url") or "#"
+                            st.markdown(f"**• {src_label}:** *\"{quote_txt}\"*")
+                            st.markdown(f"  ↳ [Open Original Discussion ↗]({url})")
 
         # Execute query if triggered by Button or Chat Input
         user_query = st.session_state.input_query
@@ -508,12 +549,13 @@ Important Rules:
                         )
 
                         choice = completion.choices[0].message
-                        answer = choice.content or "No textual response generated."
+                        raw_answer = choice.content or "No textual response generated."
+                        formatted_answer = linkify_citations(raw_answer, records_lookup)
 
-                        st.markdown(answer)
+                        st.markdown(formatted_answer)
                         st.session_state.messages.append({
                             "role": "assistant",
-                            "content": answer,
+                            "content": formatted_answer,
                             "references": retrieved_docs
                         })
                         st.rerun()
