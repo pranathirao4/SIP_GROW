@@ -1,480 +1,488 @@
 """
-Groww AI-Powered SIP Retention Discovery Agent
-Enterprise-grade Streamlit research workspace powered by Groq LLM.
+Groww SIP Retention Discovery Engine
+AI-powered qualitative discovery agent powered by Groq 120B Big Model and empirical retail investor signals.
 """
 
 import os
 import sys
 import json
 from pathlib import Path
-import pandas as pd
 import streamlit as st
-import plotly.express as px
-import plotly.graph_objects as go
 from dotenv import load_dotenv
+from src.pipeline.retriever import SIPRetriever
 
 # Ensure UTF-8 output
 sys.stdout.reconfigure(encoding='utf-8')
 
-# Load environment variables (supports .env and Streamlit secrets)
+# Load environment variables
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not GROQ_API_KEY and hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
-
-# Set Page Config
+# Page configuration
 st.set_page_config(
-    page_title="Groww SIP Retention Discovery Agent",
+    page_title="Groww SIP Discovery Engine",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling (Groww Dark Theme)
+# Dark Theme CSS tailored to Groww brand aesthetics and Discovery Agent layout
 st.markdown("""
 <style>
-    /* Metric Card Styling */
-    div[data-testid="stMetricValue"] {
-        font-size: 28px;
-        color: #00D09C !important;
+    /* Global Background & Typography */
+    .stApp {
+        background-color: #0B0F17;
+        color: #F1F5F9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    /* Left Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: #111827;
+        border-right: 1px solid #1F2937;
+        padding-top: 1rem;
+    }
+    
+    /* Hero Section */
+    .hero-container {
+        text-align: center;
+        margin-top: 2.5rem;
+        margin-bottom: 2rem;
+    }
+    .hero-title {
+        font-size: 2.2rem;
         font-weight: 700;
+        color: #F8FAFC;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.5rem;
     }
-    div[data-testid="stMetricLabel"] {
+    .hero-subtitle {
+        font-size: 1rem;
+        color: #94A3B8;
+        max-width: 650px;
+        margin: 0 auto 1.5rem auto;
+        line-height: 1.5;
+    }
+    
+    /* Pipeline Step Cards (Image 1 Style) */
+    .pipeline-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin: 1.5rem 0;
+    }
+    .pipeline-card {
+        background: #162032;
+        border: 1px solid #243247;
+        border-radius: 10px;
+        padding: 14px;
+        transition: transform 0.15s ease;
+    }
+    .pipeline-card:hover {
+        transform: translateY(-2px);
+        border-color: #00D09C;
+    }
+    .step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 700;
+        color: #FFFFFF;
+        margin-right: 8px;
+    }
+    .step-1 { background-color: #2563EB; }
+    .step-2 { background-color: #DC2626; }
+    .step-3 { background-color: #D97706; }
+    .step-4 { background-color: #059669; }
+    .step-5 { background-color: #3B82F6; }
+    
+    .step-title {
         font-size: 14px;
-        color: #94A3B8 !important;
-        font-weight: 500;
+        font-weight: 700;
+        color: #F1F5F9;
+        display: inline-block;
     }
-    /* Card Container */
-    .metric-card {
-        background: #131B2E;
-        border: 1px solid #1E293B;
-        border-radius: 12px;
-        padding: 16px 20px;
+    .step-desc {
+        font-size: 12px;
+        color: #94A3B8;
+        margin-top: 6px;
+        line-height: 1.4;
+    }
+    
+    /* Reference Cards */
+    .ref-header {
+        font-size: 15px;
+        font-weight: 700;
+        color: #00D09C;
+        display: flex;
+        align-items: center;
+        gap: 6px;
         margin-bottom: 12px;
     }
-    /* Badge */
-    .badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        margin-right: 6px;
+    .ref-card {
+        background: #131B2E;
+        border: 1px solid #1E293B;
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        font-size: 13px;
     }
-    .badge-tier1 { background: rgba(0, 208, 156, 0.15); color: #00D09C; border: 1px solid #00D09C; }
-    .badge-tier2 { background: rgba(56, 189, 248, 0.15); color: #38BDF8; border: 1px solid #38BDF8; }
-    .badge-tier3 { background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid #F59E0B; }
-    .badge-churn { background: rgba(244, 63, 94, 0.15); color: #F43F5E; border: 1px solid #F43F5E; }
-    /* Quote Box */
-    .quote-box {
-        background: #162032;
-        border-left: 4px solid #00D09C;
-        padding: 12px 16px;
-        border-radius: 0 8px 8px 0;
+    .ref-card:hover {
+        border-color: #38BDF8;
+    }
+    .ref-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .badge-reddit { background: rgba(255, 69, 0, 0.15); color: #FF4500; border: 1px solid #FF4500; }
+    .badge-tradingqna { background: rgba(56, 189, 248, 0.15); color: #38BDF8; border: 1px solid #38BDF8; }
+    .badge-reviews { background: rgba(0, 208, 156, 0.15); color: #00D09C; border: 1px solid #00D09C; }
+    
+    .ref-quote {
+        color: #CBD5E1;
         font-style: italic;
-        color: #E2E8F0;
-        margin: 8px 0;
+        border-left: 2px solid #00D09C;
+        padding-left: 8px;
+        margin: 6px 0;
+        font-size: 12px;
+    }
+    .ref-link {
+        color: #38BDF8;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 500;
+    }
+    .ref-link:hover {
+        text-decoration: underline;
+    }
+    
+    /* Prompt Chips */
+    .chip-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    /* Bottom Chat Input Bar */
+    div[data-testid="stChatInput"] {
+        background: #162032;
+        border-radius: 24px;
+    }
+    
+    /* Nav Button Styling */
+    .nav-btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        color: #94A3B8;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    .nav-btn:hover {
+        background: #1F2937;
+        color: #F8FAFC;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
-# Data Loaders with Caching
+# Load Data
 @st.cache_data
-def load_all_data():
+def load_discovery_data():
     base = Path("data")
     cleaned = []
     relevant = []
-    review_q = []
-    clusters = []
-    opps = []
-    evidence = []
-
+    
     if (base / "processed/cleaned_records.json").exists():
         with open(base / "processed/cleaned_records.json", "r", encoding="utf-8") as f:
             cleaned = json.load(f)
     if (base / "processed/relevant_records.json").exists():
         with open(base / "processed/relevant_records.json", "r", encoding="utf-8") as f:
             relevant = json.load(f)
-    if (base / "processed/review_queue.json").exists():
-        with open(base / "processed/review_queue.json", "r", encoding="utf-8") as f:
-            review_q = json.load(f)
-    if (base / "processed/theme_clusters.json").exists():
-        with open(base / "processed/theme_clusters.json", "r", encoding="utf-8") as f:
-            clusters = json.load(f)
-    if (base / "processed/opportunity_matrix.json").exists():
-        with open(base / "processed/opportunity_matrix.json", "r", encoding="utf-8") as f:
-            opps = json.load(f)
-    if (base / "evidence_log.json").exists():
-        with open(base / "evidence_log.json", "r", encoding="utf-8") as f:
-            evidence = json.load(f)
+            
+    return cleaned, relevant
 
-    return cleaned, relevant, review_q, clusters, opps, evidence
+cleaned_records, relevant_records = load_discovery_data()
+
+# Initialize Retriever
+@st.cache_resource
+def get_retriever():
+    return SIPRetriever(cleaned_records)
+
+retriever = get_retriever()
+
+# Initialize Session State
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+if "recents" not in st.session_state:
+    st.session_state.recents = []
+if "current_view" not in st.session_state:
+    st.session_state.current_view = "chat"
+if "active_references" not in st.session_state:
+    st.session_state.active_references = []
+if "input_query" not in st.session_state:
+    st.session_state.input_query = ""
 
 
-cleaned_data, relevant_data, review_queue, theme_clusters, opportunities, evidence_log = load_all_data()
-
-# Sidebar Navigation
-st.sidebar.image("https://assets-netstorage.groww.in/web-assets/big_logo.png", width=140)
-st.sidebar.title("SIP Retention Discovery")
-st.sidebar.markdown(f"**Live Database:** `{len(cleaned_data)}` Records  \n**Core Signals:** `{len(relevant_data)}` Verified  \n**Groq LLM:** `OpenAI GPT-OSS 120B`")
-st.sidebar.markdown("---")
-
-menu = st.sidebar.radio(
-    "Select Workspace Module",
-    [
-        "📊 1. Executive Overview",
-        "⚠️ 2. Data Quality & Review Queue",
-        "🔍 3. Conversation Explorer",
-        "🧩 4. Semantic Theme Clusters",
-        "👥 5. Cohort & Segment Analysis",
-        "🎯 6. Opportunity Prioritization Matrix",
-        "📜 7. AI Evidence Log & Audit",
-        "❓ 8. Research Questions & Interview Guides",
-        "🤖 9. Live Groq AI Assistant",
-        "📥 10. Export Center"
-    ]
-)
-
-# -------------------------------------------------------------
-# Module 1: Executive Overview
-# -------------------------------------------------------------
-if menu == "📊 1. Executive Overview":
-    st.title("📈 Executive Overview: 12-Month SIP Retention Discovery")
-    st.markdown("Evidence-based discovery analyzing why first-time mutual fund investors reduce, pause, cancel, or abandon SIPs before 12 months.")
-
-    # KPI Metrics
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Total Cleaned Records", f"{len(cleaned_data)}", "Multi-Source")
-    with col2:
-        st.metric("Core Retention Signals", f"{len(relevant_data)}", f"{round(len(relevant_data)/len(cleaned_data)*100, 1)}% of Sample")
-    with col3:
-        st.metric("Discovered Risk Themes", f"{len(theme_clusters)}", "Operational Taxonomy")
-    with col4:
-        st.metric("Top Prioritized Bet", "Bank ECS Shield", "OPS: 4.71 / 5.0")
-
+# ------------------------------------------------------------------
+# Sidebar: Navigation & Controls (Matches Image 2)
+# ------------------------------------------------------------------
+with st.sidebar:
+    # App Branding
+    st.image("https://assets-netstorage.groww.in/web-assets/big_logo.png", width=120)
+    st.markdown("### **SIP Discovery Engine**")
+    st.caption("AI-Powered Qualitative Retention Agent")
     st.markdown("---")
 
-    # Visual Funnel & Distribution
-    col_left, col_right = st.columns([1, 1])
+    # Navigation Actions
+    if st.button("✏️ New chat", use_container_width=True):
+        st.session_state.messages = []
+        st.session_state.active_references = []
+        st.session_state.current_view = "chat"
+        st.rerun()
 
-    with col_left:
-        st.subheader("Discourse Funnel")
-        funnel_stages = ["Total Raw Scraped", "Cleaned Unique", "Relevant Retention Signals", "Prioritized Opportunities"]
-        funnel_counts = [334, len(cleaned_data), len(relevant_data), len(opportunities)]
-        fig_funnel = go.Figure(go.Funnel(
-            y=funnel_stages,
-            x=funnel_counts,
-            textinfo="value+percent previous",
-            marker={"color": ["#38BDF8", "#00D09C", "#F59E0B", "#F43F5E"]}
-        ))
-        fig_funnel.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", margin=dict(l=0, r=0, t=20, b=0))
-        st.plotly_chart(fig_funnel, use_container_width=True)
+    if st.button("📖 Signals library", use_container_width=True):
+        st.session_state.current_view = "library"
+        st.rerun()
 
-    with col_right:
-        st.subheader("Source Breakdown")
-        sources = [r["source"] for r in cleaned_data]
-        source_df = pd.Series(sources).value_counts().reset_index()
-        source_df.columns = ["Source", "Count"]
-        fig_pie = px.pie(
-            source_df,
-            values="Count",
-            names="Source",
-            hole=0.45,
-            color_discrete_sequence=["#00D09C", "#38BDF8", "#818CF8", "#F59E0B", "#F43F5E", "#EC4899"]
-        )
-        fig_pie.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", margin=dict(l=0, r=0, t=20, b=0))
-        st.plotly_chart(fig_pie, use_container_width=True)
+    if st.button("🔀 How it works", use_container_width=True):
+        st.session_state.current_view = "how_it_works"
+        st.rerun()
 
-    # Core Discovered Findings
-    st.subheader("Key Strategic Discoveries")
-    st.markdown("""
-    1. **Bank ECS Bounce Penalty Trap (Severe Severity):**  
-       Users cancel mandates proactively to escape recurring **₹450–₹590 bank bounce fees** caused when debit dates precede salary arrival.
-    2. **Inflexible Emergency Liquidity Traps:**  
-       Users facing short-term cash crunches (medical bills, rent, exams) default to **hard cancellation** because a simple 1-3 month pause is not intuitive.
-    3. **First-Year Negative XIRR Panic:**  
-       Month 3–6 market drawdowns destroy confidence; beginners compare volatile equity to guaranteed 7% FDs and prematurely exit.
-    """)
+    st.markdown("[⟨⟩ Repository](https://github.com/pranathirao4/SIP_GROW)", unsafe_allow_html=True)
 
-# -------------------------------------------------------------
-# Module 2: Data Quality & Review Queue
-# -------------------------------------------------------------
-elif menu == "⚠️ 2. Data Quality & Review Queue":
-    st.title("⚠️ Data Quality & Human Review Queue")
-    st.markdown("Inspect borderline records (confidence 0.40–0.60) routed to human triage before downstream classification.")
-
-    st.info(f"There are currently **{len(review_queue)} records** awaiting human review.")
-
-    for item in review_queue:
-        with st.expander(f"[{item['record_id']}] {item['title']} (Score: {item['score']} | {item['source']})"):
-            st.markdown(f"**Source:** `{item['source']}` | **URL:** [{item['url']}]({item['url']})")
-            st.markdown(f"**Snippet:** *\"{item['snippet']}\"*")
-            st.markdown(f"**AI Rationale:** {item['rationale']}")
-            st.markdown(f"**Matched Keywords:** `{', '.join(item['matched_keywords'])}`")
-            c1, c2 = st.columns([1, 4])
-            with c1:
-                if st.button("✅ Accept into Dataset", key=f"acc_{item['record_id']}"):
-                    st.success(f"{item['record_id']} approved!")
-            with c2:
-                if st.button("❌ Exclude as Noise", key=f"rej_{item['record_id']}"):
-                    st.warning(f"{item['record_id']} excluded.")
-
-# -------------------------------------------------------------
-# Module 3: Conversation Explorer
-# -------------------------------------------------------------
-elif menu == "🔍 3. Conversation Explorer":
-    st.title("🔍 Conversation Explorer")
-    st.markdown("Search, filter, and inspect all 321 qualitative investor records across Reddit, TradingQ&A, and App Reviews.")
-
-    # Search and Filters
-    col_s1, col_s2, col_s3 = st.columns([2, 1, 1])
-    with col_s1:
-        search_query = st.text_input("Live Keyword Search", placeholder="e.g. bounce, pause, penalty, negative return, student")
-    with col_s2:
-        source_options = ["All Sources"] + sorted(list(set(r["source"] for r in cleaned_data)))
-        sel_source = st.selectbox("Filter Source", source_options)
-    with col_s3:
-        tier_options = ["All Records", "Tiers 1-3 (Core Retention)", "Tier 1 (Directly Relevant)"]
-        sel_tier = st.selectbox("Relevance Filter", tier_options)
-
-    # Filter records
-    filtered = cleaned_data
-    if sel_source != "All Sources":
-        filtered = [r for r in filtered if r["source"] == sel_source]
-    if search_query:
-        sq = search_query.lower()
-        filtered = [r for r in filtered if sq in r["title"].lower() or sq in r["raw_text"].lower()]
-
-    st.markdown(f"Showing **{len(filtered)} records** matching your criteria.")
-
-    for record in filtered[:30]:
-        with st.expander(f"[{record['record_id']}] {record['title'] or record['raw_text'][:60]} ({record['source']})"):
-            st.markdown(f"**URL:** [{record['url']}]({record['url']}) | **Author:** `{record.get('author')}` | **Likes/Upvotes:** `{record.get('upvotes_or_likes')}`")
-            st.markdown(f"<div class='quote-box'>{record['raw_text'] or record['title']}</div>", unsafe_allow_html=True)
-
-# -------------------------------------------------------------
-# Module 4: Semantic Theme Clusters
-# -------------------------------------------------------------
-elif menu == "🧩 4. Semantic Theme Clusters":
-    st.title("🧩 Semantic Theme Clusters (Operational Taxonomy)")
-    st.markdown("The 13 baseline operational hypotheses ranked by qualitative prevalence among relevant discussions.")
-
-    for thm in theme_clusters:
-        with st.container():
-            st.markdown(f"""
-            <div class='metric-card'>
-                <h3 style='margin:0; color:#38BDF8;'>[{thm['theme_id']}] {thm['theme_name']}</h3>
-                <p style='color:#94A3B8; font-size:14px; margin-top:4px;'>{thm['definition']}</p>
-                <span class='badge badge-tier1'>Prevalence: {thm['record_count']}/{thm['denominator']} ({thm['prevalence_percentage']}%)</span>
-                <span class='badge badge-tier2'>Sources: {thm['unique_sources_count']} Channels</span>
-                <p style='margin-top:10px;'><strong>Impact on 12-Month Retention:</strong> {thm['retention_connection']}</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-            if thm.get("representative_verbatims"):
-                st.markdown("**Representative Quotations:**")
-                for q in thm["representative_verbatims"][:2]:
-                    st.markdown(f"<div class='quote-box'>\"{q['quote']}\"<br><small>— [{q['record_id']}] via <a href='{q['url']}'>{q['source']}</a></small></div>", unsafe_allow_html=True)
-
-# -------------------------------------------------------------
-# Module 5: Cohort & Segment Analysis
-# -------------------------------------------------------------
-elif menu == "👥 5. Cohort & Segment Analysis":
-    st.title("👥 Cohort & Segment Analysis")
-    st.markdown("Comparative behavioral analysis across investor experience and cash-flow segments.")
-
-    tab1, tab2, tab3 = st.tabs(["First-Time vs Experienced", "Retained vs Stopped", "Income Stability"])
-
-    with tab1:
-        st.subheader("First-Time Investors vs Experienced Portfolios")
-        st.markdown("""
-        | Behavioral Dimension | First-Time SIP Starters | Experienced Investors (>2 Years) |
-        | :--- | :--- | :--- |
-        | **Initial Expectation** | High optimism; expects 15-20% compounding within 6 months. | Realistic multi-year horizon (5-7 years). |
-        | **Reaction to Market Dips** | Panic selling, negative returns viewed as 'scam/loss'. | Views drawdowns as rupee-cost averaging opportunity. |
-        | **Monitoring Frequency** | High anxiety; checks portfolio daily or weekly. | Infrequent checkers (monthly or quarterly). |
-        | **Cash-Flow Fragility** | Vulnerable to single salary delays or emergency expenses. | Has separate 6-month liquid emergency fund. |
-        """)
-
-    with tab2:
-        st.subheader("Investors Who Retain vs Those Who Discontinue")
-        st.markdown("""
-        | Retention Dimension | 12-Month Retained Investors | Stopped / Cancelled Investors (<12 Months) |
-        | :--- | :--- | :--- |
-        | **Debit Timing** | Scheduled 3–5 days *after* guaranteed salary credit date. | Scheduled on the 1st of month, leading to ECS bounces. |
-        | **Fund Count** | Simple, focused (1–2 broad index/flexi-cap funds). | Overloaded with 6–8 small-cap and sectoral funds. |
-        | **Pause Usage** | Utilized pause during job transitions. | Defaulted to cancellation due to opaque pause flows. |
-        """)
-
-    with tab3:
-        st.subheader("Fixed Salaried vs Variable / Freelance Income")
-        st.markdown("""
-        * **Fixed Salaried:** Predictable cash flow; drop-offs driven by ECS bounce penalties and competing EMIs.
-        * **Students & Freelancers:** Highly volatile monthly cash; rigid monthly SIP models lead to early churn when income dips.
-        """)
-
-# -------------------------------------------------------------
-# Module 6: Opportunity Prioritization Matrix
-# -------------------------------------------------------------
-elif menu == "🎯 6. Opportunity Prioritization Matrix":
-    st.title("🎯 Opportunity Prioritization Matrix")
-    st.markdown("8-Dimensional Opportunity Priority Score (OPS) balancing retention impact, severity, evidence strength, and Groww addressability.")
-
-    opp_df = pd.DataFrame(opportunities)
-
-    # 2x2 Quadrant Chart
-    fig_matrix = px.scatter(
-        opp_df,
-        x="prevalence_pct",
-        y=[opp["scores"]["groww_addressability"] for opp in opportunities],
-        size="ops_score",
-        color="ops_score",
-        text="title",
-        labels={"x": "Sample Prevalence (%)", "y": "Groww Addressability (1-5)"},
-        title="Problem Prioritization Matrix (Quadrant)",
-        color_continuous_scale="Viridis"
-    )
-    fig_matrix.update_traces(textposition="top center")
-    fig_matrix.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
-    st.plotly_chart(fig_matrix, use_container_width=True)
-
-    # Candidate Cards
-    st.subheader("Candidate Problem Bets Ranked by OPS")
-    for opp in opportunities:
-        with st.container():
-            st.markdown(f"""
-            <div class='metric-card'>
-                <h4 style='color:#00D09C;'>[{opp['opportunity_id']}] {opp['title']} (OPS: {opp['ops_score']} / 5.0)</h4>
-                <p><strong>User Problem Hypothesis:</strong> {opp['hypothesis']}</p>
-                <p><strong>Prevalence:</strong> {opp['evidence_count']}/{opp['denominator']} ({opp['prevalence_pct']}%)</p>
-                <p><strong>Potential Product Intervention:</strong> {opp['solution_direction']}</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-# -------------------------------------------------------------
-# Module 7: AI Evidence Log & Audit
-# -------------------------------------------------------------
-elif menu == "📜 7. AI Evidence Log & Audit":
-    st.title("📜 Persistent AI Evidence Log")
-    st.markdown("Auditable ledger connecting every proposed insight to verbatim citations and PM verification status.")
-
-    for entry in evidence_log:
-        with st.expander(f"[{entry['log_id']}] {entry['title']} (Status: {entry['verification_status']})"):
-            st.markdown(f"**Theme:** `{entry['theme_name']}` | **Prevalence:** `{entry['evidence_count']}/{entry['denominator']} ({entry['prevalence_percentage']}%)`")
-            st.markdown(f"**User Problem Hypothesis:** {entry['user_problem_hypothesis']}")
-            st.markdown(f"**AI Confidence:** `{int(entry['ai_confidence'] * 100)}%`")
-            st.markdown("**Direct Supporting Citations:**")
-            for cit in entry["citations"]:
-                st.markdown(f"<div class='quote-box'>\"{cit['quote']}\"<br><small>Source: <a href='{cit['url']}'>{cit['source']}</a></small></div>", unsafe_allow_html=True)
-
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                st.button("✅ Mark Accepted", key=f"ev_acc_{entry['log_id']}")
-            with c2:
-                st.button("✏️ Mark Revised", key=f"ev_rev_{entry['log_id']}")
-            with c3:
-                st.button("❌ Mark Rejected", key=f"ev_rej_{entry['log_id']}")
-
-# -------------------------------------------------------------
-# Module 8: Research Questions & Interview Guides
-# -------------------------------------------------------------
-elif menu == "❓ 8. Research Questions & Interview Guides":
-    st.title("❓ Research Questions & Interview Guides")
-    st.markdown("Qualitative open questions and pre-drafted 1-on-1 interview scripts for user research teams.")
-
-    st.subheader("Top Open Research Hypotheses")
-    st.markdown("""
-    1. **The '₹450 Penalty' Churn Effect:** What percentage of users who experience a bank bounce charge cancel their mandate within 72 hours?
-    2. **Intentional vs Accidental Pause:** How many cancellations are actually temporary pauses in disguise?
-    3. **First Volatility Encounter:** Does proactive education at the first negative XIRR reading protect retention?
-    """)
-
-    st.subheader("1-on-1 User Interview Script (Groww UX Research)")
-    st.code("""
-1. "Think back to the last time you stopped or skipped an SIP instalment. What was happening in your personal or financial life at that exact moment?"
-2. "Have you ever experienced a bank bounce charge or penalty for an unsuccessful mutual fund debit? How did that make you feel about continuing?"
-3. "When your portfolio first showed negative returns, what did you do inside or outside the app?"
-4. "If you could temporarily adjust your monthly contribution amount during months with tight cash, would you have kept your SIP active?"
-    """, language="markdown")
-
-# -------------------------------------------------------------
-# Module 9: Live Groq AI Assistant
-# -------------------------------------------------------------
-elif menu == "🤖 9. Live Groq AI Assistant":
-    st.title("🤖 Live Groq AI Assistant (OpenAI GPT-OSS 120B Big Model)")
-    st.markdown("Query the entire 321-record qualitative database in natural language using Groq's ultra-fast 120B inference engine.")
-
-    # Model selector and connection status
-    c_m1, c_m2 = st.columns([2, 1])
-    with c_m1:
-        model_choice = st.selectbox(
-            "Select Groq LLM Engine:",
-            [
-                "openai/gpt-oss-120b (120B Flagship Big Model - Active)",
-                "qwen/qwen3.8-27b (27B Fast Reasoning)",
-                "openai/gpt-oss-20b (20B Lightweight)"
-            ],
-            index=0,
-            help="openai/gpt-oss-120b is the 120-Billion parameter reasoning model on Groq."
-        )
-        selected_model = model_choice.split(" ")[0]
-
-    with c_m2:
-        st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-        if GROQ_API_KEY:
-            st.success("🟢 Groq Connected", icon="✅")
-        else:
-            st.warning("⚠️ API Key Needed", icon="🔑")
-
-    active_key = GROQ_API_KEY
-    if not active_key:
-        active_key = st.text_input("Enter Groq API Key:", type="password", placeholder="gsk_...")
-
-    if not active_key:
-        st.error("Please configure `GROQ_API_KEY` in `.env` or enter your key above to use the AI Assistant.")
+    st.markdown("---")
+    
+    # Recents List
+    st.markdown("**RECENTS**")
+    if not st.session_state.recents:
+        st.caption("Chats you start show up here.")
     else:
-        try:
-            from groq import Groq
-            client = Groq(api_key=active_key)
+        for idx, recent in enumerate(st.session_state.recents[-6:][::-1]):
+            if st.button(f"💬 {recent[:28]}...", key=f"recent_{idx}", use_container_width=True):
+                st.session_state.current_view = "chat"
+                st.session_state.input_query = recent
+                st.rerun()
 
-            # Chat history in session state
-            if "messages" not in st.session_state:
-                st.session_state.messages = [
-                    {"role": "assistant", "content": "Hello! I am your Groww SIP Retention Discovery Assistant powered by Groq's 120B Big Model. Ask me anything about our 321 investor conversations, specific verbatims, or why students and gig workers stop their SIPs."}
-                ]
+    st.markdown("---")
+    
+    # LLM Engine Selector
+    model_choice = st.selectbox(
+        "Groq LLM Engine:",
+        [
+            "openai/gpt-oss-120b (120B Big Model)",
+            "qwen/qwen3.8-27b (27B Fast)",
+            "openai/gpt-oss-20b"
+        ],
+        index=0
+    )
+    selected_model = model_choice.split(" ")[0]
 
-            for msg in st.session_state.messages:
-                with st.chat_message(msg["role"]):
-                    if "reasoning" in msg and msg["reasoning"]:
-                        with st.expander("🧠 View 120B Reasoning Trace", expanded=False):
-                            st.caption(msg["reasoning"])
-                    st.markdown(msg["content"])
+    if GROQ_API_KEY:
+        st.markdown("<span style='color: #00D09C; font-size: 12px;'>🟢 Groq 120B Connected</span>", unsafe_allow_html=True)
+    else:
+        st.warning("API Key not found in .env")
 
-            if prompt := st.chat_input("Ask about investor churn reasons, quotes, or themes..."):
-                st.session_state.messages.append({"role": "user", "content": prompt})
-                with st.chat_message("user"):
-                    st.markdown(prompt)
+    st.markdown("---")
+    st.caption("Note - Chats are limited to this browser session. Refreshing the page clears them.")
 
-                with st.chat_message("assistant"):
-                    with st.spinner(f"Analyzing qualitative database with {selected_model}..."):
-                        # Ingest sample verbatims as context
-                        context_snippets = []
-                        for r in relevant_data[:25]:
-                            context_snippets.append(f"[{r['record_id']}] {r['title']}: {r.get('classification', {}).get('verbatim_quote', r.get('raw_text', ''))[:150]}")
-                        context_str = "\n".join(context_snippets)
 
-                        system_prompt = f"""You are a senior Product Discovery AI Assistant for Groww's Growth PM team.
-You have direct access to a database of 321 cleaned qualitative retail investor records regarding SIP drop-off and retention in India.
-Here is a representative sample of real investor verbatims from the dataset:
+# ------------------------------------------------------------------
+# View 1: How It Works (Exact 5-Step Card Banner from Image 1)
+# ------------------------------------------------------------------
+if st.session_state.current_view == "how_it_works":
+    st.title("🔀 How the Discovery Engine Works")
+    st.markdown("The 5-stage pipeline transforming unstructured retail investor conversations into audited behavioral retention insights:")
+
+    # 5-step banner cards
+    st.markdown("""
+    <div class="pipeline-grid">
+        <div class="pipeline-card">
+            <span class="step-badge step-1">1</span>
+            <span class="step-title">Collect</span>
+            <div class="step-desc"><strong>334 raw posts</strong> from Reddit (r/personalfinanceindia, r/IndiaInvestments), TradingQ&A, and Groww app reviews.</div>
+        </div>
+        <div class="pipeline-card">
+            <span class="step-badge step-2">2</span>
+            <span class="step-title">Filter</span>
+            <div class="step-desc"><strong>321 search posts</strong> cleaned, unicode normalized, and MD5 deduplicated across all sources.</div>
+        </div>
+        <div class="pipeline-card">
+            <span class="step-badge step-3">3</span>
+            <span class="step-title">AI tag</span>
+            <div class="step-desc"><strong>Groq 120B & heuristics</strong> label each post with investor stage, behaviour, and trigger context.</div>
+        </div>
+        <div class="pipeline-card">
+            <span class="step-badge step-4">4</span>
+            <span class="step-title">RAG</span>
+            <div class="step-desc"><strong>321 semantic records</strong> indexed for BM25 retrieval to ground answers in real verbatim evidence.</div>
+        </div>
+        <div class="pipeline-card">
+            <span class="step-badge step-5">5</span>
+            <span class="step-title">Ask</span>
+            <div class="step-desc"><strong>AI answers questions</strong> with context from real user discussions and verified clickable references.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.subheader("Ethical & SEBI Compliance Guardrails")
+    st.markdown("""
+    1. **Strictly Zero Fund Recommendations:** The engine never recommends mutual funds, asset managers, or stock picks.
+    2. **Zero FOMO / Urgency Tactics:** Analysis focuses solely on understanding friction, anxiety, and cash-flow reality.
+    3. **Ground Truth Citations:** Every finding presented by the agent is mapped directly to an immutable record ID (`REC-XXXXX`) and original forum permalink.
+    """)
+    
+    if st.button("← Back to Discovery Agent"):
+        st.session_state.current_view = "chat"
+        st.rerun()
+
+
+# ------------------------------------------------------------------
+# View 2: Signals Library (Browse All 321 Cleaned Records)
+# ------------------------------------------------------------------
+elif st.session_state.current_view == "library":
+    st.title("📖 Verified Signals Library")
+    st.markdown(f"Explore the entire database of **{len(cleaned_records)} cleaned records** ({len(relevant_records)} core retention signals).")
+
+    search_term = st.text_input("🔍 Search investor verbatims or keywords:", placeholder="e.g. bounce charge, salary delay, student, XIRR...")
+    
+    col_f1, col_f2 = st.columns(2)
+    with col_f1:
+        source_filter = st.selectbox("Filter by Source:", ["All Sources", "reddit", "tradingqna", "app_reviews"])
+    with col_f2:
+        tier_filter = st.selectbox("Filter by Relevance:", ["All Records", "Tier 1: Direct SIP Retention", "Tier 2: Investor Psychology", "Tier 3: Mandate Technical"])
+
+    filtered = cleaned_records
+    if source_filter != "All Sources":
+        filtered = [r for r in filtered if source_filter in r.get("source", "")]
+    if tier_filter != "All Records":
+        tier_num = 1 if "Tier 1" in tier_filter else (2 if "Tier 2" in tier_filter else 3)
+        filtered = [r for r in filtered if r.get("relevance_tier") == tier_num]
+    if search_term:
+        filtered = [r for r in filtered if search_term.lower() in (r.get("title", "") + r.get("raw_text", "")).lower()]
+
+    st.caption(f"Showing **{len(filtered)}** matching records")
+
+    for r in filtered[:30]:
+        with st.expander(f"[{r['record_id']}] {r.get('title', 'Untitled')} ({r.get('source', '')})"):
+            st.markdown(f"**Verbatim Text:**\n> {r.get('raw_text', '')[:400]}...")
+            st.markdown(f"**URL:** [{r.get('url', '#')}]({r.get('url', '#')})")
+            if "classification" in r:
+                c = r["classification"]
+                st.caption(f"Stage: `{c.get('investor_stage')}` | Trigger: `{c.get('trigger_context')}` | Behavior: `{c.get('reported_behaviour')}`")
+
+    if st.button("← Back to Discovery Agent"):
+        st.session_state.current_view = "chat"
+        st.rerun()
+
+
+# ------------------------------------------------------------------
+# View 3: Main Discovery Agent (Matches Image 2)
+# ------------------------------------------------------------------
+elif st.session_state.current_view == "chat":
+    # Two-column layout: Left (70%) Chat Agent, Right (30%) References Drawer
+    col_main, col_ref = st.columns([7, 3])
+
+    with col_main:
+        # If no messages yet, show Hero Section and Prompt Chips (Image 2)
+        if len(st.session_state.messages) == 0:
+            st.markdown("""
+            <div class="hero-container">
+                <div class="hero-title">Ask what retail investors say about SIP cancellations & retention</div>
+                <div class="hero-subtitle">Answers come only from Reddit, TradingQ&A, and Groww app reviews. References sit on the right.</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # Suggested Query Chips (Pill Buttons)
+            chips = [
+                "Why do people cancel SIP within 6 months?",
+                "Do users say bank bounce charges make them stop?",
+                "What do students and irregular earners say about SIPs?",
+                "Why do investors panic when XIRR is negative?"
+            ]
+
+            st.markdown("<div style='max-width: 600px; margin: 0 auto;'>", unsafe_allow_html=True)
+            for c_idx, chip in enumerate(chips):
+                if st.button(chip, key=f"chip_{c_idx}", use_container_width=True):
+                    st.session_state.input_query = chip
+                    st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        # Render Active Chat Conversation
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                if msg.get("reasoning"):
+                    with st.expander("🧠 View 120B Reasoning Trace", expanded=False):
+                        st.caption(msg["reasoning"])
+                st.markdown(msg["content"])
+
+        # Execute query if triggered by Chip or Input
+        user_query = st.session_state.input_query
+        if not user_query:
+            user_query = st.chat_input("Ask about retail investor SIP drop-off, pause habits, or bounce penalties...")
+
+        if user_query:
+            # Clear input query from state
+            st.session_state.input_query = ""
+            
+            # Add to recents
+            if user_query not in st.session_state.recents:
+                st.session_state.recents.append(user_query)
+
+            # Record user message
+            st.session_state.messages.append({"role": "user", "content": user_query})
+            with st.chat_message("user"):
+                st.markdown(user_query)
+
+            # Step 4: RAG Retrieval
+            with st.spinner("Retrieving verified investor discussions (BM25 RAG)..."):
+                retrieved_docs = retriever.retrieve(user_query, top_k=6)
+                st.session_state.active_references = retrieved_docs
+
+            # Step 5: Ask LLM (Groq 120B)
+            with st.chat_message("assistant"):
+                with st.spinner(f"Synthesizing answer with {selected_model}..."):
+                    try:
+                        from groq import Groq
+                        client = Groq(api_key=GROQ_API_KEY)
+
+                        # Context from retrieved references
+                        context_blocks = []
+                        for r in retrieved_docs:
+                            quote = r.get("classification", {}).get("verbatim_quote") or r.get("raw_text", "")[:200]
+                            context_blocks.append(
+                                f"ID: {r['record_id']} | Source: {r.get('source')} | Title: {r.get('title')}\nVerbatim: \"{quote}\""
+                            )
+                        context_str = "\n\n".join(context_blocks)
+
+                        system_prompt = f"""You are the senior Groww SIP Retention Discovery AI Agent.
+Your job is to explain empirically why first-time Indian mutual fund investors cancel, pause, or abandon SIPs.
+
+Ground Truth Qualitative Evidence from Database:
 {context_str}
 
-Guidelines:
-1. Always cite real verbatims and record IDs where relevant.
-2. Strictly never recommend specific mutual funds, stocks, or FOMO-driven nudges.
-3. Be concise, strategic, and evidence-focused."""
+Strict Rules:
+1. Ground every claim in the provided evidence. Cite record IDs like [REC-00163] inline.
+2. Quote actual investor phrasing wherever relevant.
+3. Strictly NEVER recommend specific mutual funds, equities, or artificial FOMO nudges (SEBI compliance).
+4. Be structured, objective, and highlight both user financial constraints and product/mandate friction."""
 
                         completion = client.chat.completions.create(
                             model=selected_model,
@@ -484,67 +492,54 @@ Guidelines:
                             ],
                             max_tokens=1200
                         )
+
                         choice = completion.choices[0].message
-                        reply = choice.content or "No textual response generated."
+                        answer = choice.content or "No textual response generated."
                         reasoning = getattr(choice, 'reasoning', None)
 
                         if reasoning:
                             with st.expander("🧠 View 120B Reasoning Trace", expanded=False):
                                 st.caption(reasoning)
 
-                        st.markdown(reply)
-                        st.session_state.messages.append({"role": "assistant", "content": reply, "reasoning": reasoning})
+                        st.markdown(answer)
+                        st.session_state.messages.append({
+                            "role": "assistant",
+                            "content": answer,
+                            "reasoning": reasoning,
+                            "references": retrieved_docs
+                        })
+                        st.rerun()
 
-        except Exception as e:
-            st.error(f"Error querying Groq: {e}")
+                    except Exception as e:
+                        st.error(f"Error connecting to Groq: {e}")
 
-# -------------------------------------------------------------
-# Module 10: Export Center
-# -------------------------------------------------------------
-elif menu == "📥 10. Export Center":
-    st.title("📥 Export Center")
-    st.markdown("Download audited datasets, theme tables, and executive discovery documents.")
+    # Right Column: References Panel (Matches Image 2 "References >")
+    with col_ref:
+        st.markdown("""
+        <div class="ref-header">
+            <span>📚 References</span>
+            <span style="font-size: 12px; color: #94A3B8;">(Real Verbatims)</span>
+        </div>
+        """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.subheader("Cleaned Dataset")
-        df_clean = pd.DataFrame(cleaned_data)
-        csv_clean = df_clean.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Download Cleaned CSV (321 Records)",
-            data=csv_clean,
-            file_name="groww_sip_cleaned_records.csv",
-            mime="text/csv"
-        )
-
-    with col2:
-        st.subheader("Theme Clusters")
-        df_themes = pd.DataFrame(theme_clusters)
-        csv_themes = df_themes.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Download Themes CSV",
-            data=csv_themes,
-            file_name="groww_sip_theme_clusters.csv",
-            mime="text/csv"
-        )
-
-    with col3:
-        st.subheader("Executive Report")
-        report_path = Path("Docs/final_discovery_report.md")
-        if report_path.exists():
-            with open(report_path, "r", encoding="utf-8") as f:
-                report_content = f.read()
-            st.download_button(
-                label="📥 Download Executive Report (MD)",
-                data=report_content,
-                file_name="Groww_SIP_Retention_Discovery_Report.md",
-                mime="text/markdown"
-            )
-
-    st.markdown("---")
-    st.subheader("Executive Discovery Report Preview")
-    report_file = Path("Docs/final_discovery_report.md")
-    if report_file.exists():
-        with open(report_file, "r", encoding="utf-8") as f:
-            st.markdown(f.read())
+        refs = st.session_state.active_references
+        if not refs:
+            st.caption("When you ask a question, the retrieved investor quotes and sources will appear here.")
+        else:
+            for r in refs:
+                source = r.get("source", "other")
+                badge_class = "badge-reddit" if "reddit" in source else ("badge-tradingqna" if "tradingqna" in source else "badge-reviews")
+                badge_label = "Reddit" if "reddit" in source else ("TradingQ&A" if "tradingqna" in source else "App Review")
+                
+                quote = r.get("classification", {}).get("verbatim_quote") or r.get("raw_text", "")[:180]
+                url = r.get("url", "#")
+                
+                st.markdown(f"""
+                <div class="ref-card">
+                    <span class="ref-badge {badge_class}">{badge_label}</span>
+                    <strong style="color: #F8FAFC; display: block; margin-bottom: 4px;">{r['record_id']}</strong>
+                    <div style="font-size: 12px; color: #94A3B8; margin-bottom: 6px;">{r.get('title', '')[:55]}...</div>
+                    <div class="ref-quote">"{quote}..."</div>
+                    <a href="{url}" target="_blank" class="ref-link">View original discussion ↗</a>
+                </div>
+                """, unsafe_allow_html=True)
