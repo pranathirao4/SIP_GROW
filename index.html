@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_dashboard" name="shell-type"/>
+  <title>SIP Insight - Groww Research Lab</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 108, 79, 0.15); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 108, 79, 0.3); }
+    
+    .markdown-body p { margin-bottom: 0.75rem; line-height: 1.6; }
+    .markdown-body ul { list-style-type: disc; margin-left: 1.25rem; margin-bottom: 0.75rem; }
+    .markdown-body li { margin-bottom: 0.4rem; }
+    .markdown-body strong { font-weight: 600; color: #151c27; }
+  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-tertiary": "#ffffff",
+            "surface-container-high": "#e2e8f8",
+            "on-primary-fixed-variant": "#00513b",
+            "on-tertiary-fixed-variant": "#404758",
+            "error-container": "#ffdad6",
+            "surface-container-low": "#f0f3ff",
+            "secondary-fixed-dim": "#50ddad",
+            "on-secondary-fixed-variant": "#00513b",
+            "on-secondary-container": "#007153",
+            "secondary-fixed": "#71fac8",
+            "tertiary": "#575e70",
+            "on-secondary-fixed": "#002116",
+            "surface-tint": "#006c4f",
+            "surface-container": "#e7eefe",
+            "on-primary": "#ffffff",
+            "inverse-primary": "#2fe0aa",
+            "surface": "#f9f9ff",
+            "surface-variant": "#dce2f3",
+            "on-primary-fixed": "#002116",
+            "on-secondary": "#ffffff",
+            "on-tertiary-fixed": "#141b2b",
+            "primary-fixed-dim": "#2fe0aa",
+            "outline-variant": "#bacac1",
+            "surface-container-highest": "#dce2f3",
+            "on-primary-container": "#00533c",
+            "error": "#ba1a1a",
+            "surface-bright": "#f9f9ff",
+            "outline": "#6b7b72",
+            "tertiary-fixed": "#dce2f7",
+            "on-surface": "#151c27",
+            "on-background": "#151c27",
+            "primary": "#006c4f",
+            "primary-container": "#00d09c",
+            "secondary": "#006c4f",
+            "secondary-container": "#6ef7c6",
+            "tertiary-container": "#b0b7cb",
+            "surface-container-lowest": "#ffffff",
+            "tertiary-fixed-dim": "#c0c6db",
+            "inverse-surface": "#2a313d",
+            "background": "#f9f9ff",
+            "primary-fixed": "#59fdc5",
+            "inverse-on-surface": "#ebf1ff",
+            "on-surface-variant": "#3c4a43",
+            "on-tertiary-container": "#414859",
+            "on-error": "#ffffff",
+            "surface-dim": "#d3daea",
+            "on-error-container": "#93000a"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "space-xl": "2rem",
+            "space-sm": "0.5rem",
+            "gutter-sm": "1rem",
+            "space-md": "1rem",
+            "space-2xl": "3rem",
+            "margin": "2rem",
+            "space-lg": "1.5rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin-mobile": "1rem"
+          },
+          fontFamily: {
+            "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-lg-mobile": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+            "mono-metric": ["Inter", "sans-serif"],
+            "display-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "display-lg-mobile": ["Plus Jakarta Sans", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+            "label-md": ["Inter", "sans-serif"],
+            "label-lg": ["Inter", "sans-serif"]
+          },
+          fontSize: {
+            "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "body-lg": ["16px", {"lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "400"}],
+            "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600"}],
+            "headline-sm": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "mono-metric": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "700"}],
+            "body-sm": ["12px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "body-md": ["14px", {"lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+            "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.025em", "fontWeight": "500"}],
+            "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased">
+  
+  <!-- Left Sidebar (Google Stitch Exact) -->
+  <aside class="fixed left-0 top-0 h-screen w-[250px] bg-surface-container-low shadow-[1px_0_0_0_rgba(229,231,235,1)] z-40 flex flex-col justify-between">
+    <div class="flex flex-col">
+      <!-- Logo & Brand -->
+      <div class="px-space-md py-space-lg flex items-center gap-space-sm cursor-pointer" onclick="switchView('new-research')">
+        <img alt="SIP Insight Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XxscqvhXBkcVgnh5Xxbd9_HnN3BS1M02nmO_6n16xf3P6p8FFRNf68vmVkuP6gG8q_PXL-RRmkfVEYx23SdWEUHYCrvGynx27dOv7rFS_-kV4rCei2kNWp08O1gNKIUHSaFU1wf_R13A3BuXYU1f8PzzI65iDVX5apFu9xLoWo8j5OnIdYJyAfbzX2dDMGMGgRAoyn_nRA18HMJn6mSedpDmWaBSSm6IKYUE9DRbMTvoVrOZoLzf1qpg"/>
+        <div class="flex flex-col min-w-0">
+          <span class="font-headline-sm text-headline-sm text-on-surface truncate tracking-tight">SIP Insight</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant truncate uppercase tracking-wider">Groww Research Lab</span>
+        </div>
+      </div>
+      
+      <!-- Core Navigation Title -->
+      <div class="px-space-md py-space-xs">
+        <span class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider px-space-xs">Core Navigation</span>
+      </div>
+      
+      <!-- Nav Links -->
+      <nav class="flex flex-col gap-space-xs px-space-sm mt-space-xs" id="sidebarNav">
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg transition-colors bg-secondary-container text-on-secondary-container font-semibold cursor-pointer" data-path="new-research" onclick="switchView('new-research')">
+          <span class="material-symbols-outlined text-[20px]">explore</span>
+          <span class="font-label-md text-label-md">New Research</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" data-path="research-overview" onclick="switchView('research-overview')">
+          <span class="material-symbols-outlined text-[20px]">bar_chart</span>
+          <span class="font-label-md text-label-md">Research Overview</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" data-path="data-sources" onclick="switchView('data-sources')">
+          <span class="material-symbols-outlined text-[20px]">database</span>
+          <span class="font-label-md text-label-md">Data Sources (406)</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" data-path="conversation-library" onclick="switchView('conversation-library')">
+          <span class="material-symbols-outlined text-[20px]">archive</span>
+          <span class="font-label-md text-label-md">Conversation Library</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" data-path="theme-explorer" onclick="switchView('theme-explorer')">
+          <span class="material-symbols-outlined text-[20px]">account_tree</span>
+          <span class="font-label-md text-label-md">Theme Explorer</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" data-path="ai-evidence-log" onclick="switchView('ai-evidence-log')">
+          <span class="material-symbols-outlined text-[20px]">verified_user</span>
+          <span class="font-label-md text-label-md">AI Evidence Log</span>
+        </a>
+      </nav>
+    </div>
+    
+    <!-- Sidebar Bottom Status Card -->
+    <div class="p-space-md flex flex-col gap-space-xs">
+      <div class="bg-surface-container p-space-sm rounded-lg flex flex-col gap-space-xs">
+        <div class="flex items-center gap-space-xs">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class="font-label-sm text-label-sm text-primary font-semibold">Groq 120B Active</span>
+        </div>
+        <span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">406 Verified Groww & Retail Investor Signals</span>
+      </div>
+      <div class="flex items-center justify-between pt-space-xs px-space-xs">
+        <span class="font-label-sm text-label-sm text-tertiary">Groww Quantitative Unit</span>
+        <span class="material-symbols-outlined text-[16px] text-tertiary">lock</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main View Area -->
+  <div class="pl-[250px]">
+    <!-- Top Header (Google Stitch Exact) -->
+    <header class="fixed top-0 left-[250px] right-0 z-30 bg-surface-container-lowest/90 backdrop-blur-md shadow-[0_1px_0_0_rgba(229,231,235,1)]">
+      <div class="h-14 w-full px-gutter flex items-center justify-between">
+        <div class="flex items-center gap-space-md">
+          <img alt="SIP Insight Logo" class="h-8 w-auto object-contain cursor-pointer" onclick="switchView('new-research')" src="https://lh3.googleusercontent.com/aida/AEtjO1XxscqvhXBkcVgnh5Xxbd9_HnN3BS1M02nmO_6n16xf3P6p8FFRNf68vmVkuP6gG8q_PXL-RRmkfVEYx23SdWEUHYCrvGynx27dOv7rFS_-kV4rCei2kNWp08O1gNKIUHSaFU1wf_R13A3BuXYU1f8PzzI65iDVX5apFu9xLoWo8j5OnIdYJyAfbzX2dDMGMGgRAoyn_nRA18HMJn6mSedpDmWaBSSm6IKYUE9DRbMTvoVrOZoLzf1qpg"/>
+          <div class="hidden sm:flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full text-on-surface-variant text-label-sm font-label-sm">
+            <span class="material-symbols-outlined text-[14px] text-primary">science</span>
+            <span>Research Sandbox</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-space-md">
+          <div class="hidden md:flex items-center gap-space-xs bg-surface-container-low text-tertiary px-space-md h-8 rounded-full cursor-pointer hover:bg-surface-container transition-colors" onclick="focusSearch()">
+            <span class="material-symbols-outlined text-[16px]">search</span>
+            <span class="font-label-sm text-label-sm">Search corpus (⌘K)</span>
+          </div>
+          <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full pt-14 min-h-screen bg-surface-container-lowest">
+      
+      <!-- ========================================== -->
+      <!-- VIEW 1: NEW RESEARCH (DISCOVERY AGENT HERO) -->
+      <!-- ========================================== -->
+      <section id="view-new-research" class="relative w-full min-h-[calc(100vh-3.5rem)] flex flex-col justify-between px-space-lg lg:px-space-2xl py-space-xl overflow-hidden bg-surface-container-lowest">
+        <!-- Ambient Background Gradients -->
+        <div class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[760px] h-[340px] bg-gradient-to-b from-primary/5 via-secondary-fixed/5 to-transparent blur-3xl opacity-60"></div>
+        <div class="pointer-events-none absolute -bottom-24 right-1/4 w-[420px] h-[220px] bg-gradient-to-tr from-surface-container-high/40 to-transparent blur-2xl opacity-70"></div>
+
+        <!-- Top Status Bar & Evidence Dropdown -->
+        <div class="w-full flex items-center justify-between relative z-10">
+          <div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+            <span>Quantitative Synthesis Lab</span>
+            <span class="text-tertiary">/</span>
+            <span class="text-on-surface">Agent Core 04</span>
+          </div>
+
+          <!-- Evidence & Sources Dropdown -->
+          <div class="relative">
+            <button class="group flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest hover:bg-surface-container-low shadow-sm transition-all duration-200 cursor-pointer border border-gray-200/80" id="evidenceMenuBtn" onclick="toggleEvidenceDrawer()">
+              <span class="material-symbols-outlined text-[16px] text-primary group-hover:rotate-12 transition-transform">database</span>
+              <span class="font-label-md text-label-md text-on-surface font-medium">Evidence &amp; Sources</span>
+              <span class="material-symbols-outlined text-[16px] text-tertiary group-hover:translate-y-0.5 transition-transform" id="evidenceChevron">expand_more</span>
+            </button>
+            <div class="hidden absolute right-0 mt-space-xs w-80 p-space-sm rounded-xl bg-surface-container-lowest shadow-xl z-50 transition-all border border-gray-200" id="evidenceDropdown">
+              <div class="px-space-sm py-space-xs flex items-center justify-between border-b border-gray-100 pb-2">
+                <span class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider">Connected Indices</span>
+                <span class="font-label-sm text-label-sm text-primary font-semibold">Live (406 Verified)</span>
+              </div>
+              <div class="flex flex-col gap-space-xs mt-space-xs">
+                <div class="flex items-start gap-space-sm p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
+                  <span class="material-symbols-outlined text-[18px] text-primary mt-0.5">forum</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-md text-label-md text-on-surface font-medium">r/IndiaInvestments & Reddit</span>
+                    <span class="font-body-sm text-body-sm text-tertiary">137 validated threads</span>
+                  </div>
+                </div>
+                <div class="flex items-start gap-space-sm p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
+                  <span class="material-symbols-outlined text-[18px] text-primary mt-0.5">reviews</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-md text-label-md text-on-surface font-medium">Groww Play Store & iOS Audits</span>
+                    <span class="font-body-sm text-body-sm text-tertiary">40 indexed user reviews</span>
+                  </div>
+                </div>
+                <div class="flex items-start gap-space-sm p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
+                  <span class="material-symbols-outlined text-[18px] text-primary mt-0.5">groups</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-md text-label-md text-on-surface font-medium">TradingQ&A Groww Inquiries</span>
+                    <span class="font-body-sm text-body-sm text-tertiary">229 indexed discussions</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-space-xs pt-space-xs px-space-sm flex items-center justify-between bg-surface-container-low rounded-lg p-2">
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Corpus Freshness</span>
+                <span class="font-label-sm text-label-sm text-primary font-semibold">Synced Today</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Content Area -->
+        <div class="w-full max-w-4xl mx-auto flex flex-col items-center justify-center my-auto py-space-md relative z-10 text-center">
+          <!-- Tag Pill -->
+          <div class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm tracking-wider uppercase mb-space-md shadow-sm border border-gray-100">
+            <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+            <span class="font-semibold text-primary">Groww SIP Retention Research</span>
+            <span class="text-tertiary">•</span>
+            <span class="text-tertiary">Behavioral AI Model</span>
+          </div>
+
+          <!-- Main Title & Subtitle -->
+          <h1 class="font-display-lg text-display-lg text-on-surface tracking-tight max-w-3xl leading-[1.18] mb-space-sm">
+            Discover why investors stay with their SIPs — or stop.
+          </h1>
+          <p class="font-body-lg text-body-lg text-tertiary max-w-2xl text-center leading-relaxed mb-space-lg">
+            Explore real investor conversations, identify recurring behavioral friction, and uncover evidence-backed opportunities to improve 12-month SIP retention.
+          </p>
+
+          <!-- Prompt Chips (Google Stitch Prompt Chips) -->
+          <div class="flex flex-wrap items-center justify-center gap-space-sm mb-space-lg w-full max-w-3xl">
+            <button class="group inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest hover:bg-surface-container-low shadow-sm transition-all duration-150 cursor-pointer text-left border border-gray-200" onclick="fillAndSubmit('Why do first-time investors stop their SIPs?')">
+              <span class="material-symbols-outlined text-[16px] text-primary-container group-hover:scale-110 transition-transform">auto_awesome</span>
+              <span class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Why do first-time investors stop their SIPs?</span>
+            </button>
+            <button class="group inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest hover:bg-surface-container-low shadow-sm transition-all duration-150 cursor-pointer text-left border border-gray-200" onclick="fillAndSubmit('What changes after starting a SIP?')">
+              <span class="material-symbols-outlined text-[16px] text-primary-container group-hover:scale-110 transition-transform">trending_up</span>
+              <span class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">What changes after starting a SIP?</span>
+            </button>
+            <button class="group inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest hover:bg-surface-container-low shadow-sm transition-all duration-150 cursor-pointer text-left border border-gray-200" onclick="fillAndSubmit('What unmet needs emerge from investor conversations?')">
+              <span class="material-symbols-outlined text-[16px] text-primary-container group-hover:scale-110 transition-transform">psychology_alt</span>
+              <span class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">What unmet needs emerge from investor conversations?</span>
+            </button>
+          </div>
+
+          <!-- Search Form (Google Stitch Exact) -->
+          <div class="w-full max-w-[720px] relative">
+            <form class="w-full flex items-center bg-surface-container-lowest rounded-2xl sm:rounded-full px-space-md py-2.5 shadow-md hover:shadow-xl transition-all duration-200 border border-gray-200 focus-within:border-primary" onsubmit="handleSearch(event)">
+              <div class="flex items-center justify-center pl-space-xs pr-space-sm text-tertiary">
+                <span class="material-symbols-outlined text-[22px] text-primary-container">psychology</span>
+              </div>
+              <input autocomplete="off" class="w-full bg-transparent border-0 outline-none font-body-md text-body-md text-on-surface placeholder:text-tertiary/70 py-space-xs px-space-xs" id="researchInput" placeholder="Ask your research agent about SIP investor behaviour..." type="text"/>
+              <div class="flex items-center gap-space-xs pl-space-xs">
+                <button class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low text-tertiary hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer" onclick="surpriseQuery()" title="Surprise query" type="button">
+                  <span class="material-symbols-outlined text-[18px]">lightbulb</span>
+                </button>
+                <button aria-label="Send Query" class="w-10 h-10 rounded-full bg-primary-container hover:bg-secondary flex items-center justify-center text-on-primary shadow-sm hover:scale-105 active:scale-95 transition-all duration-150 cursor-pointer" type="submit" id="submitBtn">
+                  <span class="material-symbols-outlined text-[20px] font-bold">arrow_upward</span>
+                </button>
+              </div>
+            </form>
+            <div class="flex items-center justify-center gap-space-xs mt-space-sm">
+              <span class="material-symbols-outlined text-[14px] text-primary">verified</span>
+              <p class="font-body-sm text-body-sm text-tertiary">
+                Research answers are grounded in 406 collected public conversations and linked evidence.
+              </p>
+            </div>
+          </div>
+
+          <!-- Dynamic Live Answer Container (Google / AI Overview Style) -->
+          <div class="w-full max-w-[780px] mt-6 hidden text-left" id="answerContainer">
+            <div class="bg-surface-container-lowest border border-primary/20 rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all">
+              <!-- Top Header of the Answer Card -->
+              <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+                  <span class="font-headline-sm text-[15px] text-on-surface font-semibold" id="answerQueryTitle">Research Synthesis</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="bg-secondary-container/50 text-on-secondary-container font-label-sm text-label-sm px-2.5 py-1 rounded-full font-semibold">Groq 120B Model Grounded</span>
+                  <button class="text-tertiary hover:text-on-surface text-sm flex items-center" onclick="resetSearch()" title="Clear answer">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Main Answer Text (Markdown formatted) -->
+              <div class="markdown-body font-body-md text-on-surface text-[14.5px] leading-relaxed" id="answerContent">
+                <!-- Answer goes here -->
+              </div>
+
+              <!-- Interactive Investor Concerns Drawer -->
+              <div class="mt-5 pt-4 border-t border-gray-100" id="concernsDrawerSection">
+                <button class="w-full flex items-center justify-between py-2 px-3 bg-surface-container-low hover:bg-surface-container rounded-xl transition-colors cursor-pointer" onclick="toggleConcernsDrawer()">
+                  <div class="flex items-center gap-2 text-on-surface font-medium text-sm">
+                    <span class="material-symbols-outlined text-primary text-[18px]">chat</span>
+                    <span id="concernsButtonLabel">Show Specific Investor Concerns &amp; Quotes</span>
+                  </div>
+                  <span class="material-symbols-outlined text-tertiary transition-transform duration-200" id="concernsChevron">expand_more</span>
+                </button>
+                <div class="hidden mt-3 flex flex-col gap-2.5" id="concernsList">
+                  <!-- References cards will be injected here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Status Bar (Google Stitch Exact) -->
+        <div class="w-full flex flex-col sm:flex-row items-center justify-between pt-space-lg gap-space-xs text-tertiary font-body-sm text-body-sm relative z-10 border-t border-gray-100">
+          <div class="flex items-center gap-space-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+            <span class="truncate">Public discussions from Reddit r/IndiaInvestments, Play Store reviews, and personal finance communities</span>
+          </div>
+          <div class="flex items-center gap-space-md text-tertiary">
+            <span class="font-label-sm text-label-sm tracking-wider uppercase">Synthesized Cohorts: 406 Records</span>
+            <span>•</span>
+            <span class="font-label-sm text-label-sm">Updated Live</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 2: RESEARCH OVERVIEW                   -->
+      <!-- ========================================== -->
+      <section id="view-research-overview" class="hidden w-full min-h-[calc(100vh-3.5rem)] px-space-lg lg:px-space-2xl py-space-xl bg-surface-container-lowest">
+        <div class="max-w-5xl mx-auto">
+          <!-- Page Header -->
+          <div class="mb-8">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-low text-primary font-label-sm text-label-sm uppercase tracking-wider mb-2">
+              <span class="w-2 h-2 rounded-full bg-primary"></span> Executive Qualitative Summary
+            </div>
+            <h2 class="font-display-lg text-headline-lg text-on-surface">12-Month SIP Retention Landscape</h2>
+            <p class="font-body-md text-tertiary mt-1">Empirical breakdown of why first-time investors discontinue SIPs on Groww before reaching their 12th monthly instalment.</p>
+          </div>
+
+          <!-- Top Metric Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-surface-container-low p-5 rounded-2xl border border-gray-200/80">
+              <div class="text-tertiary text-xs font-semibold uppercase tracking-wider mb-1">Audited Corpus</div>
+              <div class="text-3xl font-bold text-on-surface font-headline-sm">406</div>
+              <div class="text-xs text-primary font-medium mt-1">Verified Retail Discussions</div>
+            </div>
+            <div class="bg-surface-container-low p-5 rounded-2xl border border-gray-200/80">
+              <div class="text-tertiary text-xs font-semibold uppercase tracking-wider mb-1">Core Retention Signals</div>
+              <div class="text-3xl font-bold text-primary font-headline-sm">80</div>
+              <div class="text-xs text-tertiary font-medium mt-1">Deep Qualitative Drop-off Cases</div>
+            </div>
+            <div class="bg-surface-container-low p-5 rounded-2xl border border-gray-200/80">
+              <div class="text-tertiary text-xs font-semibold uppercase tracking-wider mb-1">Peak Drop-off Window</div>
+              <div class="text-3xl font-bold text-error font-headline-sm">Month 3–6</div>
+              <div class="text-xs text-tertiary font-medium mt-1">Salary &amp; Drawdown Inflection</div>
+            </div>
+            <div class="bg-surface-container-low p-5 rounded-2xl border border-gray-200/80">
+              <div class="text-tertiary text-xs font-semibold uppercase tracking-wider mb-1">AutoPay Friction Rate</div>
+              <div class="text-3xl font-bold text-on-secondary-container font-headline-sm">38.4%</div>
+              <div class="text-xs text-tertiary font-medium mt-1">Hard Mandate Cancellations</div>
+            </div>
+          </div>
+
+          <!-- Main Retention Analysis -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-surface-container-lowest p-6 rounded-2xl border border-gray-200 shadow-sm">
+              <h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">psychology</span>
+                The 3 Critical Churn Moments
+              </h3>
+              <div class="flex flex-col gap-3 font-body-sm text-on-surface-variant">
+                <div class="p-3 bg-surface-container-low rounded-xl">
+                  <div class="font-semibold text-on-surface mb-1">1. The First Salary Delay (Month 2-4)</div>
+                  <div>When monthly debits coincide with irregular salary credit dates or month-end cash crunches, users face mandate bounce fears. Because Groww's 'Pause' is less obvious than 'Delete SIP', users permanently delete the mandate.</div>
+                </div>
+                <div class="p-3 bg-surface-container-low rounded-xl">
+                  <div class="font-semibold text-on-surface mb-1">2. First Portfolio Drawdown (Month 4-7)</div>
+                  <div>First-time investors expect compounding immediately. When seeing -3% or -5% XIRR on the Groww home screen, psychological panic triggers a redemption or SIP stop.</div>
+                </div>
+                <div class="p-3 bg-surface-container-low rounded-xl">
+                  <div class="font-semibold text-on-surface mb-1">3. Bank Mandate Expiry / Re-verification (Month 8-11)</div>
+                  <div>Bank e-mandate renewal notices confuse users. Instead of completing OTP re-auth, users abandon the SIP out of friction.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-lowest p-6 rounded-2xl border border-gray-200 shadow-sm">
+              <h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary-container">lightbulb</span>
+                High-Impact Product Interventions for Groww
+              </h3>
+              <div class="flex flex-col gap-3 font-body-sm text-on-surface-variant">
+                <div class="p-3 bg-surface-container-low rounded-xl border-l-4 border-primary">
+                  <div class="font-semibold text-on-surface mb-1">Smart Pre-Debit Warning (T-24h)</div>
+                  <div>Notify users via WhatsApp/Push 24h prior to SIP debit with a 1-tap "Skip this month" button, preventing bank bounce penalties.</div>
+                </div>
+                <div class="p-3 bg-surface-container-low rounded-xl border-l-4 border-secondary-container">
+                  <div class="font-semibold text-on-surface mb-1">Prominent "Pause for 1-3 Months" Flow</div>
+                  <div>When user taps "Cancel SIP", intercept with "Need a temporary break? Pause for 1-3 months without canceling your mandate."</div>
+                </div>
+                <div class="p-3 bg-surface-container-low rounded-xl border-l-4 border-primary-container">
+                  <div class="font-semibold text-on-surface mb-1">Market Dip Reassurance Banner</div>
+                  <div>During market corrections, display educational insights on unit accumulation ("You're buying 8% more units today at a discount").</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 3: DATA SOURCES (406 RECORDS)          -->
+      <!-- ========================================== -->
+      <section id="view-data-sources" class="hidden w-full min-h-[calc(100vh-3.5rem)] px-space-lg lg:px-space-2xl py-space-xl bg-surface-container-lowest">
+        <div class="max-w-5xl mx-auto">
+          <!-- Page Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-low text-primary font-label-sm text-label-sm uppercase tracking-wider mb-2">
+                <span class="w-2 h-2 rounded-full bg-primary"></span> Complete Verified Corpus
+              </div>
+              <h2 class="font-display-lg text-headline-lg text-on-surface">Data Sources (406 Discussions)</h2>
+              <p class="font-body-md text-tertiary mt-1">Multi-channel public qualitative evidence from Reddit r/IndiaInvestments, Play Store reviews, and TradingQ&A.</p>
+            </div>
+            <!-- Search Filter -->
+            <div class="w-full sm:w-72">
+              <input type="text" id="dataSourceSearchInput" oninput="filterDataSources()" placeholder="Filter discussions..." class="w-full px-4 py-2 bg-surface-container-low rounded-xl border border-gray-200 text-sm outline-none focus:border-primary"/>
+            </div>
+          </div>
+
+          <!-- Source Filter Tabs -->
+          <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2" id="sourceFilterTabs">
+            <button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-secondary-container text-on-secondary-container" onclick="filterBySource('all', this)">All (406)</button>
+            <button class="px-4 py-1.5 rounded-full text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container" onclick="filterBySource('reddit', this)">Reddit (137)</button>
+            <button class="px-4 py-1.5 rounded-full text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container" onclick="filterBySource('tradingqna', this)">TradingQ&amp;A (229)</button>
+            <button class="px-4 py-1.5 rounded-full text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container" onclick="filterBySource('app_reviews', this)">Groww App Reviews (40)</button>
+          </div>
+
+          <!-- Records List Container -->
+          <div class="flex flex-col gap-3" id="recordsListContainer">
+            <div class="text-center py-12 text-tertiary">
+              <span class="material-symbols-outlined text-4xl animate-spin text-primary">progress_activity</span>
+              <p class="mt-2 text-sm">Loading verified discussions...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 4: CONVERSATION LIBRARY                -->
+      <!-- ========================================== -->
+      <section id="view-conversation-library" class="hidden w-full min-h-[calc(100vh-3.5rem)] px-space-lg lg:px-space-2xl py-space-xl bg-surface-container-lowest">
+        <div class="max-w-5xl mx-auto">
+          <!-- Page Header -->
+          <div class="mb-8">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-low text-primary font-label-sm text-label-sm uppercase tracking-wider mb-2">
+              <span class="w-2 h-2 rounded-full bg-primary"></span> Curated Verbatim Feed
+            </div>
+            <h2 class="font-display-lg text-headline-lg text-on-surface">Conversation Library</h2>
+            <p class="font-body-md text-tertiary mt-1">Real verbatim investor quotes highlighting exact words, emotions, and friction points experienced on Groww.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="conversationsGrid">
+            <!-- Dynamically populated or static cards -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 5: THEME EXPLORER                      -->
+      <!-- ========================================== -->
+      <section id="view-theme-explorer" class="hidden w-full min-h-[calc(100vh-3.5rem)] px-space-lg lg:px-space-2xl py-space-xl bg-surface-container-lowest">
+        <div class="max-w-5xl mx-auto">
+          <!-- Page Header -->
+          <div class="mb-8">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-low text-primary font-label-sm text-label-sm uppercase tracking-wider mb-2">
+              <span class="w-2 h-2 rounded-full bg-primary"></span> 5 Behavioral Retention Themes
+            </div>
+            <h2 class="font-display-lg text-headline-lg text-on-surface">Theme Explorer</h2>
+            <p class="font-body-md text-tertiary mt-1">Quantitative prevalence and qualitative taxonomy of recurring friction clusters identified across 406 records.</p>
+          </div>
+
+          <div class="flex flex-col gap-4" id="themesList">
+            <!-- Theme cards injected here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 6: AI EVIDENCE LOG                     -->
+      <!-- ========================================== -->
+      <section id="view-ai-evidence-log" class="hidden w-full min-h-[calc(100vh-3.5rem)] px-space-lg lg:px-space-2xl py-space-xl bg-surface-container-lowest">
+        <div class="max-w-5xl mx-auto">
+          <!-- Page Header -->
+          <div class="mb-8">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-low text-primary font-label-sm text-label-sm uppercase tracking-wider mb-2">
+              <span class="w-2 h-2 rounded-full bg-primary"></span> SEBI-Compliant Opportunity Matrix
+            </div>
+            <h2 class="font-display-lg text-headline-lg text-on-surface">AI Evidence Log &amp; Roadmap</h2>
+            <p class="font-body-md text-tertiary mt-1">Prioritized product interventions scored on Problem Severity, Groww Addressability, and 12-Month Retention Impact.</p>
+          </div>
+
+          <div class="flex flex-col gap-4" id="opportunitiesList">
+            <!-- Opportunities cards injected here -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- JavaScript: Core Functionality & View Routing -->
+  <script>
+    // Global State
+    let currentView = 'new-research';
+    let allRecords = [];
+    let currentFilteredRecords = [];
+    let activeSourceFilter = 'all';
+
+    // Surprise queries queue specifically for Groww
+    const surpriseQueries = [
+      "Why do users permanently delete Groww AutoPay instead of using Pause?",
+      "How does seeing negative returns on the Groww dashboard cause users to panic?",
+      "What causes students and gig workers on Groww to stop their monthly SIPs?",
+      "Why do first-time Groww investors drop out before completing 12 months?",
+      "What changes after starting a SIP?"
+    ];
+    let surpriseIndex = 0;
+
+    function surpriseQuery() {
+      const q = surpriseQueries[surpriseIndex % surpriseQueries.length];
+      surpriseIndex++;
+      fillAndSubmit(q);
+    }
+
+    // Toggle Evidence Drawer in Top Right
+    function toggleEvidenceDrawer() {
+      const dropdown = document.getElementById('evidenceDropdown');
+      const chevron = document.getElementById('evidenceChevron');
+      if (dropdown.classList.contains('hidden')) {
+        dropdown.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        dropdown.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Click outside handler for evidence dropdown
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('evidenceDropdown');
+      const btn = document.getElementById('evidenceMenuBtn');
+      if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.add('hidden');
+        const chevron = document.getElementById('evidenceChevron');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    // Toggle Specific Investor Concerns Drawer
+    function toggleConcernsDrawer() {
+      const list = document.getElementById('concernsList');
+      const chevron = document.getElementById('concernsChevron');
+      if (list.classList.contains('hidden')) {
+        list.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        list.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Quick focus search
+    function focusSearch() {
+      switchView('new-research');
+      const input = document.getElementById('researchInput');
+      if (input) {
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // View Switching Logic (Google Stitch Tabs)
+    function switchView(viewName) {
+      currentView = viewName;
+      
+      // Update sidebar nav link active states
+      const navLinks = document.querySelectorAll('#sidebarNav a[data-path]');
+      navLinks.forEach(link => {
+        if (link.getAttribute('data-path') === viewName) {
+          link.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high', 'hover:text-on-surface');
+          link.classList.add('bg-secondary-container', 'text-on-secondary-container', 'font-semibold');
+        } else {
+          link.classList.remove('bg-secondary-container', 'text-on-secondary-container', 'font-semibold');
+          link.classList.add('text-on-surface-variant', 'hover:bg-surface-container-high', 'hover:text-on-surface');
+        }
+      });
+
+      // Show/hide sections
+      const sections = ['new-research', 'research-overview', 'data-sources', 'conversation-library', 'theme-explorer', 'ai-evidence-log'];
+      sections.forEach(sec => {
+        const el = document.getElementById(`view-${sec}`);
+        if (el) {
+          if (sec === viewName) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+
+      // Lazy load view content if needed
+      if (viewName === 'data-sources' && allRecords.length === 0) {
+        loadDataSources();
+      } else if (viewName === 'theme-explorer') {
+        loadThemes();
+      } else if (viewName === 'ai-evidence-log') {
+        loadOpportunities();
+      } else if (viewName === 'conversation-library') {
+        loadConversations();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function fillAndSubmit(text) {
+      const input = document.getElementById('researchInput');
+      if (input) {
+        input.value = text;
+        submitQuery(text);
+      }
+    }
+
+    function handleSearch(e) {
+      e.preventDefault();
+      const input = document.getElementById('researchInput');
+      if (!input || !input.value.trim()) return;
+      submitQuery(input.value.trim());
+    }
+
+    function resetSearch() {
+      const container = document.getElementById('answerContainer');
+      container.classList.add('hidden');
+      const input = document.getElementById('researchInput');
+      if (input) input.value = '';
+    }
+
+    // Markdown simple parser for bold and bullets
+    function renderMarkdown(md) {
+      if (!md) return '';
+      let html = md
+        .replace(/^### (.*$)/gim, '<h3 class="font-headline-sm text-base font-bold text-on-surface mt-3 mb-1">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 class="font-headline-sm text-lg font-bold text-on-surface mt-4 mb-2">$1</h2>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-on-surface">$1</strong>')
+        .replace(/\*(.*?)\*/gim, '<em class="italic">$1</em>')
+        .replace(/^\s*-\s+(.*$)/gim, '<li class="ml-4 list-disc text-on-surface mb-1">$1</li>')
+        .replace(/\n\n/gim, '</p><p class="mb-3">');
+      return `<p class="mb-3">${html}</p>`;
+    }
+
+    // Submit Query to /api/query
+    async function submitQuery(query) {
+      const submitBtn = document.getElementById('submitBtn');
+      const answerContainer = document.getElementById('answerContainer');
+      const answerQueryTitle = document.getElementById('answerQueryTitle');
+      const answerContent = document.getElementById('answerContent');
+      const concernsList = document.getElementById('concernsList');
+      const concernsSection = document.getElementById('concernsDrawerSection');
+      const concernsLabel = document.getElementById('concernsButtonLabel');
+
+      // UI loading state
+      submitBtn.innerHTML = `<span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span>`;
+      submitBtn.disabled = true;
+
+      answerQueryTitle.innerText = `"${query}"`;
+      answerContent.innerHTML = `
+        <div class="flex items-center gap-3 py-4 text-tertiary">
+          <span class="material-symbols-outlined text-2xl text-primary animate-spin">sync</span>
+          <span>Searching 406 Groww and retail investor signals with Groq 120B...</span>
+        </div>
+      `;
+      answerContainer.classList.remove('hidden');
+      concernsSection.classList.add('hidden');
+      concernsList.innerHTML = '';
+      concernsList.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query })
+        });
+        const data = await res.json();
+
+        // Render response
+        answerContent.innerHTML = renderMarkdown(data.answer);
+
+        // Render concerns drawer if in scope and references exist
+        if (!data.is_out_of_scope && data.references && data.references.length > 0) {
+          concernsSection.classList.remove('hidden');
+          concernsLabel.innerText = `Show Specific Investor Concerns & Verbatim Quotes (${data.references.length} Sources)`;
+          
+          let cardsHtml = '';
+          data.references.forEach(ref => {
+            let badgeClass = 'bg-blue-100 text-blue-800';
+            if (ref.badge_type === 'reviews') badgeClass = 'bg-emerald-100 text-emerald-800';
+            else if (ref.badge_type === 'reddit') badgeClass = 'bg-orange-100 text-orange-800';
+            else badgeClass = 'bg-sky-100 text-sky-800';
+
+            cardsHtml += `
+              <div class="p-3 bg-surface-container-low rounded-xl border border-gray-200/80 text-xs text-on-surface">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="px-2 py-0.5 rounded-full text-[10.5px] font-semibold ${badgeClass}">${ref.source}</span>
+                  <a href="${ref.url}" target="_blank" class="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
+                    <span>Open Link</span><span class="material-symbols-outlined text-[13px]">north_east</span>
+                  </a>
+                </div>
+                <div class="italic text-tertiary border-l-2 border-primary pl-2 my-1">"${ref.quote}"</div>
+              </div>
+            `;
+          });
+          concernsList.innerHTML = cardsHtml;
+        } else {
+          concernsSection.classList.add('hidden');
+        }
+
+      } catch (err) {
+        console.error("Query error:", err);
+        answerContent.innerHTML = `
+          <div class="text-error font-medium p-3 bg-red-50 rounded-xl">
+            Could not retrieve AI response. Please ensure local server is running on port 8000.
+          </div>
+        `;
+      } finally {
+        submitBtn.innerHTML = `<span class="material-symbols-outlined text-[20px] font-bold">arrow_upward</span>`;
+        submitBtn.disabled = false;
+        answerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // Load Data Sources View
+    async function loadDataSources() {
+      const container = document.getElementById('recordsListContainer');
+      try {
+        const res = await fetch('/api/records?limit=150');
+        const data = await res.json();
+        allRecords = data.records;
+        currentFilteredRecords = allRecords;
+        renderDataSourcesList(currentFilteredRecords);
+      } catch (e) {
+        container.innerHTML = `<div class="p-4 text-tertiary text-center">Failed to load records.</div>`;
+      }
+    }
+
+    function renderDataSourcesList(records) {
+      const container = document.getElementById('recordsListContainer');
+      if (!records || records.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-tertiary">No matching records found.</div>`;
+        return;
+      }
+
+      let html = '';
+      records.forEach(r => {
+        let badgeColor = 'bg-sky-100 text-sky-800';
+        let srcLabel = 'Reddit';
+        if (r.source.includes('play_store')) {
+          badgeColor = 'bg-emerald-100 text-emerald-800';
+          srcLabel = 'Groww Play Store';
+        } else if (r.source.includes('app_store')) {
+          badgeColor = 'bg-emerald-100 text-emerald-800';
+          srcLabel = 'Groww App Store';
+        } else if (r.source.includes('tradingqna')) {
+          badgeColor = 'bg-blue-100 text-blue-800';
+          srcLabel = 'TradingQ&A';
+        }
+
+        const quote = (r.classification && r.classification.verbatim_quote) || r.raw_text.substring(0, 180);
+
+        html += `
+          <div class="p-4 bg-surface-container-low rounded-xl border border-gray-200/80 hover:border-primary/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex flex-col min-w-0 pr-2">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2 py-0.5 rounded text-[10.5px] font-semibold ${badgeColor}">${srcLabel}</span>
+                <span class="text-xs font-mono text-tertiary">${r.record_id}</span>
+              </div>
+              <div class="font-medium text-sm text-on-surface truncate">${r.title || 'Untitled Post'}</div>
+              <div class="text-xs text-tertiary mt-1 italic line-clamp-1">"${quote}..."</div>
+            </div>
+            <div class="shrink-0">
+              <a href="${r.url || '#'}" target="_blank" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline px-3 py-1.5 bg-surface-container-lowest rounded-lg border border-gray-200">
+                <span>View Discussion</span>
+                <span class="material-symbols-outlined text-[14px]">north_east</span>
+              </a>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function filterBySource(source, btn) {
+      activeSourceFilter = source;
+      const buttons = document.querySelectorAll('#sourceFilterTabs button');
+      buttons.forEach(b => {
+        b.className = 'px-4 py-1.5 rounded-full text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container';
+      });
+      btn.className = 'px-4 py-1.5 rounded-full text-xs font-semibold bg-secondary-container text-on-secondary-container';
+      
+      applyFilters();
+    }
+
+    function filterDataSources() {
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const search = (document.getElementById('dataSourceSearchInput').value || '').toLowerCase();
+      let res = allRecords;
+      if (activeSourceFilter !== 'all') {
+        res = res.filter(r => r.source.toLowerCase().includes(activeSourceFilter.toLowerCase()));
+      }
+      if (search) {
+        res = res.filter(r => (r.title + " " + r.raw_text).toLowerCase().includes(search));
+      }
+      renderDataSourcesList(res);
+    }
+
+    // Load Themes View
+    async function loadThemes() {
+      const container = document.getElementById('themesList');
+      try {
+        const res = await fetch('/api/themes');
+        const themes = await res.json();
+        let html = '';
+        themes.forEach(t => {
+          let quotesHtml = '';
+          if (t.representative_verbatims) {
+            t.representative_verbatims.slice(0, 3).forEach(v => {
+              quotesHtml += `
+                <div class="text-xs italic text-tertiary p-2 bg-surface-container-lowest rounded border border-gray-100 mb-1">
+                  "${v.quote}"
+                  <a href="${v.url}" target="_blank" class="text-primary font-medium hover:underline ml-1">↗</a>
+                </div>
+              `;
+            });
+          }
+
+          html += `
+            <div class="p-5 bg-surface-container-low rounded-2xl border border-gray-200/80">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-primary text-white">${t.theme_id}</span>
+                  <h3 class="font-headline-sm text-base font-bold text-on-surface">${t.theme_name}</h3>
+                </div>
+                <span class="text-xs font-semibold text-primary bg-secondary-container px-2.5 py-1 rounded-full">${t.prevalence_percentage}% Prevalence</span>
+              </div>
+              <p class="text-sm text-on-surface-variant mb-3">${t.definition}</p>
+              <div class="text-xs font-semibold text-tertiary uppercase tracking-wider mb-1.5">Representative Verbatims:</div>
+              ${quotesHtml}
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = `<div class="p-4 text-tertiary text-center">Failed to load themes.</div>`;
+      }
+    }
+
+    // Load Opportunities View
+    async function loadOpportunities() {
+      const container = document.getElementById('opportunitiesList');
+      try {
+        const res = await fetch('/api/opportunities');
+        const opps = await res.json();
+        let html = '';
+        opps.forEach(o => {
+          html += `
+            <div class="p-5 bg-surface-container-low rounded-2xl border border-gray-200/80">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-primary text-white">${o.opportunity_id}</span>
+                  <h3 class="font-headline-sm text-base font-bold text-on-surface">${o.title}</h3>
+                </div>
+                <span class="text-xs font-semibold text-on-secondary-container bg-secondary-container px-2.5 py-1 rounded-full">Score: ${o.ops_score} / 5.0</span>
+              </div>
+              <p class="text-sm text-on-surface-variant mb-2"><strong>Root Problem:</strong> ${o.hypothesis}</p>
+              <p class="text-sm text-primary font-medium"><strong>Recommended Solution:</strong> ${o.solution_direction}</p>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = `<div class="p-4 text-tertiary text-center">Failed to load opportunities.</div>`;
+      }
+    }
+
+    // Load Conversation Library View
+    async function loadConversations() {
+      const container = document.getElementById('conversationsGrid');
+      try {
+        if (allRecords.length === 0) {
+          const res = await fetch('/api/records?limit=60');
+          const data = await res.json();
+          allRecords = data.records;
+        }
+        let html = '';
+        allRecords.slice(0, 16).forEach(r => {
+          const quote = (r.classification && r.classification.verbatim_quote) || r.raw_text.substring(0, 220);
+          html += `
+            <div class="p-4 bg-surface-container-low rounded-2xl border border-gray-200/80 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between text-xs text-tertiary mb-2">
+                  <span class="font-mono">${r.record_id}</span>
+                  <span class="capitalize">${r.source.replace('_', ' ')}</span>
+                </div>
+                <div class="font-semibold text-sm text-on-surface mb-2">${r.title || 'Investor Feedback'}</div>
+                <div class="text-xs text-on-surface-variant italic mb-3">"${quote}..."</div>
+              </div>
+              <div class="pt-2 border-t border-gray-200/60 flex items-center justify-between">
+                <span class="text-[11px] text-primary font-medium">Groww SIP Experience</span>
+                <a href="${r.url || '#'}" target="_blank" class="text-xs text-primary font-semibold hover:underline flex items-center gap-0.5">
+                  <span>Open</span><span class="material-symbols-outlined text-[13px]">north_east</span>
+                </a>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = `<div class="p-4 text-tertiary text-center">Failed to load conversations.</div>`;
+      }
+    }
+
+    // Initialize on DOM load
+    document.addEventListener("DOMContentLoaded", () => {
+      // Check for URL hash to deep-link
+      const hash = window.location.hash.replace('#', '');
+      if (hash && ['new-research', 'research-overview', 'data-sources', 'conversation-library', 'theme-explorer', 'ai-evidence-log'].includes(hash)) {
+        switchView(hash);
+      } else {
+        switchView('new-research');
+      }
+    });
+  </script>
+</body>
+</html>

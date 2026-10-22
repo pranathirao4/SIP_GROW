@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_dashboard" name="shell-type"/>
+  <title>SIP Insight - Groww Research Lab</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-tertiary": "#ffffff",
+            "surface-container-high": "#e2e8f8",
+            "on-primary-fixed-variant": "#00513b",
+            "on-tertiary-fixed-variant": "#404758",
+            "error-container": "#ffdad6",
+            "surface-container-low": "#f0f3ff",
+            "secondary-fixed-dim": "#50ddad",
+            "on-secondary-fixed-variant": "#00513b",
+            "on-secondary-container": "#007153",
+            "secondary-fixed": "#71fac8",
+            "tertiary": "#575e70",
+            "on-secondary-fixed": "#002116",
+            "surface-tint": "#006c4f",
+            "surface-container": "#e7eefe",
+            "on-primary": "#ffffff",
+            "inverse-primary": "#2fe0aa",
+            "surface": "#f9f9ff",
+            "surface-variant": "#dce2f3",
+            "on-primary-fixed": "#002116",
+            "on-secondary": "#ffffff",
+            "on-tertiary-fixed": "#141b2b",
+            "primary-fixed-dim": "#2fe0aa",
+            "outline-variant": "#bacac1",
+            "surface-container-highest": "#dce2f3",
+            "on-primary-container": "#00533c",
+            "error": "#ba1a1a",
+            "surface-bright": "#f9f9ff",
+            "outline": "#6b7b72",
+            "tertiary-fixed": "#dce2f7",
+            "on-surface": "#151c27",
+            "on-background": "#151c27",
+            "primary": "#006c4f",
+            "primary-container": "#00d09c",
+            "secondary": "#006c4f",
+            "secondary-container": "#6ef7c6",
+            "tertiary-container": "#b0b7cb",
+            "surface-container-lowest": "#ffffff",
+            "tertiary-fixed-dim": "#c0c6db",
+            "inverse-surface": "#2a313d",
+            "background": "#f9f9ff",
+            "primary-fixed": "#59fdc5",
+            "inverse-on-surface": "#ebf1ff",
+            "on-surface-variant": "#3c4a43",
+            "on-tertiary-container": "#414859",
+            "on-error": "#ffffff",
+            "surface-dim": "#d3daea",
+            "on-error-container": "#93000a"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "space-xl": "2rem",
+            "space-sm": "0.5rem",
+            "gutter-sm": "1rem",
+            "space-md": "1rem",
+            "space-2xl": "3rem",
+            "margin": "2rem",
+            "space-lg": "1.5rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin-mobile": "1rem"
+          },
+          fontFamily: {
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "label-lg": ["Inter"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased">
+  <!-- Left Sidebar -->
+  <aside class="fixed left-0 top-0 h-screen w-[250px] bg-surface-container-low shadow-[1px_0_0_0_rgba(229,231,235,1)] z-40 flex flex-col justify-between">
+    <div class="flex flex-col">
+      <div class="px-space-md py-space-lg flex items-center gap-space-sm">
+        <img alt="SIP Insight Logo" class="h-8 w-auto object-contain" src="https://assets-netstorage.groww.in/web-assets/big_logo.png"/>
+        <div class="flex flex-col min-w-0">
+          <span class="font-headline-sm text-headline-sm text-on-surface truncate tracking-tight">SIP Insight</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant truncate uppercase tracking-wider">Groww Research Lab</span>
+        </div>
+      </div>
+      <div class="px-space-md py-space-xs">
+        <span class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider px-space-xs">Core Navigation</span>
+      </div>
+      <nav class="flex flex-col gap-space-xs px-space-sm mt-space-xs">
+        <a aria-current="page" class="flex items-center gap-space-sm h-10 px-space-md rounded-lg transition-colors bg-secondary-container text-on-secondary-container font-semibold" href="#">
+          <span class="material-symbols-outlined text-[20px]">explore</span>
+          <span class="font-label-md text-label-md">New Research</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" href="#">
+          <span class="material-symbols-outlined text-[20px]">bar_chart</span>
+          <span class="font-label-md text-label-md">Research Overview</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" href="#">
+          <span class="material-symbols-outlined text-[20px]">database</span>
+          <span class="font-label-md text-label-md">Data Sources (406)</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" href="#">
+          <span class="material-symbols-outlined text-[20px]">archive</span>
+          <span class="font-label-md text-label-md">Conversation Library</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" href="#">
+          <span class="material-symbols-outlined text-[20px]">account_tree</span>
+          <span class="font-label-md text-label-md">Theme Explorer</span>
+        </a>
+        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" href="#">
+          <span class="material-symbols-outlined text-[20px]">verified_user</span>
+          <span class="font-label-md text-label-md">AI Evidence Log</span>
+        </a>
+      </nav>
+    </div>
+    <div class="p-space-md flex flex-col gap-space-xs">
+      <div class="bg-surface-container p-space-sm rounded-lg flex flex-col gap-space-xs">
+        <div class="flex items-center gap-space-xs">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class="font-label-sm text-label-sm text-primary font-semibold">Groq 120B Active</span>
+        </div>
+        <span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">406 Groww & Retail Investor Signals</span>
+      </div>
+      <div class="flex items-center justify-between pt-space-xs px-space-xs">
+        <span class="font-label-sm text-label-sm text-tertiary">Groww Quantitative Unit</span>
+        <span class="material-symbols-outlined text-[16px] text-tertiary">lock</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="pl-[250px]">
+    <!-- Top Header -->
+    <header class="fixed top-0 left-[250px] right-0 z-30 bg-surface-container-lowest/90 backdrop-blur-md shadow-[0_1px_0_0_rgba(229,231,235,1)]">
+      <div class="h-14 w-full px-gutter flex items-center justify-between">
+        <div class="flex items-center gap-space-md">
+          <div class="hidden sm:flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full text-on-surface-variant text-label-sm font-label-sm">
+            <span class="material-symbols-outlined text-[14px] text-primary">science</span>
+            <span>Research Sandbox</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-space-md">
+          <div class="hidden md:flex items-center gap-space-xs bg-surface-container-low text-tertiary px-space-md h-8 rounded-full">
+            <span class="material-symbols-outlined text-[16px]">search</span>
+            <span class="font-label-sm text-label-sm">Search 406 records (⌘K)</span>
+          </div>
+          <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main View -->
+    <main class="w-full pt-14 min-h-screen bg-surface-container-lowest">
+      <div class="relative w-full min-h-[calc(100vh-3.5rem)] flex flex-col justify-between px-space-lg lg:px-space-2xl py-space-xl overflow-hidden bg-surface-container-lowest">
+        <div class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[760px] h-[340px] bg-gradient-to-b from-primary/5 via-secondary-fixed/5 to-transparent blur-3xl opacity-60"></div>
+        <div class="pointer-events-none absolute -bottom-24 right-1/4 w-[420px] h-[220px] bg-gradient-to-tr from-surface-container-high/40 to-transparent blur-2xl opacity-70"></div>
+
+        <!-- Top Breadcrumb & Evidence Dropdown -->
+        <div class="w-full flex items-center justify-between relative z-10">
+          <div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+            <span>Quantitative Synthesis Lab</span>
+            <span class="text-tertiary">/</span>
+            <span class="text-on-surface">Agent Core 04</span>
+          </div>
+          <div class="relative">
+            <button class="group flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest hover:bg-surface-container-low shadow-sm transition-all duration-200 cursor-pointer border border-gray-200" id="evidenceMenuBtn" onclick="toggleEvidenceDrawer()">
+              <span class="material-symbols-outlined text-[16px] text-primary group-hover:rotate-12 transition-transform">database</span>
+              <span class="font-label-md text-label-md text-on-surface font-medium">Evidence &amp; Sources</span>
+              <span class="material-symbols-outlined text-[16px] text-tertiary group-hover:translate-y-0.5 transition-transform" id="evidenceChevron">expand_more</span>
+            </button>
+            <div class="hidden absolute right-0 mt-space-xs w-80 p-space-sm rounded-xl bg-surface-container-lowest shadow-xl z-50 transition-all border border-gray-200" id="evidenceDropdown">
+              <div class="px-space-sm py-space-xs flex items-center justify-between">
+                <span class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider">Connected Indices</span>
+                <span class="font-label-sm text-label-sm text-primary font-semibold">Live (406 Verified)</span>
+              </div>
+              <div class="flex flex-col gap-space-xs mt-space-xs">
+                <div class="flex items-start gap-space-sm p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
+                  <span class="material-symbols-outlined text-[18px] text-primary mt-0.5">forum</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-md text-label-md text-on-surface font-medium">Groww Community Discussions</span>
+                    <span class="font-body-sm text-body-sm text-tertiary">138 Reddit & 79 TradingQ&A threads</span>
+                  </div>
+                </div>
+                <div class="flex items-start gap-space-sm p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
+                  <span class="material-symbols-outlined text-[18px] text-primary mt-0.5">reviews</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-md text-label-md text-on-surface font-medium">Groww App Store Audits</span>
+                    <span class="font-body-sm text-body-sm text-tertiary">40 verified Play Store & iOS reviews</span>
+                  </div>
+                </div>
+                <div class="flex items-start gap-space-sm p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
+                  <span class="material-symbols-outlined text-[18px] text-primary mt-0.5">groups</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-md text-label-md text-on-surface font-medium">First-Time SIP Cohorts</span>
+                    <span class="font-body-sm text-body-sm text-tertiary">80 high-signal behavioral cases</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-space-xs pt-space-xs px-space-sm flex items-center justify-between bg-surface-container-low rounded-lg p-2">
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Corpus Freshness</span>
+                <span class="font-label-sm text-label-sm text-primary font-semibold">Synced Live</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Hero Section -->
+        <div class="w-full max-w-4xl mx-auto flex flex-col items-center justify-center my-auto py-space-lg relative z-10 text-center">
+          <div class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm tracking-wider uppercase mb-space-lg shadow-sm border border-gray-100">
+            <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+            <span class="font-semibold text-primary">Groww SIP Retention Research</span>
+            <span class="text-tertiary">•</span>
+            <span class="text-tertiary">Behavioral AI Model</span>
+          </div>
+          <h1 class="font-display-lg text-display-lg text-on-surface tracking-tight max-w-3xl leading-[1.18] mb-space-md">
+            Discover why investors stay with their SIPs — or stop.
+          </h1>
+          <p class="font-body-lg text-body-lg text-tertiary max-w-2xl text-center leading-relaxed mb-space-xl">
+            Explore real investor conversations, identify recurring behavioral friction, and uncover evidence-backed opportunities to improve 12-month SIP retention.
+          </p>
+
+          <!-- Prompt Chips -->
+          <div class="flex flex-wrap items-center justify-center gap-space-sm mb-space-xl w-full max-w-3xl">
+            <button class="group inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest hover:bg-surface-container-low shadow-sm transition-all duration-150 cursor-pointer text-left border border-gray-200" onclick="fillQuery('Why do first-time investors stop their SIPs?')">
+              <span class="material-symbols-outlined text-[16px] text-primary-container group-hover:scale-110 transition-transform">auto_awesome</span>
+              <span class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Why do first-time investors stop their SIPs?</span>
+            </button>
+            <button class="group inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest hover:bg-surface-container-low shadow-sm transition-all duration-150 cursor-pointer text-left border border-gray-200" onclick="fillQuery('What changes after starting a SIP?')">
+              <span class="material-symbols-outlined text-[16px] text-primary-container group-hover:scale-110 transition-transform">trending_up</span>
+              <span class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">What changes after starting a SIP?</span>
+            </button>
+            <button class="group inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest hover:bg-surface-container-low shadow-sm transition-all duration-150 cursor-pointer text-left border border-gray-200" onclick="fillQuery('What unmet needs emerge from investor conversations?')">
+              <span class="material-symbols-outlined text-[16px] text-primary-container group-hover:scale-110 transition-transform">psychology_alt</span>
+              <span class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">What unmet needs emerge from investor conversations?</span>
+            </button>
+          </div>
+
+          <!-- Search Input Form -->
+          <div class="w-full max-w-[720px] relative">
+            <form class="w-full flex items-center bg-surface-container-lowest rounded-2xl sm:rounded-full px-space-md py-2.5 shadow-md hover:shadow-xl transition-all duration-200 border border-gray-200" onsubmit="handleSearch(event)">
+              <div class="flex items-center justify-center pl-space-xs pr-space-sm text-tertiary">
+                <span class="material-symbols-outlined text-[22px] text-primary-container">psychology</span>
+              </div>
+              <input autocomplete="off" class="w-full bg-transparent border-0 outline-none font-body-md text-body-md text-on-surface placeholder:text-tertiary/70 py-space-xs px-space-xs" id="researchInput" placeholder="Ask your research agent about SIP investor behaviour..." type="text"/>
+              <div class="flex items-center gap-space-xs pl-space-xs">
+                <button class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low text-tertiary hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer" onclick="fillQuery('Why do users permanently delete Groww AutoPay instead of using Pause?')" title="Surprise query" type="button">
+                  <span class="material-symbols-outlined text-[18px]">lightbulb</span>
+                </button>
+                <button aria-label="Send Query" class="w-10 h-10 rounded-full bg-primary-container hover:bg-secondary flex items-center justify-center text-on-primary shadow-sm hover:scale-105 active:scale-95 transition-all duration-150 cursor-pointer" type="submit">
+                  <span class="material-symbols-outlined text-[20px] font-bold">arrow_upward</span>
+                </button>
+              </div>
+            </form>
+            <div class="flex items-center justify-center gap-space-xs mt-space-sm">
+              <span class="material-symbols-outlined text-[14px] text-primary">verified</span>
+              <p class="font-body-sm text-body-sm text-tertiary">
+                Research answers are grounded in 406 collected public conversations and linked evidence.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Status Bar -->
+        <div class="w-full flex flex-col sm:flex-row items-center justify-between pt-space-lg gap-space-xs text-tertiary font-body-sm text-body-sm relative z-10 border-t border-gray-100">
+          <div class="flex items-center gap-space-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+            <span class="truncate">Public discussions from Reddit r/IndiaInvestments, Play Store reviews, and personal finance communities</span>
+          </div>
+          <div class="flex items-center gap-space-md text-tertiary">
+            <span class="font-label-sm text-label-sm tracking-wider uppercase">Synthesized Cohorts: 406 Records</span>
+            <span>•</span>
+            <span class="font-label-sm text-label-sm">Updated Live</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleEvidenceDrawer() {
+      const dropdown = document.getElementById('evidenceDropdown');
+      const chevron = document.getElementById('evidenceChevron');
+      if (dropdown.classList.contains('hidden')) {
+        dropdown.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        dropdown.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('evidenceDropdown');
+      const btn = document.getElementById('evidenceMenuBtn');
+      if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.add('hidden');
+        const chevron = document.getElementById('evidenceChevron');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    function fillQuery(text) {
+      const input = document.getElementById('researchInput');
+      if (input) {
+        input.value = text;
+        input.focus();
+      }
+    }
+
+    function handleSearch(e) {
+      e.preventDefault();
+      const input = document.getElementById('researchInput');
+      if (!input || !input.value.trim()) return;
+      const query = input.value.trim();
+      window.location.href = `http://localhost:8501/?q=${encodeURIComponent(query)}`;
+    }
+  </script>
+</body>
+</html>
