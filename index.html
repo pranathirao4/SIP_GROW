@@ -165,22 +165,6 @@
           <span class="material-symbols-outlined text-[20px]">bar_chart</span>
           <span class="font-label-md text-label-md">Research Overview</span>
         </a>
-        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" data-path="data-sources" onclick="switchView('data-sources')">
-          <span class="material-symbols-outlined text-[20px]">database</span>
-          <span class="font-label-md text-label-md">Data Sources (406)</span>
-        </a>
-        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" data-path="conversation-library" onclick="switchView('conversation-library')">
-          <span class="material-symbols-outlined text-[20px]">archive</span>
-          <span class="font-label-md text-label-md">Conversation Library</span>
-        </a>
-        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" data-path="theme-explorer" onclick="switchView('theme-explorer')">
-          <span class="material-symbols-outlined text-[20px]">account_tree</span>
-          <span class="font-label-md text-label-md">Theme Explorer</span>
-        </a>
-        <a class="flex items-center gap-space-sm h-10 px-space-md rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" data-path="ai-evidence-log" onclick="switchView('ai-evidence-log')">
-          <span class="material-symbols-outlined text-[20px]">verified_user</span>
-          <span class="font-label-md text-label-md">AI Evidence Log</span>
-        </a>
       </nav>
     </div>
     
@@ -236,13 +220,7 @@
         <div class="pointer-events-none absolute -bottom-24 right-1/4 w-[420px] h-[220px] bg-gradient-to-tr from-surface-container-high/40 to-transparent blur-2xl opacity-70"></div>
 
         <!-- Top Status Bar & Evidence Dropdown -->
-        <div class="w-full flex items-center justify-between relative z-10">
-          <div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
-            <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
-            <span>Quantitative Synthesis Lab</span>
-            <span class="text-tertiary">/</span>
-            <span class="text-on-surface">Agent Core 04</span>
-          </div>
+        <div class="w-full flex items-center justify-end relative z-10">
 
           <!-- Evidence & Sources Dropdown -->
           <div class="relative">
@@ -289,13 +267,6 @@
 
         <!-- Hero Content Area -->
         <div class="w-full max-w-4xl mx-auto flex flex-col items-center justify-center my-auto py-space-md relative z-10 text-center">
-          <!-- Tag Pill -->
-          <div class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm tracking-wider uppercase mb-space-md shadow-sm border border-gray-100">
-            <span class="w-2 h-2 rounded-full bg-primary-container"></span>
-            <span class="font-semibold text-primary">Groww SIP Retention Research</span>
-            <span class="text-tertiary">•</span>
-            <span class="text-tertiary">Behavioral AI Model</span>
-          </div>
 
           <!-- Main Title & Subtitle -->
           <h1 class="font-display-lg text-display-lg text-on-surface tracking-tight max-w-3xl leading-[1.18] mb-space-sm">
@@ -337,12 +308,6 @@
                 </button>
               </div>
             </form>
-            <div class="flex items-center justify-center gap-space-xs mt-space-sm">
-              <span class="material-symbols-outlined text-[14px] text-primary">verified</span>
-              <p class="font-body-sm text-body-sm text-tertiary">
-                Research answers are grounded in 406 collected public conversations and linked evidence.
-              </p>
-            </div>
           </div>
 
           <!-- Dynamic Live Answer Container (Google / AI Overview Style) -->
@@ -355,8 +320,7 @@
                   <span class="font-headline-sm text-[15px] text-on-surface font-semibold" id="answerQueryTitle">Research Synthesis</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="bg-secondary-container/50 text-on-secondary-container font-label-sm text-label-sm px-2.5 py-1 rounded-full font-semibold">Groq 120B Model Grounded</span>
-                  <button class="text-tertiary hover:text-on-surface text-sm flex items-center" onclick="resetSearch()" title="Clear answer">
+                  <button class="text-tertiary hover:text-on-surface text-sm flex items-center p-1 rounded-lg hover:bg-surface-container transition-colors" onclick="resetSearch()" title="Clear answer">
                     <span class="material-symbols-outlined text-[18px]">close</span>
                   </button>
                 </div>
@@ -384,18 +348,6 @@
           </div>
         </div>
 
-        <!-- Bottom Status Bar (Google Stitch Exact) -->
-        <div class="w-full flex flex-col sm:flex-row items-center justify-between pt-space-lg gap-space-xs text-tertiary font-body-sm text-body-sm relative z-10 border-t border-gray-100">
-          <div class="flex items-center gap-space-xs">
-            <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
-            <span class="truncate">Public discussions from Reddit r/IndiaInvestments, Play Store reviews, and personal finance communities</span>
-          </div>
-          <div class="flex items-center gap-space-md text-tertiary">
-            <span class="font-label-sm text-label-sm tracking-wider uppercase">Synthesized Cohorts: 406 Records</span>
-            <span>•</span>
-            <span class="font-label-sm text-label-sm">Updated Live</span>
-          </div>
-        </div>
       </section>
 
       <!-- ========================================== -->
