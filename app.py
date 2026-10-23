@@ -128,8 +128,8 @@ st.markdown("""
     /* Main Content Styling */
     .main .block-container {
         max-width: 860px !important;
-        padding-top: 1.5rem !important;
-        padding-bottom: 3rem !important;
+        padding-top: 1.25rem !important;
+        padding-bottom: 7.5rem !important; /* WhatsApp sticky chat bar clearance */
     }
     
     /* Hero Title & Subtitle */
@@ -191,103 +191,160 @@ st.markdown("""
         box-shadow: 0 4px 10px rgba(0, 108, 79, 0.08) !important;
     }
     
-    /* Center Hero Search Bar (Google Stitch Exact) */
-    div[data-testid="stForm"] {
-        background: #FFFFFF !important;
+    /* WhatsApp Bottom Sticky Chat Input Bar */
+    div[data-testid="stChatInput"] {
         background-color: #FFFFFF !important;
-        border: 1.5px solid #E2E8F0 !important;
-        border-radius: 9999px !important;
-        padding: 4px 8px 4px 16px !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
-        max-width: 720px !important;
-        margin: 0.5rem auto 1.8rem auto !important;
-        display: flex !important;
-        align-items: center !important;
+        border: 1.5px solid #CBD5E1 !important;
+        border-radius: 28px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        padding: 4px 8px !important;
         transition: all 0.2s ease !important;
+        max-width: 860px !important;
+        margin: 0 auto !important;
     }
-    div[data-testid="stForm"]:hover, div[data-testid="stForm"]:focus-within {
+    div[data-testid="stChatInput"]:focus-within {
         border-color: #00D09C !important;
-        box-shadow: 0 6px 20px rgba(0, 208, 156, 0.15) !important;
+        box-shadow: 0 6px 24px rgba(0, 208, 156, 0.18) !important;
     }
-    
-    /* Remove any dark/black background in between and keep it pure white only */
-    div[data-testid="stForm"] div[data-testid="stTextInput"],
-    div[data-testid="stForm"] div[data-testid="stTextInput"] * {
-        background: #FFFFFF !important;
+    div[data-testid="stChatInput"] textarea {
         background-color: #FFFFFF !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-    div[data-testid="stForm"] div[data-testid="stTextInput"] {
-        width: 100% !important;
-        margin: 0 !important;
-    }
-    div[data-testid="stForm"] div[data-testid="stTextInput"] input {
-        background: #FFFFFF !important;
-        background-color: #FFFFFF !important;
-        font-size: 15px !important;
+        color: #111B21 !important;
+        font-size: 14.5px !important;
         font-weight: 500 !important;
-        color: #151C27 !important;
-        padding: 8px 8px !important;
+        line-height: 1.5 !important;
+        padding: 8px 12px !important;
         border: none !important;
         outline: none !important;
-        box-shadow: none !important;
-        width: 100% !important;
     }
-    div[data-testid="stForm"] div[data-testid="stTextInput"] input::placeholder {
+    div[data-testid="stChatInput"] textarea::placeholder {
         color: #64748B !important;
-        opacity: 0.9 !important;
-        font-size: 14.5px !important;
-        font-weight: 400 !important;
+        font-size: 14px !important;
     }
-    div[data-testid="stForm"] [data-testid="InputInstructions"] {
-        display: none !important;
-    }
-    div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] {
-        margin: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-    }
-    div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] button {
-        border-radius: 9999px !important;
+    div[data-testid="stChatInput"] button {
         background-color: #00D09C !important;
+        border-radius: 50% !important;
         color: #FFFFFF !important;
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-        min-height: 38px !important;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
         padding: 0 !important;
-        font-size: 20px !important;
-        font-weight: 700 !important;
-        border: none !important;
-        box-shadow: 0 2px 6px rgba(0, 208, 156, 0.25) !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        border: none !important;
+        box-shadow: 0 2px 6px rgba(0, 208, 156, 0.25) !important;
         transition: all 0.15s ease !important;
     }
-    div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] button:hover {
+    div[data-testid="stChatInput"] button:hover {
         background-color: #006C4F !important;
-        transform: scale(1.05) !important;
+        transform: scale(1.06) !important;
     }
-    .search-icon-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #00D09C;
-        height: 100%;
-        padding-right: 4px;
+    div[data-testid="stChatInput"] button svg {
+        fill: #FFFFFF !important;
+        color: #FFFFFF !important;
     }
-    
-    /* Chat Messages Container */
-    div[data-testid="stChatMessage"] {
+
+    /* WhatsApp User Message Bubble - Right-aligned Mint Green */
+    div[data-testid="stChatMessage"]:has(.wa-bubble-user),
+    div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+        flex-direction: row-reverse !important;
+        background-color: #D9FDD3 !important;
+        border: 1px solid #C4EBC2 !important;
+        border-radius: 18px 18px 3px 18px !important;
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        max-width: 78% !important;
+        width: fit-content !important;
+        padding: 10px 16px !important;
+        box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.06) !important;
+        margin-bottom: 1.25rem !important;
+    }
+    div[data-testid="stChatMessage"]:has(.wa-bubble-user) > div:first-child,
+    div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) > div:first-child {
+        margin-left: 10px !important;
+        margin-right: 0 !important;
+    }
+    div[data-testid="stChatMessage"]:has(.wa-bubble-user) [data-testid="stChatMessageContent"] *,
+    div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stChatMessageContent"] * {
+        color: #111B21 !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        line-height: 1.5 !important;
+    }
+    div[data-testid="stChatMessage"]:has(.wa-bubble-user) .wa-bubble-user {
+        display: none !important;
+    }
+
+    /* WhatsApp Assistant Message Bubble - Left-aligned Clean White Card */
+    div[data-testid="stChatMessage"]:has(.wa-bubble-bot),
+    div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+        flex-direction: row !important;
         background-color: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
-        border-radius: 16px !important;
-        padding: 1.25rem 1.5rem !important;
-        margin-bottom: 1.25rem !important;
+        border-radius: 18px 18px 18px 3px !important;
+        margin-left: 0 !important;
+        margin-right: auto !important;
+        max-width: 92% !important;
+        width: 100% !important;
+        padding: 1.35rem 1.6rem !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
-        color: #151C27 !important;
+        margin-bottom: 1.5rem !important;
+    }
+    div[data-testid="stChatMessage"]:has(.wa-bubble-bot) > div:first-child,
+    div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) > div:first-child {
+        margin-right: 12px !important;
+        margin-left: 0 !important;
+    }
+    div[data-testid="stChatMessage"]:has(.wa-bubble-bot) .wa-bubble-bot {
+        display: none !important;
+    }
+
+    /* WhatsApp Typing / Answering Animation Indicator */
+    .typing-bubble {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #F0FDF4;
+        border: 1px solid #BBF7D0;
+        border-radius: 20px;
+        padding: 8px 16px;
+        margin: 4px 0;
+    }
+    .typing-dots {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .typing-dots .dot {
+        width: 7px;
+        height: 7px;
+        background-color: #00D09C;
+        border-radius: 50%;
+        display: inline-block;
+        animation: waDotPulse 1.35s infinite ease-in-out both;
+    }
+    .typing-dots .dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dots .dot:nth-child(2) { animation-delay: 0.22s; }
+    .typing-dots .dot:nth-child(3) { animation-delay: 0.44s; }
+
+    @keyframes waDotPulse {
+        0%, 80%, 100% {
+            transform: scale(0.65) translateY(0);
+            opacity: 0.45;
+            background-color: #00D09C;
+        }
+        40% {
+            transform: scale(1.2) translateY(-4px);
+            opacity: 1;
+            background-color: #006C4F;
+        }
+    }
+    .typing-text {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #006C4F;
+        letter-spacing: -0.01em;
     }
     
     /* Ensure ALL text inside chat messages is clearly visible with dark high-contrast typography */
@@ -520,6 +577,13 @@ with st.sidebar:
         st.session_state.current_view = "research_overview"
         st.rerun()
 
+    if st.session_state.messages:
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+        if st.button("🗑️  Clear Conversation", key="nav_clear_chat"):
+            st.session_state.messages = []
+            st.session_state.current_view = "new_research"
+            st.rerun()
+
 
 # ------------------------------------------------------------------
 # View 2: Research Overview
@@ -597,91 +661,174 @@ if st.session_state.current_view == "research_overview":
 
 
 # ------------------------------------------------------------------
-# View 1: New Research (The Main AI Discovery Agent)
+# View 1: New Research (The Main AI Discovery Agent) - WhatsApp Screen
 # ------------------------------------------------------------------
 else:
-    # Google Stitch Hero Section
-    st.markdown("""
-    <div style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.25rem;">
-        <div class="stitch-hero-title">Discover why investors stay with their SIPs — or stop.</div>
-        <div class="stitch-hero-subtitle">Explore real investor conversations, identify recurring behavioral friction, and uncover evidence-backed opportunities to improve 12-month SIP retention.</div>
-    </div>
-    """, unsafe_allow_html=True)
+    # 1. Top Section: Hero & Prompt Chips (Only shown on empty chat state)
+    if not st.session_state.messages:
+        st.markdown("""
+        <div style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.25rem;">
+            <div class="stitch-hero-title">Discover why investors stay with their SIPs — or stop.</div>
+            <div class="stitch-hero-subtitle">Explore real investor conversations, identify recurring behavioral friction, and uncover evidence-backed opportunities to improve 12-month SIP retention.</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # Prompt Chips - Completely visible without any truncation
-    # Row 1: Two spacious columns for Chip 1 and Chip 2
-    c_chip1, c_chip2 = st.columns([1.15, 0.85])
-    with c_chip1:
-        if st.button("✨ Why do first-time investors stop their SIPs?", key="btn_chip_1", use_container_width=True):
-            st.session_state.input_query = "Why do first-time investors stop their SIPs?"
-            st.rerun()
-    with c_chip2:
-        if st.button("📈 What changes after starting a SIP?", key="btn_chip_2", use_container_width=True):
-            st.session_state.input_query = "What changes after starting a SIP?"
-            st.rerun()
+        # Prompt Chips - Completely visible without any truncation
+        c_chip1, c_chip2 = st.columns([1.15, 0.85])
+        with c_chip1:
+            if st.button("✨ Why do first-time investors stop their SIPs?", key="btn_chip_1", use_container_width=True):
+                st.session_state.input_query = "Why do first-time investors stop their SIPs?"
+                st.rerun()
+        with c_chip2:
+            if st.button("📈 What changes after starting a SIP?", key="btn_chip_2", use_container_width=True):
+                st.session_state.input_query = "What changes after starting a SIP?"
+                st.rerun()
 
-    # Row 2: Full-width centered column for Chip 3 so all words are 100% visible
-    c_chip3 = st.columns([1])[0]
-    with c_chip3:
-        if st.button("🧠 What unmet needs emerge from investor conversations?", key="btn_chip_3", use_container_width=True):
-            st.session_state.input_query = "What unmet needs emerge from investor conversations?"
-            st.rerun()
+        c_chip3 = st.columns([1])[0]
+        with c_chip3:
+            if st.button("🧠 What unmet needs emerge from investor conversations?", key="btn_chip_3", use_container_width=True):
+                st.session_state.input_query = "What unmet needs emerge from investor conversations?"
+                st.rerun()
 
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div style="text-align: center; color: #575E70; font-size: 13.5px; margin-top: 1.5rem; margin-bottom: 1rem;">
+            💬 <em>Type your research question in the bar below or tap a discovery topic above.</em>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        # Compact WhatsApp Chat Header with Clear button
+        col_hdr1, col_hdr2 = st.columns([7.8, 2.2])
+        with col_hdr1:
+            st.markdown("""
+            <div style="display: flex; align-items: center; gap: 10px; padding: 4px 0 10px 0;">
+                <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 17px; font-weight: 700; color: #151C27;">Groww SIP Research Lab</span>
+                <span style="background: #E8F5E9; color: #006C4F; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px;">406 CASES AUDITED</span>
+            </div>
+            """, unsafe_allow_html=True)
+        with col_hdr2:
+            if st.button("🗑️ Clear Chat", key="btn_clear_chat_top", use_container_width=True):
+                st.session_state.messages = []
+                st.rerun()
 
-    # Centered Search Bar (Google Stitch Exact - Placed right below the questions)
-    with st.form(key="center_search_form", clear_on_submit=False):
-        col_icon, col_input, col_submit = st.columns([0.5, 8.8, 0.7])
-        with col_icon:
-            st.markdown('<div class="search-icon-wrapper"><span class="material-symbols-outlined text-[22px] text-primary">psychology</span></div>', unsafe_allow_html=True)
-        with col_input:
-            typed_query = st.text_input(
-                "Search",
-                placeholder="Ask your research agent about SIP investor behaviour...",
-                label_visibility="collapsed",
-                key="center_input_text"
-            )
-        with col_submit:
-            search_submitted = st.form_submit_button("↑")
+    # 2. Render Existing Chat Messages (WhatsApp Order: chronological, oldest at top, recent at bottom)
+    if st.session_state.messages:
+        for msg in st.session_state.messages:
+            if msg["role"] == "user":
+                with st.chat_message("user", avatar="👤"):
+                    st.markdown('<div class="wa-bubble-user"></div>', unsafe_allow_html=True)
+                    st.markdown(msg["content"])
+            else:
+                with st.chat_message("assistant", avatar="https://assets-netstorage.groww.in/web-assets/big_logo.png"):
+                    st.markdown('<div class="wa-bubble-bot"></div>', unsafe_allow_html=True)
+                    st.markdown(msg["content"], unsafe_allow_html=True)
+                    
+                    # Interactive "Show Specific Investor Concerns & Quotes"
+                    if "references" in msg and msg["references"]:
+                        with st.expander(f"💬 Show Specific Investor Concerns & Quotes ({len(msg['references'])} sources)"):
+                            for ref in msg["references"]:
+                                ref_src = ref.get("source", "").lower()
+                                if "play_store" in ref_src:
+                                    src_label = "Groww Play Store Review"
+                                elif "app_store" in ref_src:
+                                    src_label = "Groww App Store Review"
+                                elif "tradingqna" in ref_src:
+                                    src_label = "TradingQ&A (Groww)"
+                                elif "youtube" in ref_src:
+                                    src_label = "YouTube Comment"
+                                else:
+                                    src_label = "Reddit Community"
 
-    # Determine Active Query (either from Prompt Chip or from Center Search Bar)
+                                quote_txt = ref.get("classification", {}).get("verbatim_quote") or ref.get("raw_text", "")[:220]
+                                url = ref.get("url") or "#"
+
+                                st.markdown(f"**• {src_label}** `({ref['record_id']})`")
+                                st.markdown(f"> *\"{quote_txt}...\"*")
+                                st.markdown(f"↳ [Open Original Discussion ↗]({url})")
+                                st.markdown("---")
+
+    # 3. WhatsApp Bottom Sticky Question Bar
+    chat_input_query = st.chat_input("Ask your research agent about SIP investor behaviour...")
+
+    # 4. Check for Active Query (from sticky chat bar or prompt chip)
     active_query = None
-    if search_submitted and typed_query.strip():
-        active_query = typed_query.strip()
+    if chat_input_query and chat_input_query.strip():
+        active_query = chat_input_query.strip()
     elif st.session_state.get("input_query"):
         active_query = st.session_state.input_query
         st.session_state.input_query = ""
 
-    # Execute and Stream Query Response if Triggered
+    # 5. Process Active Query with WhatsApp Bubbles and Typing Animation
     if active_query:
+        # Append User Message to State
         st.session_state.messages.append({"role": "user", "content": active_query})
+        
+        # Render User Message immediately on the right
+        with st.chat_message("user", avatar="👤"):
+            st.markdown('<div class="wa-bubble-user"></div>', unsafe_allow_html=True)
+            st.markdown(active_query)
 
-        # Strict Scope Guardrail Check
-        query_lower = active_query.lower()
-        off_topic_keywords = [
-            "cricket", "cricketer", "virat", "dhoni", "ipl", "football", "messi", "ronaldo",
-            "birthday", "weather", "recipe", "cinema", "bollywood", "hollywood", "actor", "actress",
-            "prime minister", "president", "capital of", "who wrote", "song", "movie", "horoscope"
-        ]
+        # Render Assistant Bubble on the left with animated typing dots
+        with st.chat_message("assistant", avatar="https://assets-netstorage.groww.in/web-assets/big_logo.png"):
+            st.markdown('<div class="wa-bubble-bot"></div>', unsafe_allow_html=True)
+            status_box = st.empty()
+            status_box.markdown("""
+            <div class="typing-bubble">
+                <div class="typing-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <span class="typing-text">Groww Research Agent is thinking & searching 406 cases...</span>
+            </div>
+            """, unsafe_allow_html=True)
 
-        if any(k in query_lower for k in off_topic_keywords):
-            out_of_scope_reply = "This is out of scope. I am the Groww SIP Retention Discovery Agent and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandate issues, and first-time investor behavior."
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": out_of_scope_reply,
-                "references": []
-            })
-            st.rerun()
-        else:
-            # RAG Retrieval on 406 records
-            with st.spinner("Searching verified Groww and retail investor discussions..."):
+            # Strict Scope Guardrail Check
+            query_lower = active_query.lower()
+            off_topic_keywords = [
+                "cricket", "cricketer", "virat", "dhoni", "ipl", "football", "messi", "ronaldo",
+                "birthday", "weather", "recipe", "cinema", "bollywood", "hollywood", "actor", "actress",
+                "prime minister", "president", "capital of", "who wrote", "song", "movie", "horoscope"
+            ]
+
+            if any(k in query_lower for k in off_topic_keywords):
+                out_of_scope_reply = "This is out of scope. I am the Groww SIP Retention Discovery Agent and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandate issues, and first-time investor behavior."
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": out_of_scope_reply,
+                    "references": []
+                })
+                st.rerun()
+            else:
+                # RAG Retrieval on 406 records
+                status_box.markdown("""
+                <div class="typing-bubble">
+                    <div class="typing-dots">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <span class="typing-text">Retrieving verified retail investor conversations...</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
                 retrieval_res = retriever.retrieve_with_evidence_stats(active_query, top_k=6)
                 retrieved_docs = retrieval_res["primary_matches"]
                 counter_docs = retrieval_res.get("counterevidence_matches", [])
                 stats = retrieval_res["stats"]
 
-            # Groq 120B Big Model Generation
-            with st.spinner("Synthesizing answer from real investor evidence..."):
+                # Update animation state for synthesis
+                status_box.markdown("""
+                <div class="typing-bubble">
+                    <div class="typing-dots">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <span class="typing-text">Synthesizing behavioral insights & evidence...</span>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # Groq 120B Big Model Generation
                 try:
                     from groq import Groq
                     client = Groq(api_key=GROQ_API_KEY)
@@ -835,30 +982,3 @@ Based on {stats['total_matching_records']} records across {stats['unique_convers
                     })
                     st.rerun()
 
-    # Render Conversation Messages (Appears directly below the search bar)
-    if st.session_state.messages:
-        for msg in st.session_state.messages:
-            with st.chat_message(msg["role"]):
-                st.markdown(msg["content"], unsafe_allow_html=True)
-                
-                # Interactive "Show Specific Investor Concerns & Quotes"
-                if msg["role"] == "assistant" and "references" in msg and msg["references"]:
-                    with st.expander(f"💬 Show Specific Investor Concerns & Quotes ({len(msg['references'])} sources)"):
-                        for ref in msg["references"]:
-                            ref_src = ref.get("source", "").lower()
-                            if "play_store" in ref_src:
-                                src_label = "Groww Play Store Review"
-                            elif "app_store" in ref_src:
-                                src_label = "Groww App Store Review"
-                            elif "tradingqna" in ref_src:
-                                src_label = "TradingQ&A (Groww)"
-                            else:
-                                src_label = "Reddit Community"
-
-                            quote_txt = ref.get("classification", {}).get("verbatim_quote") or ref.get("raw_text", "")[:220]
-                            url = ref.get("url") or "#"
-
-                            st.markdown(f"**• {src_label}** `({ref['record_id']})`")
-                            st.markdown(f"> *\"{quote_txt}...\"*")
-                            st.markdown(f"↳ [Open Original Discussion ↗]({url})")
-                            st.markdown("---")
