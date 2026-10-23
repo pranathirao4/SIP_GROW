@@ -1,20 +1,76 @@
 [
   {
-    "record_id": "REC-00004",
-    "source": "reddit/r/IndianStockMarket",
-    "url": "https://www.reddit.com/r/IndianStockMarket/comments/1tz213a/review_sip_strategy/",
-    "title": "Review SIP Strategy",
-    "snippet": "31M | Bangalore | Family of 2 ( both working )\nInvestment horizon: 15 years\nTotal monthly SIP amount: 450,000\n\nSIP Summary:\nGold + Silver: 65,000 - 15% ( Gold: 13%, Silver 2% )\nDomestic MF: 245,000 - ",
+    "record_id": "REC-00001",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1any6aw/comment/kpvtt89/",
+    "title": "Discussion Forum Thread",
+    "snippet": "\" I don't mind taking risk if it gives high returns\"\nThink over this line, what exactly do you mean....\nIt's high risk ....so are you ok with this 5K SIP if it makes no or zero returns after 1, or 3 o",
     "tier": "Tier 2: Indirectly Relevant",
     "score": 0.6,
     "confidence": 0.75,
     "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
     "matched_keywords": [
-      "market correction"
+      "negative returns"
     ]
   },
   {
-    "record_id": "REC-00013",
+    "record_id": "REC-00015",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pf8zl77/",
+    "title": "Discussion Forum Thread",
+    "snippet": "Monthly expenses around 70k\nPaying 50k per month towards education loan\nRecently started earning so just have 2L of investment towards emergency fund",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "emergency fund"
+    ]
+  },
+  {
+    "record_id": "REC-00028",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1szpu21/comment/oj3ryql/",
+    "title": "Discussion Forum Thread",
+    "snippet": "Thank you very much for the kind words, and for the great advices.\nThank you. I will keep this in mind. This gives me a golden rule of thumb.\nYes, I think I can move over some of the FD to Gold. Also ",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "anxiety"
+    ]
+  },
+  {
+    "record_id": "REC-00060",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1ue66eb/comment/otn1fyg/",
+    "title": "Reddit Post/Comment in r/r/personalfinanceindia",
+    "snippet": "I understand that sip works well for people who aren't disciplined doing it manually, who don't want to track.the market at any level or simply have habit of spending the money they see in their bank ",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "habit"
+    ]
+  },
+  {
+    "record_id": "REC-00099",
+    "source": "reddit/r/IndiaInvestments",
+    "url": "https://www.reddit.com/r/IndiaInvestments/comments/1nd62jn/comment/nzb6kkw/",
+    "title": "Reddit Post/Comment in r/r/IndiaInvestments",
+    "snippet": "This is an interesting idea! Using a loan against investments, like a loan against mutual funds, could be a smart way to meet short-term liquidity needs without having to redeem existing investments. ",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "market volatility"
+    ]
+  },
+  {
+    "record_id": "REC-00161",
     "source": "reddit/r/IndianStockMarket",
     "url": "https://www.reddit.com/r/IndianStockMarket/comments/1u65ufw/20m_cant_commit_to_sips_due_to_inconsistent/",
     "title": "20M | Can't commit to SIPs due to inconsistent income is this lump sum MF portfolio fine for long term?",
@@ -28,11 +84,53 @@
     ]
   },
   {
-    "record_id": "REC-00041",
+    "record_id": "REC-00162",
     "source": "reddit/r/IndianStockMarket",
-    "url": "https://www.reddit.com/r/IndianStockMarket/comments/1vzjujg/starting_sip_need_guidance_and_opinions/",
-    "title": "Starting SIP, need guidance and opinions",
-    "snippet": "Hey guys, I'm gonna turn 21 in October and currently I'm earning 34k a month.\n\nI don't have much expenses as I live with my family.\n\nMy expenses are 3k for travel, 2k for gym, 3-5k for weekends and go",
+    "url": "https://www.reddit.com/r/IndianStockMarket/comments/1u65ufw/comment/orq68bl/",
+    "title": "Reddit Post/Comment in r/r/IndianStockMarket",
+    "snippet": "check fund overlaps here: (similar tools are available at other sites as well)\nhttps://www.advisorkhoj.com/mutual-funds-research/mutual-fund-portfolio-overlap?category=All&schemes=HDFC%20Mid%20Cap%20F",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "irregular income"
+    ]
+  },
+  {
+    "record_id": "REC-00165",
+    "source": "reddit/r/IndianStockMarket",
+    "url": "https://www.reddit.com/r/IndianStockMarket/comments/1u65ufw/comment/orxa3j4/",
+    "title": "Reddit Post/Comment in r/r/IndianStockMarket",
+    "snippet": "Great move starting this early.\nYour mid and small cap tilt makes sense at 20 with a 10 year horizon. ICICI Opportunities is a value/contra fund though and feels a bit out of place next to aggressive ",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "panic "
+    ]
+  },
+  {
+    "record_id": "REC-00201",
+    "source": "reddit/r/IndianStockMarket",
+    "url": "https://www.reddit.com/r/IndianStockMarket/comments/1senaf8/comment/oexf6wg/",
+    "title": "Reddit Post/Comment in r/r/IndianStockMarket",
+    "snippet": "SIP works, and the compounding do wonders in long run, I wish I continued my sip 15 yrs back after the 2008 crash, I got scared and left the equity for years. You are just 25yrs old...good time to sta",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "continued my sip"
+    ]
+  },
+  {
+    "record_id": "REC-00215",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1vj08n1/21f_earning_12lmonth_i_can_invest_2030k_every/p2i8gtm/",
+    "title": "/u/Sabmohmayahaibro on 21F earning ~₹1.2L/month, I can invest ₹20-30k every month. Where do I even start?",
+    "snippet": "At 21, I would honestly keep it boring! Build an emergency fund first then start with one broad index fund SIP and stay consistent. Increase the SIP whenever your income grows. You have plenty of time",
     "tier": "Tier 2: Indirectly Relevant",
     "score": 0.6,
     "confidence": 0.75,
@@ -42,7 +140,63 @@
     ]
   },
   {
-    "record_id": "REC-00052",
+    "record_id": "REC-00264",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1vw35nb/22f_with_salary_20k_how_to_invest/p7xp8nr/",
+    "title": "Reddit Post/Comment in r/r/personalfinanceindia",
+    "snippet": "Hi, just saw this. So since youre living with parents id actually use this phase to build a proper emergency fund first, even if your expenses are low rn,after that you can keep the investing part sim",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "emergency fund"
+    ]
+  },
+  {
+    "record_id": "REC-00271",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1wu9kvv/whats_the_best_way_to_save_and_invest_money_for_a/pdzvsqy/",
+    "title": "Reddit Post/Comment in r/r/personalfinanceindia",
+    "snippet": "id probably do a mix tbh. keep 1-2 months expenses easily accessible in the savings account and then maybe put the rest of the emergency fund in an FD/sweep FD. RD is more useful if ur saving for a sp",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "emergency fund"
+    ]
+  },
+  {
+    "record_id": "REC-00288",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1u50nie/comment/orjhl6i/",
+    "title": "Reddit Post/Comment in r/r/personalfinanceindia",
+    "snippet": "Few pointers that I look at\nRent should ideally be under 20% of your income. However 25% is also not bad. Quality of life does matter. Hopefully this means you are living in a good area and have other",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "emergency fund"
+    ]
+  },
+  {
+    "record_id": "REC-00293",
+    "source": "reddit/r/personalfinanceindia",
+    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1bujsmq/got_my_first_job_245_lakhs_per_month_need_advice/",
+    "title": "Got my first job (2.45 lakhs per month). Need advice to grow wealth and for taxes.",
+    "snippet": "So I landed my first job last year in August (2023). It is 30 lpa. It is in a niche foreign consulting firm. I work as an analyst\n\nMy salary is fixed in USD at 3000 per month, so it translates every m",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "student"
+    ]
+  },
+  {
+    "record_id": "REC-00378",
     "source": "reddit/r/personalfinanceindia",
     "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tght4m/is_it_wise_to_redeem_my_sip_to_buy_a_used_car_in/",
     "title": "Is it wise to redeem my SIP to buy a used car in the current layoff environment?",
@@ -56,10 +210,10 @@
     ]
   },
   {
-    "record_id": "REC-00055",
+    "record_id": "REC-00381",
     "source": "reddit/r/personalfinanceindia",
     "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tght4m/comment/omj1mbb/",
-    "title": "",
+    "title": "Reddit Post/Comment in r/r/personalfinanceindia",
     "snippet": "What was your goal while starting SIP?\nIs it absolutely necessary to get a car now?\nSecond hand cars come with additional maintenance, given they have wears and tears. Will you have enough funds, assu",
     "tier": "Tier 2: Indirectly Relevant",
     "score": 0.6,
@@ -70,24 +224,10 @@
     ]
   },
   {
-    "record_id": "REC-00068",
-    "source": "reddit/r/personalfinanceindia",
-    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1ue66eb/comment/ox7yu9y/",
-    "title": "",
-    "snippet": "SIP's real superpower isn't returns, it's behavioural. The auto-debit removes the decision-making moment where most retail investors destroy value: panic-selling in drawdowns, sitting on cash \"waiting",
-    "tier": "Tier 2: Indirectly Relevant",
-    "score": 0.6,
-    "confidence": 0.75,
-    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
-    "matched_keywords": [
-      "panic"
-    ]
-  },
-  {
-    "record_id": "REC-00072",
+    "record_id": "REC-00389",
     "source": "reddit/r/personalfinanceindia",
     "url": "https://www.reddit.com/r/personalfinanceindia/comments/1w482ew/comment/p75ibm8/",
-    "title": "",
+    "title": "Reddit Post/Comment in r/r/personalfinanceindia",
     "snippet": "The only concern I have is to create a stable income source in case of a job loss. At this point, I am not left with any motivation to work 9 to 5 in the Indian corporate.",
     "tier": "Tier 2: Indirectly Relevant",
     "score": 0.6,
@@ -98,11 +238,25 @@
     ]
   },
   {
-    "record_id": "REC-00132",
-    "source": "reddit/r/personalfinanceindia",
-    "url": "https://www.reddit.com/r/personalfinanceindia/comments/1vw35nb/22f_with_salary_20k_how_to_invest/p7xp8nr/",
-    "title": "",
-    "snippet": "Hi, just saw this. So since youre living with parents id actually use this phase to build a proper emergency fund first, even if your expenses are low rn,after that you can keep the investing part sim",
+    "record_id": "REC-00400",
+    "source": "reddit/r/Reddit",
+    "url": "https://www.reddit.com/r/IndianStockMarket/comments/1tz213a/review_sip_strategy/",
+    "title": "Review SIP Strategy",
+    "snippet": "31M | Bangalore | Family of 2 ( both working )\nInvestment horizon: 15 years\nTotal monthly SIP amount: 450,000\n\nSIP Summary:\nGold + Silver: 65,000 - 15% ( Gold: 13%, Silver 2% )\nDomestic MF: 245,000 - ",
+    "tier": "Tier 2: Indirectly Relevant",
+    "score": 0.6,
+    "confidence": 0.75,
+    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
+    "matched_keywords": [
+      "market correction"
+    ]
+  },
+  {
+    "record_id": "REC-00427",
+    "source": "reddit/r/Reddit",
+    "url": "https://www.reddit.com/r/IndianStockMarket/comments/1vzjujg/starting_sip_need_guidance_and_opinions/",
+    "title": "Starting SIP, need guidance and opinions",
+    "snippet": "Hey guys, I'm gonna turn 21 in October and currently I'm earning 34k a month.\n\nI don't have much expenses as I live with my family.\n\nMy expenses are 3k for travel, 2k for gym, 3-5k for weekends and go",
     "tier": "Tier 2: Indirectly Relevant",
     "score": 0.6,
     "confidence": 0.75,
@@ -112,21 +266,7 @@
     ]
   },
   {
-    "record_id": "REC-00216",
-    "source": "tradingqna",
-    "url": "https://tradingqna.com/t/coin-50rs-monthly-charges-deduction/31336",
-    "title": "COIN 50Rs Monthly Charges Deduction",
-    "snippet": "No it's not the minimum SIP amount of RS 5000/-, it's for the first time investment in that particular fund, thereafter as per the minimum amount required per fund (500/- or 1000/-). Coin is the best ",
-    "tier": "Tier 2: Indirectly Relevant",
-    "score": 0.6,
-    "confidence": 0.75,
-    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
-    "matched_keywords": [
-      "first time investment"
-    ]
-  },
-  {
-    "record_id": "REC-00249",
+    "record_id": "REC-00746",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/instruments-in-sip/56182",
     "title": "Instruments in SIP",
@@ -140,7 +280,7 @@
     ]
   },
   {
-    "record_id": "REC-00250",
+    "record_id": "REC-00747",
     "source": "tradingqna",
     "url": "https://tradingqna.com/t/small-cap-funds/54748",
     "title": "Small cap funds",
@@ -151,48 +291,6 @@
     "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
     "matched_keywords": [
       "negative returns"
-    ]
-  },
-  {
-    "record_id": "REC-00264",
-    "source": "tradingqna",
-    "url": "https://tradingqna.com/t/where-to-invest-my-5l-to-pay-emis-of-the-loan/57440",
-    "title": "Where to invest my 5L to pay EMIs of the loan",
-    "snippet": "Ok. Then for the 1 year I would say you start investing the same emi ( 11 K) into a equity MF via SIP. Choose a multicap fund and over the long term you should do well. If you plan to withdraw this am",
-    "tier": "Tier 2: Indirectly Relevant",
-    "score": 0.6,
-    "confidence": 0.75,
-    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
-    "matched_keywords": [
-      "emergency fund"
-    ]
-  },
-  {
-    "record_id": "REC-00267",
-    "source": "tradingqna",
-    "url": "https://tradingqna.com/t/is-smallcase-rebalance-burning-a-hole-in-your-pocket/39490",
-    "title": "Is Smallcase Rebalance burning a hole in your pocket?",
-    "snippet": "@investor I understand your concern and completely agree that nobody likes to see negative returns. But the nature of the equity market is that we can not avoid it. I would want to show you few number",
-    "tier": "Tier 2: Indirectly Relevant",
-    "score": 0.6,
-    "confidence": 0.75,
-    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
-    "matched_keywords": [
-      "negative returns"
-    ]
-  },
-  {
-    "record_id": "REC-00397",
-    "source": "apple_app_store",
-    "url": "https://apps.apple.com/in/app/groww-stocks-mutual-funds/id=1404871703",
-    "title": "One of the most pathetic experiences I have ever had with a financial platform.",
-    "snippet": "Groww looks impressive until you actually need help. The moment there is a serious issue involving your money, the so-called \"customer support\" becomes an endless cycle of useless automated replies, c",
-    "tier": "Tier 2: Indirectly Relevant",
-    "score": 0.6,
-    "confidence": 0.75,
-    "rationale": "Mentions beginner psychology, student/irregular income, or volatility shock (1 occurrences).",
-    "matched_keywords": [
-      "regret"
     ]
   }
 ]

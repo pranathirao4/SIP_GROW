@@ -101,6 +101,42 @@ OPPORTUNITY_CANDIDATES = [
         },
         "potential_solution_hypothesis": "Dynamic instalment flex (allowing user to temporarily drop from ₹1,000 to ₹500 for a month rather than stopping).",
         "recommended_interview_question": "If you could temporarily adjust your monthly SIP amount during months with tight cash, would you have continued?"
+    },
+    {
+        "opportunity_id": "OPP-05",
+        "title": "UPI Autopay & Mandate Failure Self-Healing Recovery",
+        "theme_id": "THM-08",
+        "user_problem_hypothesis": "Technical mandate rejections, bank server timeouts, and pending deduction statuses lead investors to assume their SIP is cancelled or broken, causing involuntary churn.",
+        "scores": {
+            "retention_link": 4.9,
+            "evidence_strength": 4.6,
+            "problem_severity": 4.5,
+            "groww_addressability": 4.9,
+            "unmet_need": 4.6,
+            "prevalence": 4.5,
+            "source_diversity": 4.5,
+            "low_assumptions": 4.3
+        },
+        "potential_solution_hypothesis": "Automated retry cascade within 48h, instant UPI Autopay re-linking prompt with zero paperwork, and real-time bank status transparency badge.",
+        "recommended_interview_question": "When your monthly instalment deduction failed or showed pending, what steps did you take to fix it?"
+    },
+    {
+        "opportunity_id": "OPP-06",
+        "title": "12-Month Compounding Milestone & Habit Reinforcement",
+        "theme_id": "THM-06",
+        "user_problem_hypothesis": "First-time investors lack tangible visual progress during early quarters, viewing monthly debits as an expense rather than asset accumulation, leading to fatigue.",
+        "scores": {
+            "retention_link": 4.6,
+            "evidence_strength": 4.3,
+            "problem_severity": 3.9,
+            "groww_addressability": 4.7,
+            "unmet_need": 4.4,
+            "prevalence": 4.1,
+            "source_diversity": 4.2,
+            "low_assumptions": 4.0
+        },
+        "potential_solution_hypothesis": "Quarterly milestone badges (3rd, 6th, 9th, 12th instalment), projected 5-year compounding trajectory display, and streak rewards celebrating consistency.",
+        "recommended_interview_question": "What milestone or feedback would make you feel proud to continue your monthly SIP past the one-year mark?"
     }
 ]
 

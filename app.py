@@ -353,6 +353,8 @@ def linkify_citations(text: str, records_map: dict) -> str:
                 src_name = "Groww App Store"
             elif "tradingqna" in src:
                 src_name = "TradingQ&A"
+            elif "youtube" in src:
+                src_name = "YouTube Comment"
             else:
                 src_name = "Reddit"
             return f"[[🔗 View {src_name} Discussion ↗]({url})]"

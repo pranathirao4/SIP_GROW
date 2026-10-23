@@ -80,6 +80,8 @@ def linkify_citations(text: str, records_map: dict) -> str:
                 src_name = "Groww App Store"
             elif "tradingqna" in src:
                 src_name = "TradingQ&A"
+            elif "youtube" in src:
+                src_name = "YouTube Comment"
             else:
                 src_name = "Reddit"
             return f'<a href="{url}" target="_blank" class="text-primary font-semibold hover:underline inline-flex items-center gap-0.5"><span>🔗 View {src_name} Discussion</span><span class="material-symbols-outlined text-[13px]">north_east</span></a>'

@@ -86,7 +86,7 @@ BASELINE_THEMES = [
         "theme_id": "THM-09",
         "theme_name": "App Usability & Information Clarity (Pause vs Cancel)",
         "definition": "Users wanting a temporary skip or pause are forced into permanent cancellation due to hidden or rigid pause flows.",
-        "patterns": [r"\bpause\s+(?:button|option|feature)\b", r"\bhow\s+to\s+pause\b", r"\bcancel\s+instead\s+of\s+pause\b", r"\bskip\s+month\b"],
+        "patterns": [r"\bpause\b", r"\bpaused\b", r"\bpausing\b", r"\bhow\s+to\s+pause\b", r"\bcancel\s+(?:or|vs|instead\s+of)\s+pause\b", r"\bskip\s+(?:month|instalment)?\b", r"\btemporar(?:y|ily)\s+stop\b"],
         "retention_link": "Direct Product Opportunity. High leverage for Groww UX."
     },
     {
