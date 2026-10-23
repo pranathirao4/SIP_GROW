@@ -194,10 +194,11 @@ st.markdown("""
     /* Center Hero Search Bar (Google Stitch Exact) */
     div[data-testid="stForm"] {
         background: #FFFFFF !important;
-        border: 1px solid #E2E8F0 !important;
+        background-color: #FFFFFF !important;
+        border: 1.5px solid #E2E8F0 !important;
         border-radius: 9999px !important;
         padding: 4px 8px 4px 16px !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
         max-width: 720px !important;
         margin: 0.5rem auto 1.8rem auto !important;
         display: flex !important;
@@ -205,21 +206,42 @@ st.markdown("""
         transition: all 0.2s ease !important;
     }
     div[data-testid="stForm"]:hover, div[data-testid="stForm"]:focus-within {
-        border-color: #006C4F !important;
-        box-shadow: 0 6px 20px rgba(0, 108, 79, 0.12) !important;
+        border-color: #00D09C !important;
+        box-shadow: 0 6px 20px rgba(0, 208, 156, 0.15) !important;
+    }
+    
+    /* Remove any dark/black background in between and keep it pure white only */
+    div[data-testid="stForm"] div[data-testid="stTextInput"],
+    div[data-testid="stForm"] div[data-testid="stTextInput"] * {
+        background: #FFFFFF !important;
+        background-color: #FFFFFF !important;
+        border: none !important;
+        box-shadow: none !important;
     }
     div[data-testid="stForm"] div[data-testid="stTextInput"] {
         width: 100% !important;
         margin: 0 !important;
     }
-    div[data-testid="stForm"] div[data-testid="stTextInput"] > div > div > input {
-        border: none !important;
-        background: transparent !important;
-        font-size: 14.5px !important;
+    div[data-testid="stForm"] div[data-testid="stTextInput"] input {
+        background: #FFFFFF !important;
+        background-color: #FFFFFF !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
         color: #151C27 !important;
-        padding: 8px 6px !important;
-        box-shadow: none !important;
+        padding: 8px 8px !important;
+        border: none !important;
         outline: none !important;
+        box-shadow: none !important;
+        width: 100% !important;
+    }
+    div[data-testid="stForm"] div[data-testid="stTextInput"] input::placeholder {
+        color: #64748B !important;
+        opacity: 0.9 !important;
+        font-size: 14.5px !important;
+        font-weight: 400 !important;
+    }
+    div[data-testid="stForm"] [data-testid="InputInstructions"] {
+        display: none !important;
     }
     div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] {
         margin: 0 !important;
