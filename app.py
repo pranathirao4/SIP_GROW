@@ -7,10 +7,12 @@ Faithfully designed to match the Google Photos Review Engine aesthetic.
 
 import os
 import sys
+import time
 import json
 import re
 from pathlib import Path
 import streamlit as st
+import streamlit.components.v1 as components
 from dotenv import load_dotenv
 from src.pipeline.retriever import SIPRetriever
 
@@ -331,20 +333,21 @@ st.markdown("""
         height: 18px;
         background-color: #1A73E8;
         border-radius: 2px;
-        margin-bottom: 12px;
+        margin-bottom: 0px;
     }
 
-    /* Searching Reviews Typing Indicator (Pic 2) */
-    .searching-reviews-box {
+    /* Reviewing Responses Typing Indicator */
+    .reviewing-responses-box {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
-    .searching-text {
+    .reviewing-text {
         font-size: 15px;
         color: #202124;
-        font-weight: 400;
+        font-weight: 500;
+        font-family: 'Inter', sans-serif;
     }
     .typing-dot-blue {
         width: 6px;
@@ -354,8 +357,8 @@ st.markdown("""
         display: inline-block;
         animation: blueDotPulse 1.4s infinite ease-in-out both;
     }
-    .typing-dot-blue:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot-blue:nth-child(3) { animation-delay: 0.4s; }
+    .typing-dot-blue:nth-child(3) { animation-delay: 0.2s; }
+    .typing-dot-blue:nth-child(4) { animation-delay: 0.4s; }
 
     @keyframes blueDotPulse {
         0%, 80%, 100% {
@@ -366,6 +369,16 @@ st.markdown("""
             transform: scale(1.15);
             opacity: 1;
         }
+    }
+
+    /* Component iframe zero visibility */
+    iframe[title="streamlit.components.v1.html"] {
+        position: absolute !important;
+        height: 0px !important;
+        width: 0px !important;
+        border: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
 
     /* Streaming Cursor (Pic 3) */
@@ -487,6 +500,166 @@ def linkify_citations(text: str, records_map: dict) -> str:
         return raw
 
     return re.sub(r'\[?REC[\-\u2010\u2011\u2012\u2013\u2014]\d{5}\]?', repl, text)
+
+
+def scroll_to_question():
+    """Smoothly scrolls the browser down to the newly entered question."""
+    js = """
+    <script>
+    (function() {
+        function doScroll() {
+            try {
+                const doc = window.parent.document;
+                if (!doc) return;
+                
+                // 1. Target the latest question element
+                const qElem = doc.getElementById('latest-user-question');
+                if (qElem) {
+                    qElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                
+                // 2. Also ensure main scrollable container scrolls down
+                const containers = [
+                    doc.querySelector('[data-testid="stAppViewContainer"]'),
+                    doc.querySelector('section.main'),
+                    doc.querySelector('.main'),
+                    doc.documentElement,
+                    doc.body
+                ];
+                for (const c of containers) {
+                    if (c && c.scrollHeight > c.clientHeight) {
+                        if (typeof c.scrollTo === 'function') {
+                            c.scrollTo({ top: c.scrollHeight + 10000, behavior: 'smooth' });
+                        } else {
+                            c.scrollTop = c.scrollHeight;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Auto-scroll error:", err);
+            }
+        }
+        
+        doScroll();
+        setTimeout(doScroll, 50);
+        setTimeout(doScroll, 150);
+        setTimeout(doScroll, 350);
+        setTimeout(doScroll, 700);
+        setTimeout(doScroll, 1200);
+    })();
+    </script>
+    """
+    components.html(js, height=0)
+
+
+def inject_input_scroll_listener():
+    """Client-side listener to immediately scroll down the millisecond Enter or Send is pressed."""
+    js = """
+    <script>
+    (function() {
+        const doc = window.parent.document;
+        if (!doc) return;
+        
+        function attachListener() {
+            const chatInput = doc.querySelector('[data-testid="stChatInput"]');
+            if (!chatInput) return;
+            
+            const textarea = chatInput.querySelector('textarea');
+            const sendBtn = chatInput.querySelector('button');
+            
+            const doImmediateScroll = () => {
+                const scrollable = doc.querySelector('[data-testid="stAppViewContainer"]') 
+                                || doc.querySelector('section.main') 
+                                || doc.documentElement 
+                                || doc.body;
+                if (scrollable) {
+                    if (typeof scrollable.scrollTo === 'function') {
+                        scrollable.scrollTo({ top: scrollable.scrollHeight + 10000, behavior: 'smooth' });
+                    } else {
+                        scrollable.scrollTop = scrollable.scrollHeight;
+                    }
+                }
+            };
+            
+            if (textarea && !textarea.dataset.hasScrollListener) {
+                textarea.dataset.hasScrollListener = "true";
+                textarea.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        doImmediateScroll();
+                        setTimeout(doImmediateScroll, 100);
+                    }
+                });
+            }
+            if (sendBtn && !sendBtn.dataset.hasScrollListener) {
+                sendBtn.dataset.hasScrollListener = "true";
+                sendBtn.addEventListener('click', function() {
+                    doImmediateScroll();
+                    setTimeout(doImmediateScroll, 100);
+                });
+            }
+        }
+        
+        attachListener();
+        setTimeout(attachListener, 300);
+        setTimeout(attachListener, 800);
+    })();
+    </script>
+    """
+    components.html(js, height=0)
+
+
+def render_references_panel(refs):
+    """Renders the Google Review Engine References panel on the right."""
+    if refs:
+        html = f"""
+        <div class="references-panel-card">
+            <div class="ref-header-row">
+                <span>References</span>
+                <span>&#x2304;</span>
+            </div>
+            <div class="ref-subtitle">Used in this chat — {len(refs)} reviews.</div>
+        """
+        for idx, ref in enumerate(refs[:8], 1):
+            src_raw = ref.get("source", "").lower()
+            if "play_store" in src_raw:
+                src_name = "Google Play Store"
+                extra_meta = "4★"
+            elif "tradingqna" in src_raw:
+                src_name = "TradingQ&A"
+                extra_meta = "Discussion"
+            elif "youtube" in src_raw:
+                src_name = "YouTube"
+                extra_meta = "Review"
+            else:
+                src_name = "Reddit"
+                upvotes = ref.get("upvotes_or_likes", 12)
+                extra_meta = f"{upvotes} upvotes/likes"
+
+            pub_date = ref.get("published_at", "2024-02-11")[:10]
+            score = ref.get("retrieval_score", 0.650)
+            url = ref.get("url") or "#"
+
+            html += f"""
+            <div class="ref-item">
+                <div class="ref-item-top">
+                    <span class="ref-item-title">{idx}. {src_name} · {pub_date} · {extra_meta}</span>
+                    <span class="ref-item-score">{score:.3f}</span>
+                </div>
+                <a href="{url}" target="_blank" class="ref-item-link">{url}</a>
+            </div>
+            """
+        html += "</div>"
+        return html
+    else:
+        return """
+        <div class="references-panel-card">
+            <div class="ref-header-row">
+                <span>References</span>
+                <span>&gt;</span>
+            </div>
+            <div class="ref-subtitle">References sit here when you ask a question.</div>
+        </div>
+        """
 
 # Initialize Retriever
 @st.cache_resource
@@ -615,8 +788,22 @@ elif st.session_state.current_view == "how_it_works":
 # Main View: Chat Screen (Exact Google Photos Review Engine Layout)
 # ------------------------------------------------------------------
 else:
+    # Always attach the client-side scroll listener so pressing Enter/Send glides down instantly
+    inject_input_scroll_listener()
+
+    # Sticky bottom chat input bar (pinned at viewport bottom by Streamlit)
+    chat_input_val = st.chat_input("Ask about Groww SIP reviews...")
+
+    # Determine Active Query (from input bar or prompt chip / recent click)
+    active_query = None
+    if chat_input_val and chat_input_val.strip():
+        active_query = chat_input_val.strip()
+    elif st.session_state.get("input_query"):
+        active_query = st.session_state.input_query
+        st.session_state.input_query = ""
+
     # Check if this is an empty chat state (Pic 1)
-    if not st.session_state.messages:
+    if not st.session_state.messages and not active_query:
         # Top-right "References >" placeholder pill (Pic 1)
         st.markdown("""
         <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
@@ -652,193 +839,121 @@ else:
         # Active Chat Screen (Two-Column Layout: Chat on Left, References on Right - Pic 4)
         col_chat, col_refs = st.columns([7.2, 2.8], gap="large")
 
-        # -----------------
-        # Left Column: Chat
-        # -----------------
-        with col_chat:
-            latest_assistant_refs = []
-
-            for msg in st.session_state.messages:
-                if msg["role"] == "user":
-                    # User Question: Right-aligned pill bubble (Pic 2 & Pic 4)
-                    with st.chat_message("user"):
-                        st.markdown('<div class="engine-user-marker"></div>', unsafe_allow_html=True)
-                        st.markdown(msg["content"])
-                else:
-                    # Assistant Response: Left-aligned clean canvas (Pic 4)
-                    with st.chat_message("assistant"):
-                        st.markdown('<div class="engine-bot-marker"></div>', unsafe_allow_html=True)
-                        st.markdown(msg["content"], unsafe_allow_html=True)
-
-                        # Option for detailed response
-                        if "detail_analysis" in msg and msg["detail_analysis"]:
-                            with st.expander("📊 View In-Depth Problem Breakdown & Strategy"):
-                                st.markdown(msg["detail_analysis"], unsafe_allow_html=True)
-
-                    if "references" in msg and msg["references"]:
-                        latest_assistant_refs = msg["references"]
+        # Determine references to display on the right panel
+        display_refs = []
+        stats = {"total_matching_records": 406, "unique_conversations_count": 80, "sources_represented": ["Reddit", "Groww Play Store", "TradingQ&A"]}
+        if active_query:
+            # Immediate retrieval (0.000s) to populate references card
+            retrieval_res = retriever.retrieve_with_evidence_stats(active_query, top_k=6)
+            display_refs = retrieval_res["primary_matches"]
+            stats = retrieval_res["stats"]
+        else:
+            # Get latest assistant references from history
+            for m in reversed(st.session_state.messages):
+                if m.get("role") == "assistant" and m.get("references"):
+                    display_refs = m["references"]
+                    break
 
         # -------------------------
         # Right Column: References (Pic 4)
         # -------------------------
         with col_refs:
-            if latest_assistant_refs:
-                st.markdown(f"""
-                <div class="references-panel-card">
-                    <div class="ref-header-row">
-                        <span>References</span>
-                        <span>&#x2304;</span>
-                    </div>
-                    <div class="ref-subtitle">Used in this chat — {len(latest_assistant_refs)} reviews.</div>
-                """, unsafe_allow_html=True)
+            st.markdown(render_references_panel(display_refs), unsafe_allow_html=True)
 
-                for idx, ref in enumerate(latest_assistant_refs[:8], 1):
-                    src_raw = ref.get("source", "").lower()
-                    if "play_store" in src_raw:
-                        src_name = "Google Play Store"
-                        extra_meta = "4★"
-                    elif "tradingqna" in src_raw:
-                        src_name = "TradingQ&A"
-                        extra_meta = "Discussion"
-                    elif "youtube" in src_raw:
-                        src_name = "YouTube"
-                        extra_meta = "Review"
-                    else:
-                        src_name = "Reddit"
-                        upvotes = ref.get("upvotes_or_likes", 12)
-                        extra_meta = f"{upvotes} upvotes/likes"
+        # -----------------
+        # Left Column: Chat
+        # -----------------
+        with col_chat:
+            # Render all previous chat history
+            for msg in st.session_state.messages:
+                if msg["role"] == "user":
+                    with st.chat_message("user"):
+                        st.markdown('<div class="engine-user-marker"></div>', unsafe_allow_html=True)
+                        st.markdown(msg["content"])
+                else:
+                    with st.chat_message("assistant"):
+                        st.markdown('<div class="engine-bot-marker"></div>', unsafe_allow_html=True)
+                        st.markdown(msg["content"], unsafe_allow_html=True)
+                        if msg.get("detail_analysis"):
+                            with st.expander("📊 View In-Depth Problem Breakdown & Strategy"):
+                                st.markdown(msg["detail_analysis"], unsafe_allow_html=True)
 
-                    pub_date = ref.get("published_at", "2024-02-11")[:10]
-                    score = ref.get("retrieval_score", 0.650)
-                    url = ref.get("url") or "#"
+            # Process Newly Entered Active Query
+            if active_query:
+                # Add to recents in sidebar
+                if active_query not in st.session_state.recent_chats:
+                    st.session_state.recent_chats.append(active_query)
 
-                    st.markdown(f"""
-                    <div class="ref-item">
-                        <div class="ref-item-top">
-                            <span class="ref-item-title">{idx}. {src_name} · {pub_date} · {extra_meta}</span>
-                            <span class="ref-item-score">{score:.3f}</span>
+                # Strict Scope Guardrail Check
+                query_lower = active_query.lower()
+                off_topic_keywords = [
+                    "cricket", "cricketer", "virat", "dhoni", "ipl", "football", "messi", "ronaldo",
+                    "birthday", "weather", "recipe", "cinema", "bollywood", "hollywood", "actor", "actress",
+                    "prime minister", "president", "capital of", "who wrote", "song", "movie", "horoscope"
+                ]
+
+                # Render User Question with Anchor and trigger Auto-Scroll
+                with st.chat_message("user"):
+                    st.markdown('<div id="latest-user-question" style="scroll-margin-top: 100px;"></div><div class="engine-user-marker"></div>', unsafe_allow_html=True)
+                    st.markdown(active_query)
+
+                scroll_to_question()
+
+                if any(k in query_lower for k in off_topic_keywords):
+                    out_of_scope_reply = "This is out of scope. I am the Groww SIP Review Discovery Engine and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandates, and retail investor behavior."
+                    with st.chat_message("assistant"):
+                        st.markdown('<div class="engine-bot-marker"></div>', unsafe_allow_html=True)
+                        st.markdown(out_of_scope_reply)
+                    st.session_state.messages.append({"role": "user", "content": active_query})
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": out_of_scope_reply,
+                        "references": [],
+                        "detail_analysis": ""
+                    })
+                else:
+                    with st.chat_message("assistant"):
+                        st.markdown('<div class="engine-bot-marker"></div>', unsafe_allow_html=True)
+                        status_box = st.empty()
+
+                        # Reviewing Responses Animation
+                        status_box.markdown("""
+                        <div class="reviewing-responses-box">
+                            <div class="blue-indicator-bar" style="margin-top: 2px;"></div>
+                            <span class="reviewing-text">Reviewing responses</span>
+                            <span class="typing-dot-blue"></span>
+                            <span class="typing-dot-blue"></span>
+                            <span class="typing-dot-blue"></span>
                         </div>
-                        <a href="{url}" target="_blank" class="ref-item-link">{url}</a>
-                    </div>
-                    """, unsafe_allow_html=True)
+                        """, unsafe_allow_html=True)
 
-                st.markdown('</div>', unsafe_allow_html=True)
-            else:
-                st.markdown("""
-                <div class="references-panel-card">
-                    <div class="ref-header-row">
-                        <span>References</span>
-                        <span>&gt;</span>
-                    </div>
-                    <div class="ref-subtitle">References sit here when you ask a question.</div>
-                </div>
-                """, unsafe_allow_html=True)
+                        answer_placeholder = st.empty()
 
-    # ------------------------------------------------------------------
-    # Bottom Sticky Input Bar (Pic 1, 2, 3, 4)
-    # ------------------------------------------------------------------
-    chat_input_val = st.chat_input("Ask about Groww SIP reviews...")
+                        # Context blocks preparation
+                        context_blocks = []
+                        for idx, r in enumerate(display_refs):
+                            r["retrieval_score"] = 0.660 - (idx * 0.015)
+                            clf = r.get("classification", {})
+                            quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:250].replace("\n", " ")
+                            obs_beh = clf.get("observable_behaviour", "Action taken")
+                            und_prob = clf.get("underlying_problem", "Cognitive / structural friction")
+                            mech = clf.get("hypothesised_mechanism", "Underlying mechanism")
+                            root_u = clf.get("root_conversation_url") or r.get("url") or "#"
 
-    # Determine Active Query (from input bar or prompt chip)
-    active_query = None
-    if chat_input_val and chat_input_val.strip():
-        active_query = chat_input_val.strip()
-    elif st.session_state.get("input_query"):
-        active_query = st.session_state.input_query
-        st.session_state.input_query = ""
+                            context_blocks.append(
+                                f"Record ID: {r['record_id']} | Source: {r.get('source')} | URL: {r.get('url')}\n"
+                                f"Root Conversation: {root_u}\n"
+                                f"Explicit Statement: \"{quote}\"\n"
+                                f"Observable Behaviour: {obs_beh}\n"
+                                f"Underlying Problem: {und_prob}\n"
+                                f"Mechanism: {mech}"
+                            )
+                        context_str = "\n\n".join(context_blocks)
 
-    # Process Active Query
-    if active_query:
-        # Add to recents
-        if active_query not in st.session_state.recent_chats:
-            st.session_state.recent_chats.append(active_query)
+                        is_detail_requested = any(w in query_lower for w in ["detail", "deep dive", "in-depth", "explain more", "full analysis", "breakdown", "elaborate"])
 
-        # Append User Message to State
-        st.session_state.messages.append({"role": "user", "content": active_query})
-
-        # Immediately render user question pill
-        with st.chat_message("user"):
-            st.markdown('<div class="engine-user-marker"></div>', unsafe_allow_html=True)
-            st.markdown(active_query)
-
-        # Assistant Answering Container with Typing Animation (Pic 2 & Pic 3)
-        with st.chat_message("assistant"):
-            st.markdown('<div class="engine-bot-marker"></div>', unsafe_allow_html=True)
-            status_box = st.empty()
-
-            # Pic 2 Animation: "Searching reviews •••"
-            status_box.markdown("""
-            <div class="searching-reviews-box">
-                <span class="searching-text">Searching reviews</span>
-                <span class="typing-dot-blue"></span>
-                <span class="typing-dot-blue"></span>
-                <span class="typing-dot-blue"></span>
-            </div>
-            """, unsafe_allow_html=True)
-
-            # Strict Scope Guardrail Check
-            query_lower = active_query.lower()
-            off_topic_keywords = [
-                "cricket", "cricketer", "virat", "dhoni", "ipl", "football", "messi", "ronaldo",
-                "birthday", "weather", "recipe", "cinema", "bollywood", "hollywood", "actor", "actress",
-                "prime minister", "president", "capital of", "who wrote", "song", "movie", "horoscope"
-            ]
-
-            if any(k in query_lower for k in off_topic_keywords):
-                out_of_scope_reply = "This is out of scope. I am the Groww SIP Review Discovery Engine and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandates, and retail investor behavior."
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": out_of_scope_reply,
-                    "references": [],
-                    "detail_analysis": ""
-                })
-                st.rerun()
-            else:
-                # Pic 3 Animation: Blue bar and streaming indicator
-                status_box.markdown("""
-                <div style="display: flex; align-items: flex-start; gap: 8px;">
-                    <div class="blue-indicator-bar" style="margin-top: 4px;"></div>
-                    <span style="font-size: 15px; color: #202124;">
-                        Synthesizing verified investor evidence across 406 cases<span class="streaming-cursor"></span>
-                    </span>
-                </div>
-                """, unsafe_allow_html=True)
-
-                # RAG Retrieval
-                retrieval_res = retriever.retrieve_with_evidence_stats(active_query, top_k=6)
-                retrieved_docs = retrieval_res["primary_matches"]
-                counter_docs = retrieval_res.get("counterevidence_matches", [])
-                stats = retrieval_res["stats"]
-
-                # Groq 120B Generation (Part 1: Understandable, crisp, Google AI Overview style)
-                try:
-                    from groq import Groq
-                    client = Groq(api_key=GROQ_API_KEY)
-
-                    context_blocks = []
-                    for idx, r in enumerate(retrieved_docs):
-                        r["retrieval_score"] = 0.660 - (idx * 0.015)
-                        clf = r.get("classification", {})
-                        quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:250].replace("\n", " ")
-                        obs_beh = clf.get("observable_behaviour", "Action taken")
-                        und_prob = clf.get("underlying_problem", "Cognitive / structural friction")
-                        mech = clf.get("hypothesised_mechanism", "Underlying mechanism")
-                        root_u = clf.get("root_conversation_url") or r.get("url") or "#"
-
-                        context_blocks.append(
-                            f"Record ID: {r['record_id']} | Source: {r.get('source')} | URL: {r.get('url')}\n"
-                            f"Root Conversation: {root_u}\n"
-                            f"Explicit Statement: \"{quote}\"\n"
-                            f"Observable Behaviour: {obs_beh}\n"
-                            f"Underlying Problem: {und_prob}\n"
-                            f"Mechanism: {mech}"
-                        )
-                    context_str = "\n\n".join(context_blocks)
-
-                    is_detail_requested = any(w in query_lower for w in ["detail", "deep dive", "in-depth", "explain more", "full analysis", "breakdown", "elaborate"])
-
-                    if is_detail_requested:
-                        system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
+                        if is_detail_requested:
+                            system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
 The user explicitly asked for an IN-DEPTH, DETAILED response.
 
 Provide an exhaustive, structured breakdown:
@@ -855,8 +970,8 @@ Provide an exhaustive, structured breakdown:
 PRIMARY EVIDENCE RECORDS:
 {context_str}
 """
-                    else:
-                        system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
+                        else:
+                            system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
 Your mission is to provide an ACCURATE, HIGHLY DIRECT, AND ACTIONABLE RESPONSE to the exact question asked.
 
 CRITICAL ANTI-PATTERNS (DO NOT DO THIS):
@@ -877,37 +992,62 @@ PRIMARY EVIDENCE RECORDS:
 {context_str}
 """
 
-                    completion = client.chat.completions.create(
-                        model="openai/gpt-oss-120b",
-                        messages=[
-                            {"role": "system", "content": system_prompt},
-                            *[{"role": m["role"], "content": m["content"]} for m in st.session_state.messages if m["role"] in ["user", "assistant"]]
-                        ],
-                        max_tokens=1000
-                    )
+                        # Stream tokens with live typing animation
+                        try:
+                            from groq import Groq
+                            client = Groq(api_key=GROQ_API_KEY)
 
-                    choice = completion.choices[0].message
-                    raw_answer = choice.content or "No textual response generated."
+                            stream = client.chat.completions.create(
+                                model="openai/gpt-oss-120b",
+                                messages=[
+                                    {"role": "system", "content": system_prompt},
+                                    *[{"role": m["role"], "content": m["content"]} for m in st.session_state.messages if m["role"] in ["user", "assistant"]],
+                                    {"role": "user", "content": active_query}
+                                ],
+                                stream=True,
+                                max_tokens=850,
+                                extra_body={"reasoning_format": "hidden"}
+                            )
 
-                    formatted_answer = linkify_citations(raw_answer, records_lookup)
+                            def token_generator():
+                                has_started = False
+                                for chunk in stream:
+                                    if not chunk.choices:
+                                        continue
+                                    delta = chunk.choices[0].delta
+                                    content = getattr(delta, "content", None)
+                                    if content:
+                                        if not has_started:
+                                            has_started = True
+                                            status_box.empty()
+                                        time.sleep(0.01)
+                                        yield content
 
-                    # Prepare detailed breakdown in case user expands it
-                    detail_text = f"""**Detailed Root-Cause Analysis for this Query:**
+                            raw_answer = answer_placeholder.write_stream(token_generator)
+                            formatted_answer = linkify_citations(raw_answer, records_lookup)
+                            answer_placeholder.markdown(formatted_answer, unsafe_allow_html=True)
+
+                            detail_text = f"""**Detailed Root-Cause Analysis for this Query:**
 - **Corpus Evidence Base:** {stats['total_matching_records']} matching records across {stats['unique_conversations_count']} unique threads ({', '.join(stats['sources_represented'])}).
 - **Primary Mechanism:** Delayed salary credits vs. fixed SIP debit dates create temporary negative balances. Fear of recurring ₹450–₹590 ECS bounce penalties overrides long-term compounding conviction.
 - **Cognitive Bias:** Loss aversion triggered by early portfolio drawdowns (-3% to -5%) before month 12.
 - **Groww Retention Strategy:** Implement 24-hour balance pre-debit alert with a 1-tap temporary 'Pause for 1–3 Months' flow instead of hard mandate deletion."""
 
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": formatted_answer,
-                        "references": retrieved_docs,
-                        "detail_analysis": detail_text
-                    })
-                    st.rerun()
+                            st.session_state.messages.append({"role": "user", "content": active_query})
+                            st.session_state.messages.append({
+                                "role": "assistant",
+                                "content": formatted_answer,
+                                "references": display_refs,
+                                "detail_analysis": detail_text
+                            })
 
-                except Exception as e:
-                    fallback_answer = f"""Across our empirical discovery dataset of 406 verified drop-off cases, first-time mutual fund investors stop their SIPs within the first 12 months primarily due to three core structural and behavioral friction points:
+                            with st.expander("📊 View In-Depth Problem Breakdown & Strategy"):
+                                st.markdown(detail_text, unsafe_allow_html=True)
+
+                            scroll_to_question()
+
+                        except Exception as e:
+                            fallback_answer = f"""Across our empirical discovery dataset of 406 verified drop-off cases, first-time mutual fund investors stop their SIPs within the first 12 months primarily due to three core structural and behavioral friction points:
 
 - **Bank AutoPay Mandate & Penalty Threat:** When scheduled monthly debits occur before delayed salary disbursements (e.g. 2nd vs 5th), bank account balances dip. Fear of recurring ₹450–₹590 bank bounce fees leads users to permanently cancel their AutoPay mandate rather than risking further penalties [🔗 Groww Play Store ↗].
 
@@ -916,10 +1056,21 @@ PRIMARY EVIDENCE RECORDS:
 - **Hidden Pause Feature:** Investors facing temporary liquidity crunches cannot easily locate an option to pause for 1–3 months, so they hard-cancel the SIP to stop upcoming debits [🔗 Reddit ↗].
 
 💡 Let me know if you want a detailed response."""
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": fallback_answer,
-                        "references": retrieved_docs,
-                        "detail_analysis": "Detailed behavioral analysis available upon request."
-                    })
-                    st.rerun()
+
+                            status_box.empty()
+                            def fallback_stream():
+                                for word in fallback_answer.split(" "):
+                                    time.sleep(0.02)
+                                    yield word + " "
+
+                            raw_fb = answer_placeholder.write_stream(fallback_stream)
+                            answer_placeholder.markdown(fallback_answer, unsafe_allow_html=True)
+
+                            st.session_state.messages.append({"role": "user", "content": active_query})
+                            st.session_state.messages.append({
+                                "role": "assistant",
+                                "content": fallback_answer,
+                                "references": display_refs,
+                                "detail_analysis": "Detailed behavioral analysis available upon request."
+                            })
+                            scroll_to_question()

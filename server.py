@@ -254,7 +254,8 @@ PRIMARY EVIDENCE RECORDS:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_query}
             ],
-            max_tokens=1000
+            max_tokens=1000,
+            extra_body={"reasoning_format": "hidden"}
         )
         raw_answer = completion.choices[0].message.content or ""
     except Exception as e:
