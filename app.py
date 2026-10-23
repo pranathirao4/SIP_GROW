@@ -103,8 +103,8 @@ st.markdown("""
         padding: 0.75rem 0.5rem 0.5rem 0.5rem;
     }
 
-    /* Stitch Navigation Buttons */
-    div[data-testid="stSidebar"] div[data-testid="stButton"] button {
+    /* Stitch Navigation Buttons in Sidebar */
+    section[data-testid="stSidebar"] div[data-testid="stButton"] button {
         background-color: transparent !important;
         border: 1px solid transparent !important;
         color: #3C4A43 !important;
@@ -120,69 +120,141 @@ st.markdown("""
         transition: all 0.15s ease-in-out !important;
         width: 100% !important;
     }
-    div[data-testid="stSidebar"] div[data-testid="stButton"] button:hover {
+    section[data-testid="stSidebar"] div[data-testid="stButton"] button:hover {
         background-color: #E2E8F8 !important;
         color: #151C27 !important;
     }
     
     /* Main Content Styling */
     .main .block-container {
-        max-width: 900px !important;
-        padding-top: 2rem !important;
-        padding-bottom: 4rem !important;
+        max-width: 860px !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 3rem !important;
     }
     
     /* Hero Title & Subtitle */
     .stitch-hero-title {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 2.25rem;
+        font-size: 2.15rem;
         font-weight: 700;
         color: #151C27;
         letter-spacing: -0.025em;
-        line-height: 1.18;
+        line-height: 1.2;
         text-align: center;
-        margin-top: 1rem;
-        margin-bottom: 0.75rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.6rem;
     }
     .stitch-hero-subtitle {
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: #575E70;
         text-align: center;
-        max-width: 660px;
-        margin: 0 auto 1.75rem auto;
-        line-height: 1.6;
+        max-width: 640px;
+        margin: 0 auto 1.4rem auto;
+        line-height: 1.55;
     }
     
-    /* Prompt Chips */
-    div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] button {
+    /* Prompt Chips - Completely visible, zero truncation, wraps gracefully */
+    .chip-section {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-width: 760px;
+        margin: 0 auto 1rem auto;
+    }
+    div[data-testid="stVerticalBlock"] > div > div[data-testid="stButton"] button {
+        white-space: normal !important;
+        word-break: normal !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
+        height: auto !important;
+        min-height: 40px !important;
+        padding: 9px 18px !important;
+        font-size: 13.5px !important;
+        font-weight: 500 !important;
+        line-height: 1.4 !important;
+        border-radius: 9999px !important;
         background-color: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
         color: #151C27 !important;
-        border-radius: 9999px !important;
-        padding: 8px 16px !important;
-        font-size: 12.5px !important;
-        font-weight: 500 !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
         transition: all 0.15s ease-in-out !important;
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
-    div[data-testid="stHorizontalBlock"] div[data-testid="stButton"] button:hover {
+    div[data-testid="stVerticalBlock"] > div > div[data-testid="stButton"] button:hover {
         border-color: #006C4F !important;
         color: #006C4F !important;
         background-color: #F0FDF4 !important;
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0, 108, 79, 0.08) !important;
+        box-shadow: 0 4px 10px rgba(0, 108, 79, 0.08) !important;
     }
     
-    /* Chat Input Styling */
-    div[data-testid="stChatInput"] {
-        border-radius: 9999px !important;
-        border: 1px solid #CBD5E1 !important;
+    /* Center Hero Search Bar (Google Stitch Exact) */
+    div[data-testid="stForm"] {
         background: #FFFFFF !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 9999px !important;
+        padding: 4px 8px 4px 16px !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+        max-width: 720px !important;
+        margin: 0.5rem auto 1.8rem auto !important;
+        display: flex !important;
+        align-items: center !important;
+        transition: all 0.2s ease !important;
     }
-    div[data-testid="stChatInput"]:focus-within {
+    div[data-testid="stForm"]:hover, div[data-testid="stForm"]:focus-within {
         border-color: #006C4F !important;
-        box-shadow: 0 4px 16px rgba(0, 108, 79, 0.12) !important;
+        box-shadow: 0 6px 20px rgba(0, 108, 79, 0.12) !important;
+    }
+    div[data-testid="stForm"] div[data-testid="stTextInput"] {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+    div[data-testid="stForm"] div[data-testid="stTextInput"] > div > div > input {
+        border: none !important;
+        background: transparent !important;
+        font-size: 14.5px !important;
+        color: #151C27 !important;
+        padding: 8px 6px !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] {
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] button {
+        border-radius: 9999px !important;
+        background-color: #00D09C !important;
+        color: #FFFFFF !important;
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
+        padding: 0 !important;
+        font-size: 20px !important;
+        font-weight: 700 !important;
+        border: none !important;
+        box-shadow: 0 2px 6px rgba(0, 208, 156, 0.25) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.15s ease !important;
+    }
+    div[data-testid="stForm"] div[data-testid="stFormSubmitButton"] button:hover {
+        background-color: #006C4F !important;
+        transform: scale(1.05) !important;
+    }
+    .search-icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #00D09C;
+        height: 100%;
+        padding-right: 4px;
     }
     
     /* Chat Messages */
@@ -321,17 +393,13 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     # Navigation buttons
-    btn_new_style = "background-color: #6EF7C6 !important; color: #007153 !important; font-weight: 600 !important;" if st.session_state.current_view == "new_research" else ""
     if st.button("🧭  New Research", key="nav_new_research"):
         st.session_state.current_view = "new_research"
         st.rerun()
 
-    btn_ov_style = "background-color: #6EF7C6 !important; color: #007153 !important; font-weight: 600 !important;" if st.session_state.current_view == "research_overview" else ""
     if st.button("📊  Research Overview", key="nav_research_overview"):
         st.session_state.current_view = "research_overview"
         st.rerun()
-
-    # Note: All unneeded sidebar sections (Data Sources, Conversation Library, Theme Explorer, AI Evidence Log, and Groq 120B Active status card) have been removed as requested.
 
 
 # ------------------------------------------------------------------
@@ -413,72 +481,64 @@ if st.session_state.current_view == "research_overview":
 # View 1: New Research (The Main AI Discovery Agent)
 # ------------------------------------------------------------------
 else:
-    # If no conversation yet, render Google Stitch Hero and Prompt Chips
-    if len(st.session_state.messages) == 0:
-        st.markdown("""
-        <div style="text-align: center; margin-top: 1rem; margin-bottom: 1.5rem;">
-            <div class="stitch-hero-title">Discover why investors stay with their SIPs — or stop.</div>
-            <div class="stitch-hero-subtitle">Explore real investor conversations, identify recurring behavioral friction, and uncover evidence-backed opportunities to improve 12-month SIP retention.</div>
-        </div>
-        """, unsafe_allow_html=True)
+    # Google Stitch Hero Section
+    st.markdown("""
+    <div style="text-align: center; margin-top: 0.5rem; margin-bottom: 1.25rem;">
+        <div class="stitch-hero-title">Discover why investors stay with their SIPs — or stop.</div>
+        <div class="stitch-hero-subtitle">Explore real investor conversations, identify recurring behavioral friction, and uncover evidence-backed opportunities to improve 12-month SIP retention.</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-        # 3 Prompt Chips (from Google Stitch)
-        chip_col1, chip_col2, chip_col3 = st.columns(3)
-        with chip_col1:
-            if st.button("✨ Why do first-time investors stop their SIPs?", key="chip_1", use_container_width=True):
-                st.session_state.input_query = "Why do first-time investors stop their SIPs?"
-                st.rerun()
-        with chip_col2:
-            if st.button("📈 What changes after starting a SIP?", key="chip_2", use_container_width=True):
-                st.session_state.input_query = "What changes after starting a SIP?"
-                st.rerun()
-        with chip_col3:
-            if st.button("🧠 What unmet needs emerge from investor conversations?", key="chip_3", use_container_width=True):
-                st.session_state.input_query = "What unmet needs emerge from investor conversations?"
-                st.rerun()
+    # Prompt Chips - Completely visible without any truncation
+    # Row 1: Two spacious columns for Chip 1 and Chip 2
+    c_chip1, c_chip2 = st.columns([1.15, 0.85])
+    with c_chip1:
+        if st.button("✨ Why do first-time investors stop their SIPs?", key="btn_chip_1", use_container_width=True):
+            st.session_state.input_query = "Why do first-time investors stop their SIPs?"
+            st.rerun()
+    with c_chip2:
+        if st.button("📈 What changes after starting a SIP?", key="btn_chip_2", use_container_width=True):
+            st.session_state.input_query = "What changes after starting a SIP?"
+            st.rerun()
 
-        st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+    # Row 2: Full-width centered column for Chip 3 so all words are 100% visible
+    c_chip3 = st.columns([1])[0]
+    with c_chip3:
+        if st.button("🧠 What unmet needs emerge from investor conversations?", key="btn_chip_3", use_container_width=True):
+            st.session_state.input_query = "What unmet needs emerge from investor conversations?"
+            st.rerun()
 
-    # Render Conversation Messages
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"], unsafe_allow_html=True)
-            
-            # Interactive "Show Specific Investor Concerns & Quotes"
-            if msg["role"] == "assistant" and "references" in msg and msg["references"]:
-                with st.expander(f"💬 Show Specific Investor Concerns & Quotes ({len(msg['references'])} sources)"):
-                    for ref in msg["references"]:
-                        ref_src = ref.get("source", "").lower()
-                        if "play_store" in ref_src:
-                            src_label = "Groww Play Store Review"
-                        elif "app_store" in ref_src:
-                            src_label = "Groww App Store Review"
-                        elif "tradingqna" in ref_src:
-                            src_label = "TradingQ&A (Groww)"
-                        else:
-                            src_label = "Reddit Community"
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
 
-                        quote_txt = ref.get("classification", {}).get("verbatim_quote") or ref.get("raw_text", "")[:220]
-                        url = ref.get("url") or "#"
+    # Centered Search Bar (Google Stitch Exact - Placed right below the questions)
+    with st.form(key="center_search_form", clear_on_submit=False):
+        col_icon, col_input, col_submit = st.columns([0.5, 8.8, 0.7])
+        with col_icon:
+            st.markdown('<div class="search-icon-wrapper"><span class="material-symbols-outlined text-[22px] text-primary">psychology</span></div>', unsafe_allow_html=True)
+        with col_input:
+            typed_query = st.text_input(
+                "Search",
+                placeholder="Ask your research agent about SIP investor behaviour...",
+                label_visibility="collapsed",
+                key="center_input_text"
+            )
+        with col_submit:
+            search_submitted = st.form_submit_button("↑")
 
-                        st.markdown(f"**• {src_label}** `({ref['record_id']})`")
-                        st.markdown(f"> *\"{quote_txt}...\"*")
-                        st.markdown(f"↳ [Open Original Discussion ↗]({url})")
-                        st.markdown("---")
-
-    # Handle Search / Chat Input
-    user_query = st.session_state.input_query
-    if not user_query:
-        user_query = st.chat_input("Ask your research agent about SIP investor behaviour...")
-
-    if user_query:
+    # Determine Active Query (either from Prompt Chip or from Center Search Bar)
+    active_query = None
+    if search_submitted and typed_query.strip():
+        active_query = typed_query.strip()
+    elif st.session_state.get("input_query"):
+        active_query = st.session_state.input_query
         st.session_state.input_query = ""
-        st.session_state.messages.append({"role": "user", "content": user_query})
-        with st.chat_message("user"):
-            st.markdown(user_query)
 
-        # Scope Guardrail Check (Strict Refusal for Off-Topic Queries)
-        query_lower = user_query.lower()
+    # Execute and Stream Query Response if Triggered
+    if active_query:
+        st.session_state.messages.append({"role": "user", "content": active_query})
+
+        # Strict Scope Guardrail Check
+        query_lower = active_query.lower()
         off_topic_keywords = [
             "cricket", "cricketer", "virat", "dhoni", "ipl", "football", "messi", "ronaldo",
             "birthday", "weather", "recipe", "cinema", "bollywood", "hollywood", "actor", "actress",
@@ -487,21 +547,18 @@ else:
 
         if any(k in query_lower for k in off_topic_keywords):
             out_of_scope_reply = "This is out of scope. I am the Groww SIP Retention Discovery Agent and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandate issues, and first-time investor behavior."
-            with st.chat_message("assistant"):
-                st.markdown(out_of_scope_reply)
             st.session_state.messages.append({
                 "role": "assistant",
                 "content": out_of_scope_reply,
                 "references": []
             })
             st.rerun()
+        else:
+            # RAG Retrieval on 406 records
+            with st.spinner("Searching verified Groww and retail investor discussions..."):
+                retrieved_docs = retriever.retrieve(active_query, top_k=5)
 
-        # Step 1: BM25 Retrieval on 406 records
-        with st.spinner("Searching verified Groww and retail investor discussions..."):
-            retrieved_docs = retriever.retrieve(user_query, top_k=5)
-
-        # Step 2: Groq 120B Big Model Generation
-        with st.chat_message("assistant"):
+            # Groq 120B Big Model Generation
             with st.spinner("Synthesizing answer from real investor evidence..."):
                 try:
                     from groq import Groq
@@ -563,7 +620,6 @@ Important Rules:
                         formatted_answer = linkify_citations(raw_answer, records_lookup)
                         final_references = retrieved_docs
 
-                    st.markdown(formatted_answer, unsafe_allow_html=True)
                     st.session_state.messages.append({
                         "role": "assistant",
                         "content": formatted_answer,
@@ -580,10 +636,37 @@ Important Rules:
 - **Hidden 'Pause' Option:** Users cannot easily locate the 1–3 month pause option in the Groww app, so they hard-cancel the SIP.
 
 **Actionable Takeaway for Groww:** Implement a 24-hour balance pre-check notification before debit and offer a 1-tap 'Pause for 1 Month' prompt whenever an investor initiates a cancellation."""
-                    st.markdown(fallback)
                     st.session_state.messages.append({
                         "role": "assistant",
                         "content": fallback,
                         "references": retrieved_docs
                     })
                     st.rerun()
+
+    # Render Conversation Messages (Appears directly below the search bar)
+    if st.session_state.messages:
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"], unsafe_allow_html=True)
+                
+                # Interactive "Show Specific Investor Concerns & Quotes"
+                if msg["role"] == "assistant" and "references" in msg and msg["references"]:
+                    with st.expander(f"💬 Show Specific Investor Concerns & Quotes ({len(msg['references'])} sources)"):
+                        for ref in msg["references"]:
+                            ref_src = ref.get("source", "").lower()
+                            if "play_store" in ref_src:
+                                src_label = "Groww Play Store Review"
+                            elif "app_store" in ref_src:
+                                src_label = "Groww App Store Review"
+                            elif "tradingqna" in ref_src:
+                                src_label = "TradingQ&A (Groww)"
+                            else:
+                                src_label = "Reddit Community"
+
+                            quote_txt = ref.get("classification", {}).get("verbatim_quote") or ref.get("raw_text", "")[:220]
+                            url = ref.get("url") or "#"
+
+                            st.markdown(f"**• {src_label}** `({ref['record_id']})`")
+                            st.markdown(f"> *\"{quote_txt}...\"*")
+                            st.markdown(f"↳ [Open Original Discussion ↗]({url})")
+                            st.markdown("---")
