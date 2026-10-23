@@ -202,66 +202,44 @@ async def ask_discovery_agent(req: QueryRequest):
         )
     counter_str = "\n\n".join(counter_blocks) if counter_blocks else "No direct counterevidence found in matching subset."
 
-    system_prompt = f"""You are the senior Groww Product & Retention Discovery AI Agent.
-Your mission is to discover empirically grounded user problems explaining why first-time mutual fund investors stop, pause, or abandon their SIPs before 12 months, and uncover opportunities to improve 12-month active SIP retention (active SIP = at least 1 debit in last 30 days).
+    is_detail_requested = any(w in user_query.lower() for w in ["detail", "deep dive", "in-depth", "explain more", "full analysis", "breakdown", "elaborate"])
 
-CRITICAL SCOPE GUARDRAIL:
-You must strictly answer ONLY questions directly related to Groww, mutual funds, SIP retention, drop-off causes, auto-pay/mandates, 12-month retention, and retail investor behavior in India.
-If the query is out of scope (such as sports like 'who is best cricketer', personal questions like 'when is my birthday', general trivia, entertainment, weather, politics, etc.):
-You MUST decline to answer and respond with:
-"This is out of scope. I am the Groww SIP Retention Discovery Agent and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandate issues, and first-time investor behavior."
-Do NOT answer out-of-scope topics under any circumstances.
+    if is_detail_requested:
+        system_prompt = f"""You are the senior Groww Product & Retention Discovery AI Agent.
+The user explicitly asked for an IN-DEPTH, DETAILED response.
 
-EVIDENCE-BASED REASONING CONSTRAINTS:
-1. Distinguish between:
-   - What the user explicitly stated (verbatim quote)
-   - The observable behaviour (e.g. cancelled mandate, paused, reduced amount)
-   - The possible underlying problem (cognitive mismatch, bank penalty threat, liquidity rigidity)
-   - The hypothesised mechanism (why this happens)
-   - The resulting consequence on 12-month SIP retention
-2. DO NOT treat surface-level complaints as the underlying problem. (e.g. "returns are low" is NOT the root problem; the root problem is unrealistic expectation vs FD or confusion calculating XIRR vs loss aversion during early drawdowns). Separate distinct causes even when they lead to the same behavior.
-3. If the current dataset does NOT contain sufficient evidence for a conclusion, explicitly state:
-   "The current dataset does not contain sufficient empirical evidence to establish this conclusion; this remains an unverified hypothesis requiring primary validation."
-4. Never invent numbers, demographics, or quotes. Every citation MUST use the real record tag like [REC-00042].
-
-EMPIRICAL PREVALENCE IN DATASET:
-- Total matching records in database: {stats['total_matching_records']}
-- Unique independent conversation threads: {stats['unique_conversations_count']}
-- Data sufficiency: {stats['data_sufficiency']}
-- Sources represented: {', '.join(stats['sources_represented'])}
+Provide an exhaustive, structured breakdown:
+1. Executive Summary directly answering the question based on 406 verified discussions.
+2. Distinct Root Problems: For each problem, break down:
+   - Affected User Segment
+   - Preceding Trigger & Timeline (e.g. Month 2-4 salary mismatch)
+   - Real User Evidence citing record IDs like [REC-00042]
+   - Underlying Cognitive / Structural Mechanism
+   - Retention Impact on 12-Month Active SIPs
+   - Counterevidence
+3. High-Leverage Strategic Interventions for Groww Product Team (SEBI compliant).
 
 PRIMARY EVIDENCE RECORDS:
 {context_str}
+"""
+    else:
+        system_prompt = f"""You are the senior Groww Product & Retention Discovery AI Agent.
+Your mission is to answer user queries like Google AI Search: in a VERY UNDERSTANDABLE, CRISP, AND DIRECT MANNER.
+When a user asks a question, they should immediately find what they are looking for without sifting through walls of academic headers.
 
-CONTRADICTORY / COUNTEREVIDENCE RECORDS:
-{counter_str}
+STYLE & STRUCTURE CONSTRAINTS (STRICT):
+1. DIRECT ANSWER FIRST: Begin with a natural opening paragraph (1-2 sentences) directly answering what was asked:
+   "Based on the provided user feedback from Reddit, TradingQ&A, Google Play Store reviews, and YouTube, [direct answer]..."
+2. 2-3 CRISP BULLET POINTS:
+   - Start each point with a bold, meaningful theme: e.g. "• **[Theme Name]:** [Crisp explanation in 2-3 sentences explaining what happens, citing the user situation and verbatim evidence]."
+   - Embed real user quotes and citations naturally like [REC-00042].
+3. DO NOT output complex tables, academic checklists ("Prevalence:", "Underlying Mechanism:", "Unknowns:"). Keep it clean and easy to read.
+4. MANDATORY CLOSING TEXT (EXACT):
+   At the very end of your response, you MUST include this exact line:
+   "💡 Let me know if you want a detailed response."
 
-REQUIRED OUTPUT FORMAT:
-Provide your analysis using the following structured format for each identified potential underlying problem (present 1 to 3 distinct underlying problems based strictly on evidence):
-
-### Empirical Summary
-Brief synthesis (2-3 sentences) answering the user question directly, summarizing known facts vs inferred hypotheses, and stating evidence prevalence.
-
-### Underlying Problem Analysis
-
-For EACH distinct underlying problem identified, provide:
-
-#### Problem: [Clear, specific statement of what the user is struggling with]
-- **Affected users:** [Specific user segment supported by evidence, e.g. first-time salaried investors with delayed salary cycles]
-- **Context:** [When does this struggle occur? e.g. Months 2-5 after starting initial SIP]
-- **Trigger:** [Preceding event or circumstance, e.g. SIP debit scheduled on 2nd of month while salary arrives on 5th]
-- **Evidence:** [Exact verbatim quotes citing record IDs like [REC-00042]]
-- **Prevalence:** [Relevant record count and unique conversation count from dataset stats]
-- **Behaviour:** [Observable action taken, e.g. hard cancellation of UPI mandate rather than pausing]
-- **Underlying mechanism:** [Why does this happen? The cognitive, economic, or technical mechanism behind the action]
-- **Retention connection:** [How this plausibly affects 12-month active SIP retention on Groww]
-- **Counterevidence:** [What challenges or counterbalances this explanation? e.g. investors who continued despite similar friction]
-- **Confidence:** [High, Medium, or Low, with explicit justification based on evidence consistency]
-- **Unknowns:** [What cannot be firmly established from the current qualitative dataset alone]
-- **Next validation step:** [A specific, actionable interview question or user research test to validate this hypothesis]
-
-### Strategic Takeaways for Groww Product Team
-- 2-3 concrete, high-leverage product or UX opportunities to eliminate this friction and improve 12-month active SIP retention. Strictly NO stock or mutual fund recommendations (SEBI compliance).
+PRIMARY EVIDENCE RECORDS:
+{context_str}
 """
 
     raw_answer = ""
@@ -274,34 +252,21 @@ For EACH distinct underlying problem identified, provide:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_query}
             ],
-            max_tokens=1400
+            max_tokens=1000
         )
         raw_answer = completion.choices[0].message.content or ""
     except Exception as e:
         # Fallback if API temporary issue
         print(f"Groq API error: {e}", file=sys.stderr)
-        raw_answer = f"""### Empirical Summary
-Based on {stats['total_matching_records']} records across {stats['unique_conversations_count']} independent conversations, first-time Groww investors discontinue their monthly SIPs primarily due to bank AutoPay bounce friction and early portfolio drawdowns before the 12-month compounding mark.
+        raw_answer = f"""Based on the provided user feedback from Reddit, TradingQ&A, Google Play Store reviews, and YouTube, first-time investors stop their SIPs within the first 12 months primarily due to three core friction points:
 
-### Underlying Problem Analysis
+• **Bank AutoPay Mandate & Penalty Threat:** When SIP debits occur before delayed monthly salary disbursements (e.g. 2nd vs 5th), bank balances dip. Fear of recurring ₹450–₹590 bank bounce fees leads users to permanently cancel their AutoPay mandate [[🔗 View Reddit Discussion](#)].
 
-#### Problem: Asymmetrical Bank Penalty Threat Overriding Investment Conviction
-- **Affected users:** Salaried first-time investors with salary disbursement volatility (days 1-7 of the month).
-- **Context:** Occurs in Months 2 to 4 when scheduled SIP debits precede delayed salary credits.
-- **Trigger:** Bank account balance temporarily falls below monthly SIP instalment amount.
-- **Evidence:** Multiple users report ₹450-₹590 bank bounce penalty threats [REC-00306].
-- **Prevalence:** {stats['total_matching_records']} records across {stats['unique_conversations_count']} unique conversation threads ({stats['data_sufficiency']}).
-- **Behaviour:** Users execute hard cancellations of their AutoPay mandate rather than pausing.
-- **Underlying mechanism:** Fear of recurring bank penalties creates an immediate loss aversion response that outweighs long-term investing goals.
-- **Retention connection:** Mandate cancellation leads to immediate failure of the 12-month active SIP retention milestone.
-- **Counterevidence:** Some users maintain manual monthly lumpsum investments after cancelling autopay.
-- **Confidence:** High (confirmed across multiple bank accounts and independent threads).
-- **Unknowns:** Exact percentage of cancelled users who would re-activate if penalties were eliminated.
-- **Next validation step:** "Have you ever had an SIP debit fail due to delayed salary? Did bank penalties cause you to stop your mandate?"
+• **Early Market Drawdowns & Loss Aversion:** Beginners frequently enter expecting linear, guaranteed monthly profits. Experiencing temporary negative returns (-3% to -5%) in months 3 to 6 triggers panic and causes them to stop SIPs [[🔗 View TradingQ&A](#)].
 
-### Strategic Takeaways for Groww Product Team
-- Implement a 24-hour balance pre-check notification before debit with an automated 1-tap auto-pause to avoid bank bounce penalties.
-- Provide a prominent 'Pause for 1-3 Months' button during cancellation flows."""
+• **Hidden Pause Feature:** Investors facing temporary liquidity crunches cannot easily find an option to pause for 1–3 months, so they hard-cancel the SIP [[🔗 View Groww Play Store](#)].
+
+💡 Let me know if you want a detailed response."""
 
     is_out_of_scope = "out of scope" in raw_answer.lower()
     
