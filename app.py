@@ -279,40 +279,135 @@ st.markdown("""
         padding-right: 4px;
     }
     
-    /* Chat Messages */
+    /* Chat Messages Container */
     div[data-testid="stChatMessage"] {
         background-color: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
         border-radius: 16px !important;
         padding: 1.25rem 1.5rem !important;
-        margin-bottom: 1rem !important;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+        margin-bottom: 1.25rem !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+        color: #151C27 !important;
+    }
+    
+    /* Ensure ALL text inside chat messages is clearly visible with dark high-contrast typography */
+    div[data-testid="stChatMessage"] [data-testid="stChatMessageContent"],
+    div[data-testid="stChatMessage"] [data-testid="stChatMessageContent"] * {
+        color: #1E293B !important;
+    }
+    
+    /* Headings inside chat messages */
+    div[data-testid="stChatMessage"] h1,
+    div[data-testid="stChatMessage"] h2,
+    div[data-testid="stChatMessage"] h3,
+    div[data-testid="stChatMessage"] h4,
+    div[data-testid="stChatMessage"] h5,
+    div[data-testid="stChatMessage"] h6 {
+        color: #0F172A !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.015em !important;
+        margin-top: 1.1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    div[data-testid="stChatMessage"] h2 {
+        font-size: 1.35rem !important;
+        color: #0F172A !important;
+        border-bottom: 2px solid #E2E8F0 !important;
+        padding-bottom: 8px !important;
+    }
+    div[data-testid="stChatMessage"] h3 {
+        font-size: 1.2rem !important;
+        color: #006C4F !important;
+        border-bottom: 1px solid #E2E8F0 !important;
+        padding-bottom: 6px !important;
+        margin-top: 1.25rem !important;
+    }
+    div[data-testid="stChatMessage"] h4 {
+        font-size: 1.05rem !important;
+        color: #007153 !important;
+        margin-top: 1rem !important;
+    }
+    
+    /* Paragraphs, lists, and spans inside chat */
+    div[data-testid="stChatMessage"] p,
+    div[data-testid="stChatMessage"] li,
+    div[data-testid="stChatMessage"] span {
+        color: #1E293B !important;
+        font-size: 14.5px !important;
+        line-height: 1.65 !important;
+    }
+    div[data-testid="stChatMessage"] strong,
+    div[data-testid="stChatMessage"] b {
+        color: #0F172A !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Tables inside chat (for Item/Details tables) */
+    div[data-testid="stChatMessage"] table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin: 1rem 0 !important;
+        background: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 8px !important;
+    }
+    div[data-testid="stChatMessage"] th {
+        background-color: #F8FAFC !important;
+        color: #0F172A !important;
+        font-weight: 700 !important;
+        font-size: 13px !important;
+        padding: 10px 14px !important;
+        border: 1px solid #E2E8F0 !important;
+        text-align: left !important;
+    }
+    div[data-testid="stChatMessage"] td {
+        padding: 9px 14px !important;
+        border: 1px solid #E2E8F0 !important;
+        color: #1E293B !important;
+        font-size: 13.5px !important;
+        background-color: #FFFFFF !important;
+    }
+    
+    /* Blockquotes */
+    div[data-testid="stChatMessage"] blockquote {
+        background-color: #F8FAFC !important;
+        border-left: 3px solid #00D09C !important;
+        color: #334155 !important;
+        padding: 10px 16px !important;
+        margin: 0.8rem 0 !important;
+        border-radius: 0 8px 8px 0 !important;
+    }
+    
+    /* Links and Citations */
+    div[data-testid="stChatMessage"] a,
+    div[data-testid="stChatMessage"] a * {
+        color: #007153 !important;
+        font-weight: 600 !important;
+        text-decoration: underline !important;
+    }
+    div[data-testid="stChatMessage"] a:hover {
+        color: #004D38 !important;
     }
     
     /* Expander Styling for Investor Concerns */
     div[data-testid="stExpander"] {
-        background-color: #F8FAFC !important;
+        background-color: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
         border-radius: 12px !important;
         margin-top: 0.75rem !important;
+        color: #151C27 !important;
+    }
+    div[data-testid="stExpander"] * {
+        color: #151C27 !important;
     }
     div[data-testid="stExpander"] details summary {
         font-size: 13.5px !important;
         font-weight: 600 !important;
         color: #006C4F !important;
-    }
-    
-    /* Citations and Links */
-    a.stitch-citation {
-        color: #006C4F !important;
-        font-weight: 600 !important;
-        text-decoration: none !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 2px !important;
-    }
-    a.stitch-citation:hover {
-        text-decoration: underline !important;
+        background-color: #F8FAFC !important;
+        padding: 10px 14px !important;
+        border-radius: 12px !important;
     }
     
     /* Clean Overview Card */
