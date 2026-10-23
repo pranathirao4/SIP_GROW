@@ -536,34 +536,45 @@ def linkify_citations(text: str, records_map: dict) -> str:
 
 
 def scroll_to_question():
-    """Smoothly scrolls the browser down to the newly entered question."""
+    """Instantly snaps the browser down to the newly entered question, removing the upper section from view."""
     js = """
     <script>
     (function() {
-        function doScroll() {
+        function getScrollContainers(doc) {
+            return [
+                doc.querySelector('section[data-testid="stMain"]'),
+                doc.querySelector('section.main'),
+                doc.querySelector('.stMain'),
+                doc.querySelector('.main'),
+                doc.querySelector('[data-testid="stAppViewContainer"]'),
+                doc.documentElement,
+                doc.body
+            ].filter(Boolean);
+        }
+
+        function snapToQuestion() {
             try {
                 const doc = window.parent.document;
                 if (!doc) return;
                 
-                // 1. Target the latest question element
                 const qElem = doc.getElementById('latest-user-question');
+                const containers = getScrollContainers(doc);
+
                 if (qElem) {
-                    qElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-                
-                // 2. Also ensure main scrollable container scrolls down
-                const containers = [
-                    doc.querySelector('[data-testid="stAppViewContainer"]'),
-                    doc.querySelector('section.main'),
-                    doc.querySelector('.main'),
-                    doc.documentElement,
-                    doc.body
-                ];
-                for (const c of containers) {
-                    if (c && c.scrollHeight > c.clientHeight) {
-                        if (typeof c.scrollTo === 'function') {
-                            c.scrollTo({ top: c.scrollHeight + 10000, behavior: 'smooth' });
-                        } else {
+                    try {
+                        qElem.scrollIntoView({ behavior: 'instant', block: 'start' });
+                    } catch (e) {}
+
+                    const rect = qElem.getBoundingClientRect();
+                    // Instantly shift scroll containers so question is pinned at top (70px margin)
+                    for (const c of containers) {
+                        if (c.scrollHeight > c.clientHeight) {
+                            c.scrollTop += (rect.top - 70);
+                        }
+                    }
+                } else {
+                    for (const c of containers) {
+                        if (c.scrollHeight > c.clientHeight) {
                             c.scrollTop = c.scrollHeight;
                         }
                     }
@@ -573,12 +584,31 @@ def scroll_to_question():
             }
         }
         
-        doScroll();
-        setTimeout(doScroll, 50);
-        setTimeout(doScroll, 150);
-        setTimeout(doScroll, 350);
-        setTimeout(doScroll, 700);
-        setTimeout(doScroll, 1200);
+        // Snap immediately across multiple animation frames and timeouts
+        snapToQuestion();
+        requestAnimationFrame(snapToQuestion);
+        setTimeout(snapToQuestion, 25);
+        setTimeout(snapToQuestion, 60);
+        setTimeout(snapToQuestion, 120);
+        setTimeout(snapToQuestion, 250);
+        setTimeout(snapToQuestion, 500);
+
+        // Keep view pinned firmly during active token streaming
+        let pollCount = 0;
+        let timer = setInterval(function() {
+            snapToQuestion();
+            pollCount++;
+            if (pollCount > 100) { // 100 * 60ms = 6 seconds
+                clearInterval(timer);
+            }
+        }, 60);
+
+        // Release lock if user manually touches scroll wheel
+        if (window.parent) {
+            window.parent.addEventListener('wheel', function() {
+                clearInterval(timer);
+            }, { passive: true, once: true });
+        }
     })();
     </script>
     """
@@ -586,15 +616,78 @@ def scroll_to_question():
 
 
 def inject_input_scroll_listener():
-    """Client-side listener to immediately scroll down the millisecond Enter or Send is pressed."""
+    """Client-side listener to immediately snap down the millisecond Enter, Send, or a prompt chip is pressed."""
     js = """
     <script>
     (function() {
         const doc = window.parent.document;
         if (!doc) return;
         
+        function getScrollContainers() {
+            return [
+                doc.querySelector('section[data-testid="stMain"]'),
+                doc.querySelector('section.main'),
+                doc.querySelector('.stMain'),
+                doc.querySelector('.main'),
+                doc.querySelector('[data-testid="stAppViewContainer"]'),
+                doc.documentElement,
+                doc.body
+            ].filter(Boolean);
+        }
+
+        let globalSnapInterval = null;
+
+        function triggerActiveSnap() {
+            if (globalSnapInterval) clearInterval(globalSnapInterval);
+
+            function doSnap() {
+                const qElem = doc.getElementById('latest-user-question');
+                const containers = getScrollContainers();
+
+                if (qElem) {
+                    try {
+                        qElem.scrollIntoView({ behavior: 'instant', block: 'start' });
+                    } catch (e) {}
+
+                    const rect = qElem.getBoundingClientRect();
+                    for (const c of containers) {
+                        if (c.scrollHeight > c.clientHeight) {
+                            c.scrollTop += (rect.top - 70);
+                        }
+                    }
+                } else {
+                    for (const c of containers) {
+                        if (c.scrollHeight > c.clientHeight) {
+                            c.scrollTop = c.scrollHeight;
+                        }
+                    }
+                }
+            }
+
+            doSnap();
+            let count = 0;
+            globalSnapInterval = setInterval(function() {
+                doSnap();
+                count++;
+                if (count > 120) { // 120 * 50ms = 6s
+                    clearInterval(globalSnapInterval);
+                    globalSnapInterval = null;
+                }
+            }, 50);
+        }
+
+        // Wheel interrupt
+        if (window.parent) {
+            window.parent.addEventListener('wheel', function() {
+                if (globalSnapInterval) {
+                    clearInterval(globalSnapInterval);
+                    globalSnapInterval = null;
+                }
+            }, { passive: true });
+        }
+
         function attachListener() {
-            // Inject anti-dimming styles directly into parent document head
+            // Anti-dimming styles directly into document head
             if (!doc.getElementById('anti-dimming-style')) {
                 const s = doc.createElement('style');
                 s.id = 'anti-dimming-style';
@@ -621,46 +714,40 @@ def inject_input_scroll_listener():
             }
 
             const chatInput = doc.querySelector('[data-testid="stChatInput"]');
-            if (!chatInput) return;
-            
-            const textarea = chatInput.querySelector('textarea');
-            const sendBtn = chatInput.querySelector('button');
-            
-            const doImmediateScroll = () => {
-                const scrollable = doc.querySelector('[data-testid="stAppViewContainer"]') 
-                                || doc.querySelector('section.main') 
-                                || doc.documentElement 
-                                || doc.body;
-                if (scrollable) {
-                    if (typeof scrollable.scrollTo === 'function') {
-                        scrollable.scrollTo({ top: scrollable.scrollHeight + 10000, behavior: 'smooth' });
-                    } else {
-                        scrollable.scrollTop = scrollable.scrollHeight;
-                    }
+            if (chatInput) {
+                const textarea = chatInput.querySelector('textarea');
+                const sendBtn = chatInput.querySelector('button');
+                
+                if (textarea && !textarea.dataset.hasScrollListener) {
+                    textarea.dataset.hasScrollListener = "true";
+                    textarea.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            triggerActiveSnap();
+                        }
+                    });
                 }
-            };
-            
-            if (textarea && !textarea.dataset.hasScrollListener) {
-                textarea.dataset.hasScrollListener = "true";
-                textarea.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        doImmediateScroll();
-                        setTimeout(doImmediateScroll, 100);
-                    }
-                });
+                if (sendBtn && !sendBtn.dataset.hasScrollListener) {
+                    sendBtn.dataset.hasScrollListener = "true";
+                    sendBtn.addEventListener('click', function() {
+                        triggerActiveSnap();
+                    });
+                }
             }
-            if (sendBtn && !sendBtn.dataset.hasScrollListener) {
-                sendBtn.dataset.hasScrollListener = "true";
-                sendBtn.addEventListener('click', function() {
-                    doImmediateScroll();
-                    setTimeout(doImmediateScroll, 100);
-                });
-            }
+
+            // Also attach to prompt chip buttons
+            const chipButtons = doc.querySelectorAll('.prompt-chip-btn button');
+            chipButtons.forEach(btn => {
+                if (!btn.dataset.hasSnapListener) {
+                    btn.dataset.hasSnapListener = "true";
+                    btn.addEventListener('click', triggerActiveSnap);
+                }
+            });
         }
         
         attachListener();
-        setTimeout(attachListener, 300);
-        setTimeout(attachListener, 800);
+        setTimeout(attachListener, 200);
+        setTimeout(attachListener, 600);
+        setTimeout(attachListener, 1200);
     })();
     </script>
     """
