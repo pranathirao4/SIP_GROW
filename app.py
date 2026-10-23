@@ -398,61 +398,67 @@ st.markdown("""
 
     /* References Right Panel Card (Pic 4) */
     .references-panel-card {
-        background: #FFFFFF;
-        border: 1px solid #DADCE0;
-        border-radius: 16px;
-        padding: 16px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-        margin-top: 0.5rem;
+        background: #FFFFFF !important;
+        border: 1px solid #DADCE0 !important;
+        border-radius: 16px !important;
+        padding: 16px 14px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+        margin-top: 0.5rem !important;
     }
     .ref-header-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 15px;
-        font-weight: 600;
-        color: #202124;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        color: #202124 !important;
     }
     .ref-subtitle {
-        font-size: 12px;
-        color: #5F6368;
-        margin-top: 4px;
-        margin-bottom: 14px;
-        border-bottom: 1px solid #F1F3F4;
-        padding-bottom: 8px;
+        font-size: 12.5px !important;
+        color: #5F6368 !important;
+        margin-top: 4px !important;
+        margin-bottom: 14px !important;
     }
     .ref-item {
-        padding: 10px 0;
-        border-bottom: 1px solid #F1F3F4;
+        background: #FFFFFF !important;
+        border: 1px solid #E0E2E6 !important;
+        border-radius: 12px !important;
+        padding: 10px 12px !important;
+        margin-bottom: 9px !important;
+        transition: all 0.15s ease !important;
     }
-    .ref-item:last-child {
-        border-bottom: none;
+    .ref-item:hover {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
     }
     .ref-item-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 4px;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        margin-bottom: 4px !important;
+        gap: 8px !important;
     }
     .ref-item-title {
-        font-size: 13px;
-        color: #202124;
-        font-weight: 500;
+        font-size: 12.5px !important;
+        font-weight: 600 !important;
+        color: #202124 !important;
+        line-height: 1.3 !important;
     }
     .ref-item-score {
-        font-size: 11px;
-        color: #1A73E8;
-        background-color: #E8F0FE;
-        padding: 1px 6px;
-        border-radius: 10px;
-        font-weight: 600;
+        font-size: 11px !important;
+        color: #1967D2 !important;
+        background-color: #EBF3FE !important;
+        padding: 2px 8px !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        flex-shrink: 0 !important;
     }
     .ref-item-link {
-        font-size: 12px;
-        color: #1A73E8;
-        text-decoration: underline;
-        word-break: break-all;
-        display: block;
+        font-size: 11.5px !important;
+        color: #1A73E8 !important;
+        text-decoration: underline !important;
+        word-break: break-all !important;
+        display: block !important;
+        line-height: 1.4 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -609,57 +615,65 @@ def inject_input_scroll_listener():
 
 
 def render_references_panel(refs):
-    """Renders the Google Review Engine References panel on the right."""
+    """Renders the Google Review Engine References panel on the right (matching Picture 2)."""
     if refs:
-        html = f"""
-        <div class="references-panel-card">
-            <div class="ref-header-row">
-                <span>References</span>
-                <span>&#x2304;</span>
-            </div>
-            <div class="ref-subtitle">Used in this chat — {len(refs)} reviews.</div>
-        """
+        items = []
         for idx, ref in enumerate(refs[:8], 1):
             src_raw = ref.get("source", "").lower()
             if "play_store" in src_raw:
                 src_name = "Google Play Store"
                 extra_meta = "4★"
+                border_color = "#0F9D58"  # Play Store Green
             elif "tradingqna" in src_raw:
                 src_name = "TradingQ&A"
                 extra_meta = "Discussion"
+                border_color = "#1A73E8"  # Community Blue
             elif "youtube" in src_raw:
                 src_name = "YouTube"
                 extra_meta = "Review"
+                border_color = "#EA4335"  # YouTube Red
             else:
                 src_name = "Reddit"
                 upvotes = ref.get("upvotes_or_likes", 12)
                 extra_meta = f"{upvotes} upvotes/likes"
+                border_color = "#FF5722"  # Reddit Orange
 
             pub_date = ref.get("published_at", "2024-02-11")[:10]
             score = ref.get("retrieval_score", 0.650)
             url = ref.get("url") or "#"
 
-            html += f"""
-            <div class="ref-item">
-                <div class="ref-item-top">
-                    <span class="ref-item-title">{idx}. {src_name} · {pub_date} · {extra_meta}</span>
-                    <span class="ref-item-score">{score:.3f}</span>
-                </div>
-                <a href="{url}" target="_blank" class="ref-item-link">{url}</a>
-            </div>
-            """
-        html += "</div>"
-        return html
+            item_html = (
+                f'<div class="ref-item" style="border-left: 3.5px solid {border_color};">'
+                f'<div class="ref-item-top">'
+                f'<span class="ref-item-title">{idx}. {src_name} · {pub_date} · {extra_meta}</span>'
+                f'<span class="ref-item-score">{score:.3f}</span>'
+                f'</div>'
+                f'<a href="{url}" target="_blank" class="ref-item-link">{url}</a>'
+                f'</div>'
+            )
+            items.append(item_html)
+
+        cards_body = "".join(items)
+        return (
+            '<div class="references-panel-card">'
+            '<div class="ref-header-row">'
+            '<span>References</span>'
+            '<span style="font-size: 16px; font-weight: 700; color: #202124;">&#x2304;</span>'
+            '</div>'
+            f'<div class="ref-subtitle">Used in this chat — {len(refs)} reviews.</div>'
+            f'{cards_body}'
+            '</div>'
+        )
     else:
-        return """
-        <div class="references-panel-card">
-            <div class="ref-header-row">
-                <span>References</span>
-                <span>&gt;</span>
-            </div>
-            <div class="ref-subtitle">References sit here when you ask a question.</div>
-        </div>
-        """
+        return (
+            '<div class="references-panel-card">'
+            '<div class="ref-header-row">'
+            '<span>References</span>'
+            '<span style="font-size: 16px; font-weight: 700; color: #202124;">&gt;</span>'
+            '</div>'
+            '<div class="ref-subtitle">References sit here when you ask a question.</div>'
+            '</div>'
+        )
 
 # Initialize Retriever
 @st.cache_resource
