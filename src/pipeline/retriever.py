@@ -1,11 +1,42 @@
 """
 RAG Retriever Module for Groww SIP Retention Discovery Agent.
-Performs fast, in-memory BM25-style lexical and semantic matching over the 321 investor records.
+Performs fast, in-memory BM25-style lexical and causal matching over the cleaned investor dataset.
+Calculates real empirical prevalence:
+  - Exact matching record count
+  - Independent unique conversation thread count (deduplicated by root URL)
+  - Identifies counterevidence records (users who stayed invested / resolved the friction)
+  - Flags data sufficiency to prevent ungrounded AI hallucinations
 """
 
 import re
 import math
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
+from urllib.parse import urlparse
+
+
+def clean_root_url(url: str) -> str:
+    """Normalize URL to its root thread/page to accurately count unique conversations."""
+    if not url:
+        return "unknown_conversation"
+    try:
+        parsed = urlparse(url)
+        path = parsed.path
+        if "reddit.com" in parsed.netloc:
+            m = re.match(r'(/r/[^/]+/comments/[a-z0-9]+)', path)
+            if m:
+                return f"https://www.reddit.com{m.group(1)}"
+        elif "tradingqna.com" in parsed.netloc:
+            m = re.match(r'(/t/[^/]+/\d+)', path)
+            if m:
+                return f"https://tradingqna.com{m.group(1)}"
+        elif "youtube.com" in parsed.netloc:
+            video_id = re.search(r'[?&]v=([a-zA-Z0-9_-]{11})', url)
+            if video_id:
+                return f"https://www.youtube.com/watch?v={video_id.group(1)}"
+        return f"{parsed.scheme}://{parsed.netloc}{path}".rstrip('/')
+    except Exception:
+        return url
+
 
 class SIPRetriever:
     def __init__(self, records: List[Dict[str, Any]]):
@@ -32,7 +63,8 @@ class SIPRetriever:
 
         for r in self.records:
             # Combine title, text, tags, and quotes for comprehensive search
-            content = f"{r.get('title', '')} {r.get('raw_text', '')} {r.get('classification', {}).get('verbatim_quote', '')} {r.get('classification', {}).get('trigger_context', '')}"
+            clf = r.get("classification", {})
+            content = f"{r.get('title', '')} {r.get('raw_text', '')} {clf.get('verbatim_quote', '')} {clf.get('trigger_context', '')} {clf.get('underlying_problem', '')} {clf.get('observable_behaviour', '')}"
             tokens = self._tokenize(content)
             self.doc_tokens.append(tokens)
             self.doc_lens.append(len(tokens))
@@ -43,10 +75,10 @@ class SIPRetriever:
 
         self.avg_doc_len = sum(self.doc_lens) / max(1, self.doc_count)
 
-    def retrieve(self, query: str, top_k: int = 6) -> List[Dict[str, Any]]:
+    def _score_records(self, query: str) -> List[Tuple[float, Dict[str, Any]]]:
         query_tokens = self._tokenize(query)
         if not query_tokens:
-            return self.records[:top_k]
+            return [(1.0, r) for r in self.records]
 
         k1 = 1.5
         b = 0.75
@@ -68,14 +100,78 @@ class SIPRetriever:
                     denom = tf + k1 * (1 - b + b * (doc_len / self.avg_doc_len))
                     score += idf * (tf * (k1 + 1)) / denom
 
-            # Boost high-signal records (Tier 1 & Tier 2)
-            tier = self.records[i].get('relevance_tier', 4)
-            if tier == 1:
-                score *= 1.3
-            elif tier == 2:
-                score *= 1.15
+            # Boost high-signal records (Tier 1 & Tier 3)
+            tier = self.records[i].get('relevance_tier')
+            if tier == "Tier 1: Directly Relevant" or tier == 1:
+                score *= 1.35
+            elif tier == "Tier 3: In-App & Mandate Friction" or tier == 3:
+                score *= 1.25
 
             scores.append((score, self.records[i]))
 
         scores.sort(key=lambda x: x[0], reverse=True)
-        return [record for score, record in scores[:top_k] if score > 0] or self.records[:top_k]
+        return scores
+
+    def retrieve(self, query: str, top_k: int = 6) -> List[Dict[str, Any]]:
+        """Standard retriever interface returning top_k records."""
+        scores = self._score_records(query)
+        positive = [record for score, record in scores if score > 0]
+        return positive[:top_k] if positive else self.records[:top_k]
+
+    def retrieve_with_evidence_stats(self, query: str, top_k: int = 6) -> Dict[str, Any]:
+        """
+        Enriched retriever interface returning:
+          - primary_matches: top_k records
+          - counterevidence_matches: records showing users who stayed invested / continued
+          - prevalence_stats: exact matching count, unique conversation count, data sufficiency flag
+        """
+        scores = self._score_records(query)
+        positive_records = [record for score, record in scores if score > 0]
+        
+        # If no positive matches, fall back to default
+        if not positive_records:
+            positive_records = self.records[:top_k]
+
+        primary_matches = positive_records[:top_k]
+
+        # Calculate exact conversation counts across ALL positive matching records
+        all_conv_urls = set()
+        sources_found = set()
+        counterevidence_candidates = []
+
+        for r in positive_records:
+            u = r.get("url", "")
+            root_u = clean_root_url(u)
+            if root_u != "unknown_conversation":
+                all_conv_urls.add(root_u)
+            
+            src = r.get("source", "unknown")
+            sources_found.add(src)
+
+            # Check for counterevidence in positive matches or whole dataset
+            combined_txt = f"{r.get('title', '')} {r.get('raw_text', '')}".lower()
+            if any(w in combined_txt for w in ["continued", "stayed invested", "did not stop", "still investing", "restarted", "success"]):
+                if len(counterevidence_candidates) < 2 and r["record_id"] not in [p["record_id"] for p in primary_matches]:
+                    counterevidence_candidates.append(r)
+
+        total_matching = len(positive_records)
+        unique_conv_count = len(all_conv_urls) if all_conv_urls else max(1, len(primary_matches))
+
+        # Data Sufficiency Assessment
+        if unique_conv_count >= 8:
+            data_sufficiency = "HIGH (Strong recurring pattern across multiple independent threads)"
+        elif unique_conv_count >= 3:
+            data_sufficiency = "MODERATE (Observed in multiple threads, but requires primary validation)"
+        else:
+            data_sufficiency = "SPARSE / ISOLATED (Limited to 1-2 examples; treat with caution, do not overgeneralize)"
+
+        return {
+            "primary_matches": primary_matches,
+            "counterevidence_matches": counterevidence_candidates,
+            "stats": {
+                "total_matching_records": total_matching,
+                "unique_conversations_count": unique_conv_count,
+                "sources_represented": list(sources_found),
+                "data_sufficiency": data_sufficiency
+            }
+        }

@@ -1,601 +1,697 @@
 [
   {
     "theme_id": "THM-11",
-    "theme_name": "Social Influence & FinTech Advice Regret",
-    "definition": "Starting SIPs based on influencer or peer hype, subsequently regretting fund selections or feeling misled.",
-    "record_count": 64,
-    "denominator": 193,
-    "prevalence_percentage": 33.2,
-    "unique_sources_count": 2,
+    "theme_name": "Social Finfluencer Hype Regret & Conviction Deficit",
+    "underlying_mechanism": "Starting SIPs based on peer pressure or social media hype without foundational understanding. At the first sign of difficulty, low conviction leads to rapid abandonment.",
+    "record_count": 65,
+    "unique_conversations_count": 7,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
+    "prevalence_percentage": 33.7,
+    "unique_sources_count": 3,
     "sources_represented": [
+      "youtube_comments",
       "reddit/r/personalfinanceindia",
-      "youtube_comments"
+      "tradingqna"
     ],
     "retention_connection": "Moderate. Low initial conviction leads to rapid abandonment at first sign of trouble.",
     "representative_verbatims": [
       {
         "record_id": "REC-00036",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "I think it's worth payign off the loan steadily alongside investing (no need to pause the SIPs for it)\nGet basic term and health insurance sorted if you haven't already, cheap at 24 and most people regret not doing it sooner.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1semdon/comment/oes4d2x/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1semdon/comment/oes4d2x/",
+        "quote": "I think it's worth payign off the loan steadily alongside investing (no need to pause the SIPs for it)\nGet basic term and health insurance sorted if you haven't already, cheap at 24 and most people regret not doing it sooner."
       },
       {
         "record_id": "REC-00299",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "I started late and regret not starting earlier , even if it were smaller values in SIP.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1bujsmq/comment/kxtqh18/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1bujsmq/comment/kxtqh18/",
+        "quote": "I started late and regret not starting earlier , even if it were smaller values in SIP."
+      },
+      {
+        "record_id": "REC-00559",
+        "source": "tradingqna",
+        "url": "https://tradingqna.com/t/sebi-skins-a-notorious-finfluencer/189350",
+        "quote": "SEBI skins a notorious finfluencer."
       },
       {
         "record_id": "REC-00853",
         "source": "youtube_comments",
-        "quote": "YouTube Comment on Groww SIP cancel kaise kare.",
-        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=UgxFK7iEOT-baaltv114AaABAg#UgxFK7iEOT-baaltv114AaABAg"
+        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=UgxFK7iEOT-baaltv114AaABAg#UgxFK7iEOT-baaltv114AaABAg",
+        "quote": "YouTube Comment on Groww SIP cancel kaise kare."
       },
       {
         "record_id": "REC-00854",
         "source": "youtube_comments",
-        "quote": "YouTube Comment on Groww SIP cancel kaise kare.",
-        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=Ugyuj36b-tkyyafeHfp4AaABAg#Ugyuj36b-tkyyafeHfp4AaABAg"
+        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=Ugyuj36b-tkyyafeHfp4AaABAg#Ugyuj36b-tkyyafeHfp4AaABAg",
+        "quote": "YouTube Comment on Groww SIP cancel kaise kare."
       },
       {
         "record_id": "REC-00855",
         "source": "youtube_comments",
-        "quote": "YouTube Comment on Groww SIP cancel kaise kare.",
-        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=Ugxb79OCbJsFT3jnn0Z4AaABAg#Ugxb79OCbJsFT3jnn0Z4AaABAg"
+        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=Ugxb79OCbJsFT3jnn0Z4AaABAg#Ugxb79OCbJsFT3jnn0Z4AaABAg",
+        "quote": "YouTube Comment on Groww SIP cancel kaise kare."
       }
     ],
     "counterexamples": [
       {
         "record_id": "REC-00897",
         "source": "youtube_comments",
+        "url": "https://www.youtube.com/watch?v=ZD4ZjqJLwCs&lc=UgzvBka1gctkPAikpAZ4AaABAg.A-t7bG5hapxA03x-FszWYy#UgzvBka1gctkPAikpAZ4AaABAg.A-t7bG5hapxA03x-FszWYy",
         "quote": "YouTube Comment on Groww autopay not working SIP."
       }
     ]
   },
   {
     "theme_id": "THM-08",
-    "theme_name": "Mandate & Payment Technical Failures",
-    "definition": "Technical rejection of UPI Autopay, Netbanking e-mandate, or NPCI authorization during monthly deduction.",
-    "record_count": 43,
-    "denominator": 193,
-    "prevalence_percentage": 22.3,
-    "unique_sources_count": 4,
+    "theme_name": "UPI Autopay & Mandate Technical Sync Failures",
+    "underlying_mechanism": "Technical rejections of UPI Autopay, bank server timeouts, or pending deduction statuses lead investors to assume their SIP is cancelled or broken, causing accidental abandonment.",
+    "record_count": 44,
+    "unique_conversations_count": 7,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
+    "prevalence_percentage": 22.8,
+    "unique_sources_count": 5,
     "sources_represented": [
-      "reddit/r/Reddit",
+      "tradingqna",
       "youtube_comments",
       "google_play_store",
-      "tradingqna"
+      "reddit/r/personalfinanceindia",
+      "reddit/r/Reddit"
     ],
     "retention_connection": "High. Accidental churn where user intended to continue but gave up after technical friction.",
     "representative_verbatims": [
       {
+        "record_id": "REC-00306",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1uu7ffm/which_banks_dont_charge_for_setting_up_an_auto/",
+        "quote": "Basically every time I set up an auto pay for any fund on groww, PNB charges me ₹100 for each mandate."
+      },
+      {
         "record_id": "REC-00425",
         "source": "reddit/r/Reddit",
-        "quote": "Autopay in GROWW SIP is getting failed..",
-        "url": "https://www.reddit.com/r/IndiaInvestments/comments/muhq07/autopay_in_groww_sip_is_getting_failed/"
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/muhq07/autopay_in_groww_sip_is_getting_failed/",
+        "quote": "Autopay in GROWW SIP is getting failed.."
       },
       {
         "record_id": "REC-00688",
         "source": "tradingqna",
-        "quote": "For a total of 5000 SIP, it has deducted 13500.",
-        "url": "https://tradingqna.com/t/introducing-upi-autopay-for-sip-payments/173064"
+        "url": "https://tradingqna.com/t/introducing-upi-autopay-for-sip-payments/173064",
+        "quote": "Introducing UPI autopay for SIP payments."
       },
       {
         "record_id": "REC-00828",
         "source": "google_play_store",
-        "quote": "giving 1 star, my worst experience, autopay always failed, ipo always autopay failed, than I uninstall and use DHAN apps it's very fast and instant payment fast response",
-        "url": "https://play.google.com/store/apps/details?id=com.nextbillion.groww#9716bc7a-9b00-48bb-8d82-2a33a4929bd5"
+        "url": "https://play.google.com/store/apps/details?id=com.nextbillion.groww#9716bc7a-9b00-48bb-8d82-2a33a4929bd5",
+        "quote": "giving 1 star, my worst experience, autopay always failed, ipo always autopay failed, than I uninstall and use DHAN apps it's very fast and instant payment fast response"
       },
       {
         "record_id": "REC-00849",
         "source": "google_play_store",
-        "quote": "Play Store Review by Aditya B..",
-        "url": "https://play.google.com/store/apps/details?id=com.nextbillion.groww#3c1aa27c-169e-497f-8d0c-2fdaa71c286d"
+        "url": "https://play.google.com/store/apps/details?id=com.nextbillion.groww#3c1aa27c-169e-497f-8d0c-2fdaa71c286d",
+        "quote": "Edit : Recent Autopay requests from IPO application haven't mentioned the application ID and I'm very frustrated I might create wrong Autopay."
       },
       {
         "record_id": "REC-00868",
         "source": "youtube_comments",
-        "quote": "YouTube Comment on Groww SIP cancel kaise kare.",
-        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=Ugzev-ig4K0vrqZlrAR4AaABAg#Ugzev-ig4K0vrqZlrAR4AaABAg"
+        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=Ugzev-ig4K0vrqZlrAR4AaABAg#Ugzev-ig4K0vrqZlrAR4AaABAg",
+        "quote": "YouTube Comment on Groww SIP cancel kaise kare."
       }
     ],
     "counterexamples": [
       {
         "record_id": "REC-00897",
         "source": "youtube_comments",
+        "url": "https://www.youtube.com/watch?v=ZD4ZjqJLwCs&lc=UgzvBka1gctkPAikpAZ4AaABAg.A-t7bG5hapxA03x-FszWYy#UgzvBka1gctkPAikpAZ4AaABAg.A-t7bG5hapxA03x-FszWYy",
         "quote": "YouTube Comment on Groww autopay not working SIP."
       }
     ]
   },
   {
     "theme_id": "THM-09",
-    "theme_name": "App Usability & Information Clarity (Pause vs Cancel)",
-    "definition": "Users wanting a temporary skip or pause are forced into permanent cancellation due to hidden or rigid pause flows.",
+    "theme_name": "UI Hierarchy Trap: Pause Invisibility vs Hard Cancellation",
+    "underlying_mechanism": "Users facing temporary 1-3 month liquidity crunches default to hard cancellation because 'Cancel SIP' is prominent while 'Pause SIP' is buried or restricted.",
     "record_count": 30,
-    "denominator": 193,
+    "unique_conversations_count": 30,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
     "prevalence_percentage": 15.5,
     "unique_sources_count": 6,
     "sources_represented": [
-      "reddit/r/personalfinanceindia",
-      "reddit/r/IndiaInvestments",
       "tradingqna",
       "reddit/r/IndianStockMarket",
+      "google_play_store",
+      "reddit/r/personalfinanceindia",
       "reddit/r/Reddit",
-      "google_play_store"
+      "reddit/r/IndiaInvestments"
     ],
     "retention_connection": "Direct Product Opportunity. High leverage for Groww UX.",
     "representative_verbatims": [
       {
         "record_id": "REC-00011",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Discussion Forum Thread.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pggfuc7/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pggfuc7/",
+        "quote": "Discussion Forum Thread."
       },
       {
         "record_id": "REC-00017",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Stop the SIP here and move that amount either toward your house corpus or into an equity fund depending on your timeline.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1t5fg5j/comment/okdeyoa/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1t5fg5j/comment/okdeyoa/",
+        "quote": "Stop the SIP here and move that amount either toward your house corpus or into an equity fund depending on your timeline."
       },
       {
         "record_id": "REC-00020",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "You're doing a lot right already, especially clearing debt early and building the SIP habit.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1szpu21/comment/ojb32c5/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1szpu21/comment/ojb32c5/",
+        "quote": "You're doing a lot right already, especially clearing debt early and building the SIP habit."
       },
       {
         "record_id": "REC-00036",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "I think it's worth payign off the loan steadily alongside investing (no need to pause the SIPs for it)\nGet basic term and health insurance sorted if you haven't already, cheap at 24 and most people regret not doing it sooner.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1semdon/comment/oes4d2x/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1semdon/comment/oes4d2x/",
+        "quote": "I think it's worth payign off the loan steadily alongside investing (no need to pause the SIPs for it)\nGet basic term and health insurance sorted if you haven't already, cheap at 24 and most people regret not doing it sooner."
       },
       {
         "record_id": "REC-00052",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "I'm PRO-SIP, so I'll directly jump into cons.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1ue66eb/comment/othe6ve/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1ue66eb/comment/othe6ve/",
+        "quote": "I'm PRO-SIP, so I'll directly jump into cons."
+      },
+      {
+        "record_id": "REC-00070",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1rli43p/comment/o8ttrjx/",
+        "quote": "OPs question was about starting/pausing the SIP."
       }
     ],
     "counterexamples": []
   },
   {
     "theme_id": "THM-02",
-    "theme_name": "Market Volatility Panic & Negative Returns",
-    "definition": "Investor panics during market corrections or drawdowns when portfolio turns red, violating buy-and-hold intent.",
-    "record_count": 17,
-    "denominator": 193,
-    "prevalence_percentage": 8.8,
-    "unique_sources_count": 5,
+    "theme_name": "Compounding Horizon Misalignment & Drawdown Panic",
+    "underlying_mechanism": "First-time investors anchor mutual funds to guaranteed bank Fixed Deposits. Observing negative returns in months 3-6 triggers loss aversion and panic selling before rupee-cost averaging can compound.",
+    "record_count": 20,
+    "unique_conversations_count": 19,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
+    "prevalence_percentage": 10.4,
+    "unique_sources_count": 6,
     "sources_represented": [
-      "reddit/r/personalfinanceindia",
       "tradingqna",
       "reddit/r/IndianStockMarket",
+      "youtube_comments",
+      "reddit/r/personalfinanceindia",
       "reddit/r/Reddit",
-      "youtube_comments"
+      "reddit/r/IndiaInvestments"
     ],
     "retention_connection": "Very High. Month 3-6 drawdowns break investor confidence before compounding is understood.",
     "representative_verbatims": [
       {
         "record_id": "REC-00001",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "It's high risk ....so are you ok with this 5K SIP if it makes no or zero returns after 1, or 3 or 5 years later ?.....",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1any6aw/comment/kpvtt89/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1any6aw/comment/kpvtt89/",
+        "quote": "It's high risk ....so are you ok with this 5K SIP if it makes no or zero returns after 1, or 3 or 5 years later ?....."
+      },
+      {
+        "record_id": "REC-00011",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pggfuc7/",
+        "quote": "Discussion Forum Thread."
+      },
+      {
+        "record_id": "REC-00099",
+        "source": "reddit/r/IndiaInvestments",
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/1nd62jn/comment/nzb6kkw/",
+        "quote": "Reddit Post/Comment in r/r/IndiaInvestments."
       },
       {
         "record_id": "REC-00165",
         "source": "reddit/r/IndianStockMarket",
-        "quote": "Same outcome as a SIP without needing fixed monthly income.",
-        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1u65ufw/comment/orxa3j4/"
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1u65ufw/comment/orxa3j4/",
+        "quote": "Same outcome as a SIP without needing fixed monthly income."
       },
       {
         "record_id": "REC-00176",
         "source": "reddit/r/IndianStockMarket",
-        "quote": "Started SIP at 18 years, accumulated ₹11L at 23, and I'm basically back to where I started.",
-        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1w43pk6/started_sip_at_18_years_accumulated_11l_at_23_and/"
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1w43pk6/started_sip_at_18_years_accumulated_11l_at_23_and/",
+        "quote": "Started SIP at 18 years, accumulated ₹11L at 23, and I'm basically back to where I started."
       },
       {
         "record_id": "REC-00206",
         "source": "reddit/r/IndianStockMarket",
-        "quote": "I stopped my ₹25k SIP to \"time the bottom\" during the dip.",
-        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1wjop5p/i_stopped_my_25k_sip_to_time_the_bottom_during/"
-      },
-      {
-        "record_id": "REC-00387",
-        "source": "reddit/r/personalfinanceindia",
-        "quote": "Could a job loss put me in a difficult position financially?.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1w482ew/could_a_job_loss_put_me_in_a_difficult_position/"
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1wjop5p/i_stopped_my_25k_sip_to_time_the_bottom_during/",
+        "quote": "I stopped my ₹25k SIP to \"time the bottom\" during the dip."
       }
     ],
     "counterexamples": []
   },
   {
     "theme_id": "THM-10",
-    "theme_name": "Competing Financial Priorities",
-    "definition": "Cash diverted away from SIPs to service car/home EMIs, wedding expenses, insurance premiums, or festive shopping.",
+    "theme_name": "Competing Fixed Commitments (EMIs, Rent & Debt)",
+    "underlying_mechanism": "Cash diverted away from SIPs to service urgent non-discretionary liabilities like home/car loans, credit card debt, or rent.",
     "record_count": 17,
-    "denominator": 193,
+    "unique_conversations_count": 14,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
     "prevalence_percentage": 8.8,
     "unique_sources_count": 3,
     "sources_represented": [
-      "reddit/r/Reddit",
+      "reddit/r/IndiaInvestments",
       "reddit/r/personalfinanceindia",
-      "reddit/r/IndiaInvestments"
+      "reddit/r/Reddit"
     ],
     "retention_connection": "Moderate to High. Structural life stage priorities overriding discretionary investing.",
     "representative_verbatims": [
       {
         "record_id": "REC-00011",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Discussion Forum Thread.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pggfuc7/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pggfuc7/",
+        "quote": "Discussion Forum Thread."
       },
       {
         "record_id": "REC-00015",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Discussion Forum Thread.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pf8zl77/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pf8zl77/",
+        "quote": "Discussion Forum Thread."
       },
       {
         "record_id": "REC-00017",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Stop the SIP here and move that amount either toward your house corpus or into an equity fund depending on your timeline.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1t5fg5j/comment/okdeyoa/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1t5fg5j/comment/okdeyoa/",
+        "quote": "Stop the SIP here and move that amount either toward your house corpus or into an equity fund depending on your timeline."
       },
       {
         "record_id": "REC-00020",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "You're doing a lot right already, especially clearing debt early and building the SIP habit.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1szpu21/comment/ojb32c5/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1szpu21/comment/ojb32c5/",
+        "quote": "You're doing a lot right already, especially clearing debt early and building the SIP habit."
       },
       {
         "record_id": "REC-00036",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "I think it's worth payign off the loan steadily alongside investing (no need to pause the SIPs for it)\nGet basic term and health insurance sorted if you haven't already, cheap at 24 and most people regret not doing it sooner.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1semdon/comment/oes4d2x/"
-      }
-    ],
-    "counterexamples": []
-  },
-  {
-    "theme_id": "THM-12",
-    "theme_name": "Customer Support & Trust Gaps",
-    "definition": "Money deducted from bank but mutual fund units not reflected in portfolio for days, causing panic and ticket logs.",
-    "record_count": 13,
-    "denominator": 193,
-    "prevalence_percentage": 6.7,
-    "unique_sources_count": 6,
-    "sources_represented": [
-      "reddit/r/personalfinanceindia",
-      "reddit/r/IndiaInvestments",
-      "tradingqna",
-      "reddit/r/IndianStockMarket",
-      "google_play_store",
-      "youtube_comments"
-    ],
-    "retention_connection": "High. Trust erosion regarding safety of investor capital.",
-    "representative_verbatims": [
-      {
-        "record_id": "REC-00137",
-        "source": "reddit/r/IndiaInvestments",
-        "quote": "SIP cancellation requested but amount still deducted - does it take a month to stop?.",
-        "url": "https://www.reddit.com/r/IndiaInvestments/comments/1rfv3xe/sip_cancellation_requested_but_amount_still/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1semdon/comment/oes4d2x/",
+        "quote": "I think it's worth payign off the loan steadily alongside investing (no need to pause the SIPs for it)\nGet basic term and health insurance sorted if you haven't already, cheap at 24 and most people regret not doing it sooner."
       },
       {
-        "record_id": "REC-00185",
-        "source": "reddit/r/IndianStockMarket",
-        "quote": "If their response to your concern seems valid, then maybe continue, reduce, or stop your SIP with them and allocate some to US stocks as you planned.",
-        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1w43pk6/comment/p74uhg5/"
-      },
-      {
-        "record_id": "REC-00287",
+        "record_id": "REC-00072",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Earning 1 lakh and still 0 savings (pls help).",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1u50nie/earning_1_lakh_and_still_0_savings_pls_help/"
-      },
-      {
-        "record_id": "REC-00288",
-        "source": "reddit/r/personalfinanceindia",
-        "quote": "Reddit Post/Comment in r/r/personalfinanceindia.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1u50nie/comment/orjhl6i/"
-      },
-      {
-        "record_id": "REC-00661",
-        "source": "tradingqna",
-        "quote": "The SIP for Mirae Asset Emerging Bluechip Fund is AMC SIP, this cannot be modified, you can cancel the SIP and start another one, there are no charges for canceling your SIP.",
-        "url": "https://tradingqna.com/t/increasing-sip-amount-for-mirae-asset-emerging-new-fund/97366"
-      }
-    ],
-    "counterexamples": [
-      {
-        "record_id": "REC-00897",
-        "source": "youtube_comments",
-        "quote": "YouTube Comment on Groww autopay not working SIP."
-      }
-    ]
-  },
-  {
-    "theme_id": "THM-01",
-    "theme_name": "Affordability & Cash-Flow Constraints",
-    "definition": "Investor stops or pauses SIP due to lack of liquid funds, salary delays, student allowance depletion, or general affordability.",
-    "record_count": 8,
-    "denominator": 193,
-    "prevalence_percentage": 4.1,
-    "unique_sources_count": 4,
-    "sources_represented": [
-      "reddit/r/IndianStockMarket",
-      "reddit/r/personalfinanceindia",
-      "reddit/r/IndiaInvestments",
-      "reddit/r/Reddit"
-    ],
-    "retention_connection": "High. Liquidity crunches force immediate mandate pause or cancellation to prevent overdrafts.",
-    "representative_verbatims": [
-      {
-        "record_id": "REC-00142",
-        "source": "reddit/r/IndiaInvestments",
-        "quote": "I'm a student doing a small project on why people pause or stop SIPs in the first year.",
-        "url": "https://www.reddit.com/r/IndiaInvestments/comments/1rfv3xe/comment/19riif3ow3shs/"
-      },
-      {
-        "record_id": "REC-00155",
-        "source": "reddit/r/IndianStockMarket",
-        "quote": "Discussion regarding SIP.",
-        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1tvlcp5/discussion_regarding_sip/"
-      },
-      {
-        "record_id": "REC-00161",
-        "source": "reddit/r/IndianStockMarket",
-        "quote": "20M | Can't commit to SIPs due to inconsistent income is this lump sum MF portfolio fine for long term?.",
-        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1u65ufw/20m_cant_commit_to_sips_due_to_inconsistent/"
-      },
-      {
-        "record_id": "REC-00162",
-        "source": "reddit/r/IndianStockMarket",
-        "quote": "Reddit Post/Comment in r/r/IndianStockMarket.",
-        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1u65ufw/comment/orq68bl/"
-      },
-      {
-        "record_id": "REC-00220",
-        "source": "reddit/r/personalfinanceindia",
-        "quote": "You can slowly step up the SIP to 40-50k over a year.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1jtq3ga/seeking_advice_on_managing_my_finances_better_31m/mlwr8ma/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tp4gbb/sharing_a_good_decision_on_epf/",
+        "quote": "I see some negative sentiments with EPF withdrawal."
       }
     ],
     "counterexamples": []
   },
   {
     "theme_id": "THM-06",
-    "theme_name": "Lack of Foundational Compounding Literacy",
-    "definition": "Misunderstanding the 5-7 year horizon required for equity compounding; treating mutual funds like short-term trading.",
-    "record_count": 8,
-    "denominator": 193,
-    "prevalence_percentage": 4.1,
+    "theme_name": "Foundational Compounding Literacy Gap",
+    "underlying_mechanism": "Misunderstanding the 5-7 year horizon required for equity compounding; treating mutual funds like short-term trading bets.",
+    "record_count": 13,
+    "unique_conversations_count": 13,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
+    "prevalence_percentage": 6.7,
     "unique_sources_count": 5,
     "sources_represented": [
-      "reddit/r/personalfinanceindia",
-      "reddit/r/IndiaInvestments",
       "tradingqna",
       "reddit/r/IndianStockMarket",
-      "reddit/r/Reddit"
+      "reddit/r/personalfinanceindia",
+      "reddit/r/Reddit",
+      "reddit/r/IndiaInvestments"
     ],
     "retention_connection": "High. Early churn within 12 months caused by unrealistic short-term expectations.",
     "representative_verbatims": [
       {
+        "record_id": "REC-00001",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1any6aw/comment/kpvtt89/",
+        "quote": "It's high risk ....so are you ok with this 5K SIP if it makes no or zero returns after 1, or 3 or 5 years later ?....."
+      },
+      {
         "record_id": "REC-00011",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Discussion Forum Thread.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pggfuc7/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1x39ie6/comment/pggfuc7/",
+        "quote": "Discussion Forum Thread."
       },
       {
         "record_id": "REC-00017",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Stop the SIP here and move that amount either toward your house corpus or into an equity fund depending on your timeline.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1t5fg5j/comment/okdeyoa/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1t5fg5j/comment/okdeyoa/",
+        "quote": "Stop the SIP here and move that amount either toward your house corpus or into an equity fund depending on your timeline."
+      },
+      {
+        "record_id": "REC-00020",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1szpu21/comment/ojb32c5/",
+        "quote": "You're doing a lot right already, especially clearing debt early and building the SIP habit."
+      },
+      {
+        "record_id": "REC-00060",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1ue66eb/comment/otn1fyg/",
+        "quote": "I understand that sip works well for people who aren't disciplined doing it manually, who don't want to track.the market at any level or simply have habit of spending the money they see in their bank account."
       },
       {
         "record_id": "REC-00099",
         "source": "reddit/r/IndiaInvestments",
-        "quote": "Reddit Post/Comment in r/r/IndiaInvestments.",
-        "url": "https://www.reddit.com/r/IndiaInvestments/comments/1nd62jn/comment/nzb6kkw/"
-      },
-      {
-        "record_id": "REC-00299",
-        "source": "reddit/r/personalfinanceindia",
-        "quote": "I started late and regret not starting earlier , even if it were smaller values in SIP.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1bujsmq/comment/kxtqh18/"
-      },
-      {
-        "record_id": "REC-00420",
-        "source": "reddit/r/Reddit",
-        "quote": "What If I cancel my sip??.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1hccklz/what_if_i_cancel_my_sip/"
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/1nd62jn/comment/nzb6kkw/",
+        "quote": "Reddit Post/Comment in r/r/IndiaInvestments."
       }
     ],
     "counterexamples": [
       {
         "record_id": "REC-00201",
         "source": "reddit/r/IndianStockMarket",
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1senaf8/comment/oexf6wg/",
         "quote": "SIP works, and the compounding do wonders in long run, I wish I continued my sip 15 yrs back after the 2008 crash, I got scared and left the equity for years."
       }
     ]
   },
   {
+    "theme_id": "THM-12",
+    "theme_name": "Processing Lag & Capital Safety Trust Erosion",
+    "underlying_mechanism": "Money deducted from bank but mutual fund units not reflected in portfolio for days, causing panic and erosion of trust regarding capital safety.",
+    "record_count": 13,
+    "unique_conversations_count": 10,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
+    "prevalence_percentage": 6.7,
+    "unique_sources_count": 6,
+    "sources_represented": [
+      "tradingqna",
+      "reddit/r/IndianStockMarket",
+      "youtube_comments",
+      "google_play_store",
+      "reddit/r/personalfinanceindia",
+      "reddit/r/IndiaInvestments"
+    ],
+    "retention_connection": "High. Trust erosion regarding safety of investor capital.",
+    "representative_verbatims": [
+      {
+        "record_id": "REC-00137",
+        "source": "reddit/r/IndiaInvestments",
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/1rfv3xe/sip_cancellation_requested_but_amount_still/",
+        "quote": "SIP cancellation requested but amount still deducted - does it take a month to stop?."
+      },
+      {
+        "record_id": "REC-00185",
+        "source": "reddit/r/IndianStockMarket",
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1w43pk6/comment/p74uhg5/",
+        "quote": "If their response to your concern seems valid, then maybe continue, reduce, or stop your SIP with them and allocate some to US stocks as you planned."
+      },
+      {
+        "record_id": "REC-00287",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1u50nie/earning_1_lakh_and_still_0_savings_pls_help/",
+        "quote": "I downloaded Groww, but what exactly do I do?"
+      },
+      {
+        "record_id": "REC-00288",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1u50nie/comment/orjhl6i/",
+        "quote": "Don't even open Groww at this point."
+      },
+      {
+        "record_id": "REC-00661",
+        "source": "tradingqna",
+        "url": "https://tradingqna.com/t/increasing-sip-amount-for-mirae-asset-emerging-new-fund/97366",
+        "quote": "The SIP for Mirae Asset Emerging Bluechip Fund is AMC SIP, this cannot be modified, you can cancel the SIP and start another one, there are no charges for canceling your SIP."
+      },
+      {
+        "record_id": "REC-00668",
+        "source": "tradingqna",
+        "url": "https://tradingqna.com/t/coin-sip-vs-amc-sip/127618",
+        "quote": "If you uncheck the options would be different image Also Refer : https://support.zerodha.com/category/mutual-funds/coin-app/sip-coin-app/articles/modify-cancel-sip-coin-app How do I modif..."
+      }
+    ],
+    "counterexamples": [
+      {
+        "record_id": "REC-00897",
+        "source": "youtube_comments",
+        "url": "https://www.youtube.com/watch?v=ZD4ZjqJLwCs&lc=UgzvBka1gctkPAikpAZ4AaABAg.A-t7bG5hapxA03x-FszWYy#UgzvBka1gctkPAikpAZ4AaABAg.A-t7bG5hapxA03x-FszWYy",
+        "quote": "YouTube Comment on Groww autopay not working SIP."
+      }
+    ]
+  },
+  {
+    "theme_id": "THM-01",
+    "theme_name": "Cash-Flow Volatility & Inflexible Fixed Commitments",
+    "underlying_mechanism": "Rigid monthly fixed deduction dates penalize variable earners (freelancers, students, gig workers). When cash is tight, the all-or-nothing commitment causes complete stoppage rather than contribution reduction.",
+    "record_count": 8,
+    "unique_conversations_count": 7,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
+    "prevalence_percentage": 4.1,
+    "unique_sources_count": 4,
+    "sources_represented": [
+      "reddit/r/IndiaInvestments",
+      "reddit/r/Reddit",
+      "reddit/r/personalfinanceindia",
+      "reddit/r/IndianStockMarket"
+    ],
+    "retention_connection": "High. Liquidity crunches force immediate mandate pause or cancellation to prevent overdrafts.",
+    "representative_verbatims": [
+      {
+        "record_id": "REC-00142",
+        "source": "reddit/r/IndiaInvestments",
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/1rfv3xe/comment/19riif3ow3shs/",
+        "quote": "I'm a student doing a small project on why people pause or stop SIPs in the first year."
+      },
+      {
+        "record_id": "REC-00155",
+        "source": "reddit/r/IndianStockMarket",
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1tvlcp5/discussion_regarding_sip/",
+        "quote": "Discussion regarding SIP."
+      },
+      {
+        "record_id": "REC-00161",
+        "source": "reddit/r/IndianStockMarket",
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1u65ufw/20m_cant_commit_to_sips_due_to_inconsistent/",
+        "quote": "20M | Can't commit to SIPs due to inconsistent income is this lump sum MF portfolio fine for long term?."
+      },
+      {
+        "record_id": "REC-00162",
+        "source": "reddit/r/IndianStockMarket",
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1u65ufw/comment/orq68bl/",
+        "quote": "Reddit Post/Comment in r/r/IndianStockMarket."
+      },
+      {
+        "record_id": "REC-00220",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1jtq3ga/seeking_advice_on_managing_my_finances_better_31m/mlwr8ma/",
+        "quote": "Check fund overlap using platforms like Kuvera, Groww, or Value Research Online."
+      },
+      {
+        "record_id": "REC-00287",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1u50nie/earning_1_lakh_and_still_0_savings_pls_help/",
+        "quote": "I downloaded Groww, but what exactly do I do?"
+      }
+    ],
+    "counterexamples": []
+  },
+  {
     "theme_id": "THM-13",
-    "theme_name": "Life Event Shocks (Job Loss & Emergencies)",
-    "definition": "Unplanned structural life disruption: tech layoffs, career gaps, medical hospitalizations, or relocations.",
+    "theme_name": "Emergency Reserve Depletion & Life Shocks",
+    "underlying_mechanism": "Unplanned structural shocks (layoffs, medical emergencies) force liquidation of mutual funds to survive because no liquid emergency fund was built beforehand.",
     "record_count": 6,
-    "denominator": 193,
+    "unique_conversations_count": 4,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
     "prevalence_percentage": 3.1,
     "unique_sources_count": 2,
     "sources_represented": [
-      "reddit/r/Reddit",
-      "reddit/r/personalfinanceindia"
+      "reddit/r/personalfinanceindia",
+      "reddit/r/Reddit"
     ],
     "retention_connection": "Severe. Involuntary discontinuation due to existential survival needs.",
     "representative_verbatims": [
       {
         "record_id": "REC-00072",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "I see some negative sentiments with EPF withdrawal.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tp4gbb/sharing_a_good_decision_on_epf/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tp4gbb/sharing_a_good_decision_on_epf/",
+        "quote": "I see some negative sentiments with EPF withdrawal."
       },
       {
         "record_id": "REC-00381",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "What was your goal while starting SIP?",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tght4m/comment/omj1mbb/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tght4m/comment/omj1mbb/",
+        "quote": "What was your goal while starting SIP?"
       },
       {
         "record_id": "REC-00384",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Reddit Post/Comment in r/r/personalfinanceindia.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tght4m/comment/omggtpd/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tght4m/comment/omggtpd/",
+        "quote": "Reddit Post/Comment in r/r/personalfinanceindia."
       },
       {
         "record_id": "REC-00387",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "Could a job loss put me in a difficult position financially?.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1w482ew/could_a_job_loss_put_me_in_a_difficult_position/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1w482ew/could_a_job_loss_put_me_in_a_difficult_position/",
+        "quote": "Could a job loss put me in a difficult position financially?."
       },
       {
         "record_id": "REC-00389",
         "source": "reddit/r/personalfinanceindia",
-        "quote": "The only concern I have is to create a stable income source in case of a job loss.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1w482ew/comment/p75ibm8/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1w482ew/comment/p75ibm8/",
+        "quote": "The only concern I have is to create a stable income source in case of a job loss."
+      },
+      {
+        "record_id": "REC-00411",
+        "source": "reddit/r/Reddit",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tk86fs/i_reviewed_50_sip_portfolios_this_year_here_are/",
+        "quote": "\"I reviewed 50 SIP portfolios this year."
       }
     ],
     "counterexamples": []
   },
   {
     "theme_id": "THM-05",
-    "theme_name": "Low Perceived Progress on Small SIPs",
-    "definition": "Feeling that small monthly contributions (₹500–₹1,000) are not creating noticeable wealth, leading to apathy.",
+    "theme_name": "Low Perceived Progress on Micro-SIPs (Milestone Deficit)",
+    "underlying_mechanism": "Small contributors (₹500-₹1,000) see negligible absolute growth in early quarters, feeling their contributions are insignificant.",
     "record_count": 4,
-    "denominator": 193,
+    "unique_conversations_count": 4,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
     "prevalence_percentage": 2.1,
     "unique_sources_count": 3,
     "sources_represented": [
-      "reddit/r/Reddit",
       "youtube_comments",
-      "tradingqna"
+      "tradingqna",
+      "reddit/r/Reddit"
     ],
     "retention_connection": "Moderate. Lack of milestone celebration makes small contributors discontinue.",
     "representative_verbatims": [
       {
         "record_id": "REC-00411",
         "source": "reddit/r/Reddit",
-        "quote": "\"I reviewed 50 SIP portfolios this year.",
-        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tk86fs/i_reviewed_50_sip_portfolios_this_year_here_are/"
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1tk86fs/i_reviewed_50_sip_portfolios_this_year_here_are/",
+        "quote": "\"I reviewed 50 SIP portfolios this year."
       },
       {
         "record_id": "REC-00422",
         "source": "reddit/r/Reddit",
-        "quote": "Can you do a single SIP then cancel it after the first payment?.",
-        "url": "https://www.reddit.com/r/IndiaInvestments/comments/bjhee4/can_you_do_a_single_sip_then_cancel_it_after_the/"
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/bjhee4/can_you_do_a_single_sip_then_cancel_it_after_the/",
+        "quote": "Can you do a single SIP then cancel it after the first payment?."
       },
       {
         "record_id": "REC-00669",
         "source": "tradingqna",
-        "quote": "I'm Willing to Do a Small Sip for Next 4 Months in ICICI Pru Tech or Tata Digital Ind Fund I'm seeing AMC Sip's Minimum amount is 100/150rs Can i Please Know How Many Number of Amc sips should be Done in Order to Cancel/pause The Sip after 4 months And I'm finding On Amc website That sip can be D...",
-        "url": "https://tradingqna.com/t/amc-sip-minimum-time/139340"
+        "url": "https://tradingqna.com/t/amc-sip-minimum-time/139340",
+        "quote": "I'm Willing to Do a Small Sip for Next 4 Months in ICICI Pru Tech or Tata Digital Ind Fund I'm seeing AMC Sip's Minimum amount is 100/150rs Can i Please Know How Many Number of Amc sips should be Done in Order to Cancel/pause The Sip after 4 months And I'm finding On Amc website That sip can be D..."
       },
       {
         "record_id": "REC-00872",
         "source": "youtube_comments",
-        "quote": "YouTube Comment on Groww SIP cancel kaise kare.",
-        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=UgzDp_KqyxBR4rM7gkt4AaABAg#UgzDp_KqyxBR4rM7gkt4AaABAg"
+        "url": "https://www.youtube.com/watch?v=H60n7TAI6GM&lc=UgzDp_KqyxBR4rM7gkt4AaABAg#UgzDp_KqyxBR4rM7gkt4AaABAg",
+        "quote": "YouTube Comment on Groww SIP cancel kaise kare."
       }
     ],
     "counterexamples": []
   },
   {
     "theme_id": "THM-07",
-    "theme_name": "Missed Instalments & Bank ECS Bounce Penalties",
-    "definition": "Bank debits fail due to low balance, triggering ₹450-₹590 penalty charges that induce proactive cancellation.",
+    "theme_name": "Asymmetric Bank ECS / NACH Bounce Penalty Shield",
+    "underlying_mechanism": "When delayed salary leaves bank account balance below SIP amount, the impending ₹450-₹590 bank penalty creates asymmetric loss. Users cancel mandates proactively in self-defense.",
     "record_count": 4,
-    "denominator": 193,
+    "unique_conversations_count": 4,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
     "prevalence_percentage": 2.1,
     "unique_sources_count": 3,
     "sources_represented": [
-      "reddit/r/Reddit",
       "reddit/r/IndiaInvestments",
-      "tradingqna"
+      "tradingqna",
+      "reddit/r/Reddit"
     ],
     "retention_connection": "Severe. Users cancel mandates explicitly to protect bank accounts from repeated penalty fees.",
     "representative_verbatims": [
       {
         "record_id": "REC-00117",
         "source": "reddit/r/IndiaInvestments",
-        "quote": "Background: Loan as an account with negative balance",
-        "url": "https://www.reddit.com/r/IndiaInvestments/comments/8x1dhh/decoding_loans_understanding_calculation_of/"
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/8x1dhh/decoding_loans_understanding_calculation_of/",
+        "quote": "Background: Loan as an account with negative balance"
       },
       {
         "record_id": "REC-00421",
         "source": "reddit/r/Reddit",
-        "quote": "Would I get charged any penalty amount if I cancel a SIP and delete the URN from my bank account and the SIP transaction still tries to go through.",
-        "url": "https://www.reddit.com/r/IndiaInvestments/comments/scov34/question_about_deletion_of_urn_for_sip_instead_of/"
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/scov34/question_about_deletion_of_urn_for_sip_instead_of/",
+        "quote": "Would I get charged any penalty amount if I cancel a SIP and delete the URN from my bank account and the SIP transaction still tries to go through."
       },
       {
         "record_id": "REC-00425",
         "source": "reddit/r/Reddit",
-        "quote": "Autopay in GROWW SIP is getting failed..",
-        "url": "https://www.reddit.com/r/IndiaInvestments/comments/muhq07/autopay_in_groww_sip_is_getting_failed/"
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/muhq07/autopay_in_groww_sip_is_getting_failed/",
+        "quote": "Autopay in GROWW SIP is getting failed.."
       },
       {
         "record_id": "REC-00685",
         "source": "tradingqna",
-        "quote": "11:19PM - 07 April 2020 https://www.livemint.com/money/personal-finance/why-you-should-stop-or-pause-your-sip-if-you-can-t-service-it-11586281310692.html mint - 7 Apr 20 https://...",
-        "url": "https://tradingqna.com/t/penalty-over-missed-sip/120657"
+        "url": "https://tradingqna.com/t/penalty-over-missed-sip/120657",
+        "quote": "11:19PM - 07 April 2020 https://www.livemint.com/money/personal-finance/why-you-should-stop-or-pause-your-sip-if-you-can-t-service-it-11586281310692.html mint - 7 Apr 20 https://..."
       }
     ],
     "counterexamples": []
   },
   {
     "theme_id": "THM-04",
-    "theme_name": "Confusion Over XIRR & Performance Metrics",
-    "definition": "Inability to interpret annualized XIRR versus absolute returns, causing false belief of massive capital loss.",
+    "theme_name": "Confusion Over XIRR & Capital Accounting",
+    "underlying_mechanism": "Inability to interpret annualized XIRR versus absolute returns, creating a false impression of catastrophic capital loss when NAV drops.",
     "record_count": 3,
-    "denominator": 193,
+    "unique_conversations_count": 3,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
     "prevalence_percentage": 1.6,
     "unique_sources_count": 3,
     "sources_represented": [
-      "reddit/r/IndianStockMarket",
       "reddit/r/IndiaInvestments",
-      "tradingqna"
+      "tradingqna",
+      "reddit/r/IndianStockMarket"
     ],
     "retention_connection": "Moderate. Psychological anxiety driven by confusing FinTech return metrics.",
     "representative_verbatims": [
       {
         "record_id": "REC-00117",
         "source": "reddit/r/IndiaInvestments",
-        "quote": "Background: Loan as an account with negative balance",
-        "url": "https://www.reddit.com/r/IndiaInvestments/comments/8x1dhh/decoding_loans_understanding_calculation_of/"
+        "url": "https://www.reddit.com/r/IndiaInvestments/comments/8x1dhh/decoding_loans_understanding_calculation_of/",
+        "quote": "Background: Loan as an account with negative balance"
       },
       {
         "record_id": "REC-00186",
         "source": "reddit/r/IndianStockMarket",
-        "quote": "I started investing in mutual funds in 2014, with an SIP of ₹10k/month split between a large-cap and a mid-cap fund.",
-        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1vndcll/sips_compound/"
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1vndcll/sips_compound/",
+        "quote": "I started investing in mutual funds in 2014, with an SIP of ₹10k/month split between a large-cap and a mid-cap fund."
       },
       {
         "record_id": "REC-00662",
         "source": "tradingqna",
-        "quote": "I dont want to cancel my SIP in this fund now as the exit load term is another 6 months away.",
-        "url": "https://tradingqna.com/t/how-does-an-amc-calculate-exit-load-and-do-all-mutual-funds-have-exit-loads/12588"
+        "url": "https://tradingqna.com/t/how-does-an-amc-calculate-exit-load-and-do-all-mutual-funds-have-exit-loads/12588",
+        "quote": "I dont want to cancel my SIP in this fund now as the exit load term is another 6 months away."
       }
     ],
     "counterexamples": []
   },
   {
     "theme_id": "THM-03",
-    "theme_name": "Expectations vs Actual Performance",
-    "definition": "Disillusionment that 1-year mutual fund returns are lower than expected, failing to beat Fixed Deposits (FDs).",
-    "record_count": 0,
-    "denominator": 193,
-    "prevalence_percentage": 0.0,
-    "unique_sources_count": 0,
-    "sources_represented": [],
+    "theme_name": "Unrealistic Return Expectations vs Traditional FDs",
+    "underlying_mechanism": "Disillusionment when 1-year mutual fund performance lags behind marketing hype or fails to drastically beat safe Fixed Deposits.",
+    "record_count": 1,
+    "unique_conversations_count": 1,
+    "total_records_denominator": 193,
+    "total_conversations_denominator": 116,
+    "prevalence_percentage": 0.5,
+    "unique_sources_count": 1,
+    "sources_represented": [
+      "reddit/r/personalfinanceindia"
+    ],
     "retention_connection": "High. Users shift money back to traditional guaranteed savings (FD/RD).",
-    "representative_verbatims": [],
+    "representative_verbatims": [
+      {
+        "record_id": "REC-00001",
+        "source": "reddit/r/personalfinanceindia",
+        "url": "https://www.reddit.com/r/personalfinanceindia/comments/1any6aw/comment/kpvtt89/",
+        "quote": "It's high risk ....so are you ok with this 5K SIP if it makes no or zero returns after 1, or 3 or 5 years later ?....."
+      }
+    ],
     "counterexamples": []
   }
 ]

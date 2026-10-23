@@ -1,122 +1,166 @@
 [
   {
-    "opportunity_id": "OPP-01",
-    "title": "Bank ECS Bounce Penalty Shield (Salary Date Alignment)",
-    "ops_score": 4.71,
-    "prevalence_pct": 2.1,
-    "evidence_count": 4,
-    "denominator": 193,
-    "scores": {
-      "retention_link": 5.0,
-      "evidence_strength": 4.5,
-      "problem_severity": 5.0,
-      "groww_addressability": 4.8,
-      "unmet_need": 4.5,
-      "prevalence": 4.0,
-      "source_diversity": 4.5,
-      "low_assumptions": 4.2
-    },
-    "hypothesis": "Users experience unexpected bank penalties (₹450-₹590) when monthly SIP debit precedes delayed salary credits, prompting proactive mandate cancellations to stop recurring fines.",
-    "solution_direction": "Salary-synced debit date picker, smart balance pre-check notification 24 hours prior, and automated auto-pause before bank bounce."
-  },
-  {
-    "opportunity_id": "OPP-05",
-    "title": "UPI Autopay & Mandate Failure Self-Healing Recovery",
-    "ops_score": 4.68,
-    "prevalence_pct": 22.3,
-    "evidence_count": 43,
-    "denominator": 193,
-    "scores": {
-      "retention_link": 4.9,
-      "evidence_strength": 4.6,
-      "problem_severity": 4.5,
-      "groww_addressability": 4.9,
-      "unmet_need": 4.6,
-      "prevalence": 4.5,
-      "source_diversity": 4.5,
-      "low_assumptions": 4.3
-    },
-    "hypothesis": "Technical mandate rejections, bank server timeouts, and pending deduction statuses lead investors to assume their SIP is cancelled or broken, causing involuntary churn.",
-    "solution_direction": "Automated retry cascade within 48h, instant UPI Autopay re-linking prompt with zero paperwork, and real-time bank status transparency badge."
-  },
-  {
     "opportunity_id": "OPP-02",
     "title": "Flexible Emergency 'Smart Pause' vs Permanent Cancellation",
-    "ops_score": 4.6,
-    "prevalence_pct": 15.5,
-    "evidence_count": 30,
+    "ops_score": 4.91,
+    "theme_id": "THM-09",
+    "theme_name": "UI Hierarchy Trap: Pause Invisibility vs Hard Cancellation",
+    "record_count": 30,
+    "unique_conversations_count": 30,
     "denominator": 193,
-    "scores": {
-      "retention_link": 4.8,
-      "evidence_strength": 4.5,
-      "problem_severity": 4.0,
+    "prevalence_percentage": 15.5,
+    "severity_type": "Involuntary Usability Trap Churn",
+    "ranking_rationale": "Top Groww addressability: 30 independent conversations confirm users wanted to skip temporarily but were forced to hard-cancel due to UI hierarchy.",
+    "user_problem": "Temporary cash-flow crunches (festivals, rent, medical expenses) default to permanent mandate cancellation because the 'Pause SIP' flow is invisible or confusing.",
+    "affected_users": "Retail investors facing 1-3 month liquidity shocks who intend to resume but cannot find a temporary pause option.",
+    "solution_direction": "Prominent 'Pause for 1-3 Months' option intercepting all cancellation attempts, accompanied by a calendar resume reminder.",
+    "recommended_interview_question": "When you decided to stop your SIP on Groww, did you want to take a temporary break or exit mutual funds permanently? Did you know you could pause?",
+    "factor_scores": {
+      "retention_leverage": 4.9,
+      "evidence_consistency": 5.0,
       "groww_addressability": 5.0,
-      "unmet_need": 4.8,
-      "prevalence": 4.5,
-      "source_diversity": 4.5,
-      "low_assumptions": 4.5
+      "problem_severity": 4.9,
+      "confidence_score": 4.5
     },
-    "hypothesis": "First-time investors facing temporary liquidity crunches (medical, festivals, exams) cannot easily locate or configure a multi-month pause, defaulting to hard mandate cancellation.",
-    "solution_direction": "Prominent 'Pause for 1-3 Months' flow placed right alongside cancellation, with calendar resume reminders."
-  },
-  {
-    "opportunity_id": "OPP-06",
-    "title": "12-Month Compounding Milestone & Habit Reinforcement",
-    "ops_score": 4.35,
-    "prevalence_pct": 4.1,
-    "evidence_count": 8,
-    "denominator": 193,
-    "scores": {
-      "retention_link": 4.6,
-      "evidence_strength": 4.3,
-      "problem_severity": 3.9,
-      "groww_addressability": 4.7,
-      "unmet_need": 4.4,
-      "prevalence": 4.1,
-      "source_diversity": 4.2,
-      "low_assumptions": 4.0
-    },
-    "hypothesis": "First-time investors lack tangible visual progress during early quarters, viewing monthly debits as an expense rather than asset accumulation, leading to fatigue.",
-    "solution_direction": "Quarterly milestone badges (3rd, 6th, 9th, 12th instalment), projected 5-year compounding trajectory display, and streak rewards celebrating consistency."
+    "counterevidence": []
   },
   {
     "opportunity_id": "OPP-03",
-    "title": "First-Year Volatility Shock Absorber (Negative XIRR Reassurance)",
-    "ops_score": 4.17,
-    "prevalence_pct": 8.8,
-    "evidence_count": 17,
+    "title": "UPI Autopay & Mandate Failure Self-Healing Recovery",
+    "ops_score": 4.62,
+    "theme_id": "THM-08",
+    "theme_name": "UPI Autopay & Mandate Technical Sync Failures",
+    "record_count": 44,
+    "unique_conversations_count": 7,
     "denominator": 193,
-    "scores": {
-      "retention_link": 4.5,
-      "evidence_strength": 4.2,
-      "problem_severity": 4.2,
-      "groww_addressability": 4.0,
-      "unmet_need": 3.8,
-      "prevalence": 4.2,
-      "source_diversity": 4.0,
-      "low_assumptions": 3.8
+    "prevalence_percentage": 22.8,
+    "severity_type": "Involuntary Technical Churn",
+    "ranking_rationale": "High conversation breadth (44 records, 7 unique threads, multiple app store reviews): Represents pure involuntary churn where user intended to invest.",
+    "user_problem": "Technical mandate rejections, bank server timeouts, and pending deduction statuses lead investors to assume their SIP is cancelled or broken, causing accidental abandonment.",
+    "affected_users": "New investors setting up UPI Autopay / e-mandate on PSU banks (PNB, SBI, BoB) with strict recurring debit limits.",
+    "solution_direction": "Automated retry cascade within 48h, instant 1-tap UPI Autopay re-linking flow with zero paperwork, and real-time bank sync status badge.",
+    "recommended_interview_question": "When your monthly instalment deduction showed pending or failed, what steps did you take? Did Groww clearly tell you what to do next?",
+    "factor_scores": {
+      "retention_leverage": 4.9,
+      "evidence_consistency": 4.1,
+      "groww_addressability": 4.7,
+      "problem_severity": 4.9,
+      "confidence_score": 4.5
     },
-    "hypothesis": "Beginners who encounter negative returns or portfolio drawdowns in months 3-6 panic due to lack of compounding perspective and comparison to guaranteed bank FDs.",
-    "solution_direction": "Contextual educational visualizer during market dips showing unit accumulation benefits ('rupee-cost averaging in action') without FOMO."
+    "counterevidence": [
+      {
+        "record_id": "REC-00897",
+        "source": "youtube_comments",
+        "url": "https://www.youtube.com/watch?v=ZD4ZjqJLwCs&lc=UgzvBka1gctkPAikpAZ4AaABAg.A-t7bG5hapxA03x-FszWYy#UgzvBka1gctkPAikpAZ4AaABAg.A-t7bG5hapxA03x-FszWYy",
+        "quote": "YouTube Comment on Groww autopay not working SIP."
+      }
+    ]
+  },
+  {
+    "opportunity_id": "OPP-05",
+    "title": "12-Month Compounding Milestone & Habit Reinforcement",
+    "ops_score": 4.5,
+    "theme_id": "THM-06",
+    "theme_name": "Foundational Compounding Literacy Gap",
+    "record_count": 13,
+    "unique_conversations_count": 13,
+    "denominator": 193,
+    "prevalence_percentage": 6.7,
+    "severity_type": "Motivational Fatigue Churn",
+    "ranking_rationale": "Directly targets the 12-month active SIP retention goal: Bridges the psychological gap between initial setup and long-term habituation.",
+    "user_problem": "First-time investors lack tangible visual progress during early quarters, viewing monthly debits as an expense rather than asset accumulation, leading to fatigue.",
+    "affected_users": "Investors who maintain SIPs for 3-6 months but lose momentum before forming a permanent 12-month habit.",
+    "solution_direction": "Quarterly milestone badges (3rd, 6th, 9th, 12th instalment), projected 5-year compounding trajectory display, and streak rewards celebrating consistency.",
+    "recommended_interview_question": "What milestone or feedback would make you feel proud to continue your monthly SIP past the one-year mark?",
+    "factor_scores": {
+      "retention_leverage": 4.7,
+      "evidence_consistency": 4.6,
+      "groww_addressability": 4.6,
+      "problem_severity": 3.8,
+      "confidence_score": 4.5
+    },
+    "counterevidence": [
+      {
+        "record_id": "REC-00201",
+        "source": "reddit/r/IndianStockMarket",
+        "url": "https://www.reddit.com/r/IndianStockMarket/comments/1senaf8/comment/oexf6wg/",
+        "quote": "SIP works, and the compounding do wonders in long run, I wish I continued my sip 15 yrs back after the 2008 crash, I got scared and left the equity for years."
+      }
+    ]
+  },
+  {
+    "opportunity_id": "OPP-01",
+    "title": "Bank ECS Bounce Penalty Shield (Salary Date Alignment)",
+    "ops_score": 4.46,
+    "theme_id": "THM-07",
+    "theme_name": "Asymmetric Bank ECS / NACH Bounce Penalty Shield",
+    "record_count": 4,
+    "unique_conversations_count": 4,
+    "denominator": 193,
+    "prevalence_percentage": 2.1,
+    "severity_type": "Severe Involuntary Churn",
+    "ranking_rationale": "High retention leverage: Even though raw volume is moderate, each occurrence causes immediate, permanent mandate deletion to protect bank balance.",
+    "user_problem": "Preemptive mandate cancellation triggered by fear of ₹450-₹590 bank bounce fees when delayed salaries collide with fixed SIP debit dates.",
+    "affected_users": "Salaried early-career professionals in India with salary disbursement volatility (days 1-7 of the month).",
+    "solution_direction": "Dynamic salary-aligned debit date picker, 24-hour balance pre-check WhatsApp/Push notification, and 1-tap auto-skip before bank deduction.",
+    "recommended_interview_question": "Have you ever had an SIP debit fail due to salary arriving late? Did bank penalty charges influence your decision to stop or cancel your mandate?",
+    "factor_scores": {
+      "retention_leverage": 4.9,
+      "evidence_consistency": 3.6,
+      "groww_addressability": 4.9,
+      "problem_severity": 4.9,
+      "confidence_score": 3.8
+    },
+    "counterevidence": []
   },
   {
     "opportunity_id": "OPP-04",
-    "title": "Student & Irregular Income Micro-SIP Adjuster",
-    "ops_score": 4.0,
-    "prevalence_pct": 4.1,
-    "evidence_count": 8,
+    "title": "First-Year Volatility Shock Absorber (Negative XIRR Reassurance)",
+    "ops_score": 4.31,
+    "theme_id": "THM-02",
+    "theme_name": "Compounding Horizon Misalignment & Drawdown Panic",
+    "record_count": 20,
+    "unique_conversations_count": 19,
     "denominator": 193,
-    "scores": {
-      "retention_link": 4.2,
-      "evidence_strength": 4.0,
-      "problem_severity": 3.8,
+    "prevalence_percentage": 10.4,
+    "severity_type": "Voluntary Cognitive Panic",
+    "ranking_rationale": "High frequency across 19 independent threads: Affects investor psychology in months 4-7, but requires education rather than purely functional UI fixes.",
+    "user_problem": "Beginners encountering negative portfolio returns in months 3-6 panic due to lack of compounding perspective and comparison to guaranteed bank FDs.",
+    "affected_users": "First-time equity mutual fund investors entering near market peaks or during interim corrections.",
+    "solution_direction": "Contextual educational visualizer during market dips showing unit accumulation benefits ('Rupee-cost averaging in action: you are buying more units at lower NAV').",
+    "recommended_interview_question": "How did you react the first time your SIP portfolio value dropped below the total money you deposited? Did you check returns daily?",
+    "factor_scores": {
+      "retention_leverage": 4.2,
+      "evidence_consistency": 4.6,
       "groww_addressability": 4.2,
-      "unmet_need": 4.0,
-      "prevalence": 3.8,
-      "source_diversity": 3.8,
-      "low_assumptions": 3.5
+      "problem_severity": 4.1,
+      "confidence_score": 4.5
     },
-    "hypothesis": "College students and gig workers with fluctuating cash inflows struggle with rigid fixed monthly commitment amounts, causing abandonment when allowances fluctuate.",
-    "solution_direction": "Dynamic instalment flex (allowing user to temporarily drop from ₹1,000 to ₹500 for a month rather than stopping)."
+    "counterevidence": []
+  },
+  {
+    "opportunity_id": "OPP-06",
+    "title": "Student & Variable Income Micro-SIP Adjuster",
+    "ops_score": 4.17,
+    "theme_id": "THM-01",
+    "theme_name": "Cash-Flow Volatility & Inflexible Fixed Commitments",
+    "record_count": 8,
+    "unique_conversations_count": 7,
+    "denominator": 193,
+    "prevalence_percentage": 4.1,
+    "severity_type": "Structural Affordability Friction",
+    "ranking_rationale": "Niche but persistent segment: Prevents complete mandate deletion during low-cash months.",
+    "user_problem": "Rigid fixed monthly commitment amounts force complete stoppage when allowances or freelance cash inflows fluctuate.",
+    "affected_users": "Students, gig workers, and commission-based professionals.",
+    "solution_direction": "Instalment flex allowing user to temporarily drop from ₹1,000 to ₹500 for a single month rather than stopping completely.",
+    "recommended_interview_question": "If you could temporarily adjust your monthly SIP amount during months with tight cash, would you have continued?",
+    "factor_scores": {
+      "retention_leverage": 4.2,
+      "evidence_consistency": 4.1,
+      "groww_addressability": 4.3,
+      "problem_severity": 3.8,
+      "confidence_score": 4.5
+    },
+    "counterevidence": []
   }
 ]
