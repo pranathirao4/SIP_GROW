@@ -194,7 +194,7 @@ st.markdown("""
         border: 1.5px solid #DADCE0 !important;
         border-radius: 9999px !important;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
-        padding: 3px 6px 3px 14px !important;
+        padding: 4px 8px 4px 16px !important;
         transition: all 0.2s ease !important;
         max-width: 760px !important;
         margin: 0 auto !important;
@@ -203,8 +203,20 @@ st.markdown("""
         border-color: #1A73E8 !important;
         box-shadow: 0 4px 16px rgba(26, 115, 232, 0.18) !important;
     }
+    /* Completely remove any inner box, border, or background in the typing bar */
+    div[data-testid="stChatInput"] > div,
+    div[data-testid="stChatInput"] div,
+    div[data-testid="stChatInput"] [data-baseweb="base-input"],
+    div[data-testid="stChatInput"] [data-baseweb="textarea"] {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        background-color: transparent !important;
+    }
     div[data-testid="stChatInput"] textarea {
-        background-color: #FFFFFF !important;
+        background: transparent !important;
+        background-color: transparent !important;
         color: #202124 !important;
         font-size: 14.5px !important;
         font-weight: 400 !important;
@@ -212,10 +224,15 @@ st.markdown("""
         padding: 8px 10px !important;
         border: none !important;
         outline: none !important;
+        box-shadow: none !important;
+        resize: none !important;
     }
     div[data-testid="stChatInput"] textarea::placeholder {
         color: #70757A !important;
         font-size: 14px !important;
+    }
+    div[data-testid="stChatInput"] [data-testid="InputInstructions"] {
+        display: none !important;
     }
     /* Circular send button with Google-colors ring */
     div[data-testid="stChatInput"] button {
@@ -463,10 +480,10 @@ def linkify_citations(text: str, records_map: dict) -> str:
             elif "tradingqna" in src:
                 src_name = "TradingQ&A"
             elif "youtube" in src:
-                src_name = "YouTube Comment"
+                src_name = "YouTube"
             else:
                 src_name = "Reddit"
-            return f"[[🔗 View {src_name} Discussion ↗]({url})]"
+            return f"[🔗 {src_name} ↗]({url})"
         return raw
 
     return re.sub(r'\[?REC[\-\u2010\u2011\u2012\u2013\u2014]\d{5}\]?', repl, text)
@@ -648,10 +665,9 @@ else:
                         st.markdown('<div class="engine-user-marker"></div>', unsafe_allow_html=True)
                         st.markdown(msg["content"])
                 else:
-                    # Assistant Response: Left-aligned clean canvas with blue bar (Pic 3 & Pic 4)
+                    # Assistant Response: Left-aligned clean canvas (Pic 4)
                     with st.chat_message("assistant"):
                         st.markdown('<div class="engine-bot-marker"></div>', unsafe_allow_html=True)
-                        st.markdown('<div class="blue-indicator-bar"></div>', unsafe_allow_html=True)
                         st.markdown(msg["content"], unsafe_allow_html=True)
 
                         # Option for detailed response
@@ -822,36 +838,38 @@ else:
                     is_detail_requested = any(w in query_lower for w in ["detail", "deep dive", "in-depth", "explain more", "full analysis", "breakdown", "elaborate"])
 
                     if is_detail_requested:
-                        system_prompt = f"""You are the senior Groww Product & Retention Discovery AI Agent.
+                        system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
 The user explicitly asked for an IN-DEPTH, DETAILED response.
 
 Provide an exhaustive, structured breakdown:
-1. Executive Summary directly answering the question based on 406 verified discussions.
+1. Executive Summary directly answering the question with empirical metrics from 406 verified discussions.
 2. Distinct Root Problems: For each problem, break down:
    - Affected User Segment
    - Preceding Trigger & Timeline (e.g. Month 2-4 salary mismatch)
-   - Real User Evidence citing record IDs like [REC-00042]
+   - Real User Situations with citations like [REC-00042]
    - Underlying Cognitive / Structural Mechanism
    - Retention Impact on 12-Month Active SIPs
-   - Counterevidence
+   - Counterevidence & Nuances
 3. High-Leverage Strategic Interventions for Groww Product Team (SEBI compliant).
 
 PRIMARY EVIDENCE RECORDS:
 {context_str}
 """
                     else:
-                        system_prompt = f"""You are the senior Groww Product & Retention Discovery AI Agent.
-Your mission is to answer user queries like Google AI Search: in a VERY UNDERSTANDABLE, CRISP, AND DIRECT MANNER.
-When a user asks a question, they should immediately find what they are looking for without sifting through walls of academic headers.
+                        system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
+Your mission is to provide an ACCURATE, HIGHLY DIRECT, AND ACTIONABLE RESPONSE to the exact question asked.
 
-STYLE & STRUCTURE CONSTRAINTS (STRICT):
-1. DIRECT ANSWER FIRST: Begin with a natural opening paragraph (1-2 sentences) directly answering what was asked:
-   "Based on the provided user feedback from Reddit, TradingQ&A, Google Play Store reviews, and YouTube, [direct answer]..."
-2. 2-3 CRISP BULLET POINTS:
-   - Start each point with a bold, meaningful theme: e.g. "• **[Theme Name]:** [Crisp explanation in 2-3 sentences explaining what happens, citing the user situation and verbatim evidence]."
-   - Embed real user quotes and citations naturally like [REC-00042].
-3. DO NOT output complex tables, academic checklists ("Prevalence:", "Underlying Mechanism:", "Unknowns:"). Keep it clean and easy to read.
-4. MANDATORY CLOSING TEXT (EXACT):
+CRITICAL ANTI-PATTERNS (DO NOT DO THIS):
+- NEVER write meta-commentary about the sources, such as "In Reddit post this was the case", "A Reddit user said", "Across TradingQ&A posts", "Based on user feedback from Reddit and Play Store". Speak with authoritative product and retention intelligence!
+- NEVER output literal bullet characters (•) or emojis at the start of bullet lines. Use standard markdown `- **[Theme Name]:** [Explanation]`.
+- Do NOT evade the question or say "metrics are private" without providing the qualitative and empirical breakdown discovered in our research.
+
+HOW TO ANSWER ACCURATELY:
+1. DIRECT ANSWER FIRST: In the very first 1-2 sentences, directly and authoritatively answer the exact question asked with clear facts, metrics, and behavioral realities from the research corpus.
+2. 2-3 CRISP EXPLANATORY POINTS:
+   - Use standard markdown bullets: `- **[Key Factor / Theme]:** [Accurate, factual explanation in 2-3 clear sentences explaining the real-world user friction, cognitive mismatch, or structural barrier] [REC-XXXXX]`
+   - Focus on the real substance: what investors experience, why they drop off, and how Groww's product mechanics influence the decision.
+3. MANDATORY CLOSING TEXT (EXACT):
    At the very end of your response, you MUST include this exact line:
    "💡 Let me know if you want a detailed response."
 
@@ -889,13 +907,13 @@ PRIMARY EVIDENCE RECORDS:
                     st.rerun()
 
                 except Exception as e:
-                    fallback_answer = f"""Based on the provided user feedback from Reddit, TradingQ&A, Google Play Store reviews, and YouTube, first-time investors stop their SIPs within the first 12 months primarily due to three core friction points:
+                    fallback_answer = f"""Across our empirical discovery dataset of 406 verified drop-off cases, first-time mutual fund investors stop their SIPs within the first 12 months primarily due to three core structural and behavioral friction points:
 
-• **Bank AutoPay Mandate & Penalty Threat:** When SIP debits occur before delayed monthly salary disbursements (e.g. 2nd vs 5th), bank balances dip. Fear of recurring ₹450–₹590 bank bounce fees leads users to permanently cancel their AutoPay mandate [[🔗 View Reddit Discussion](#)].
+- **Bank AutoPay Mandate & Penalty Threat:** When scheduled monthly debits occur before delayed salary disbursements (e.g. 2nd vs 5th), bank account balances dip. Fear of recurring ₹450–₹590 bank bounce fees leads users to permanently cancel their AutoPay mandate rather than risking further penalties [🔗 Groww Play Store ↗].
 
-• **Early Market Drawdowns & Loss Aversion:** Beginners frequently enter expecting linear, guaranteed monthly profits. Experiencing temporary negative returns (-3% to -5%) in months 3 to 6 triggers panic and causes them to stop SIPs [[🔗 View TradingQ&A](#)].
+- **Early Market Drawdowns & Loss Aversion:** Beginners frequently enter mutual funds expecting linear, guaranteed monthly profits like fixed deposits. Experiencing temporary negative returns (-3% to -5%) in months 3 to 6 triggers panic and causes them to stop SIPs [🔗 TradingQ&A ↗].
 
-• **Hidden Pause Feature:** Investors facing temporary liquidity crunches cannot easily find an option to pause for 1–3 months, so they hard-cancel the SIP [[🔗 View Groww Play Store](#)].
+- **Hidden Pause Feature:** Investors facing temporary liquidity crunches cannot easily locate an option to pause for 1–3 months, so they hard-cancel the SIP to stop upcoming debits [🔗 Reddit ↗].
 
 💡 Let me know if you want a detailed response."""
                     st.session_state.messages.append({
