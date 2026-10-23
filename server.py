@@ -227,6 +227,7 @@ PRIMARY EVIDENCE RECORDS:
 Your mission is to provide an ACCURATE, HIGHLY DIRECT, AND ACTIONABLE RESPONSE to the exact question asked.
 
 CRITICAL ANTI-PATTERNS (DO NOT DO THIS):
+- NEVER repeat, quote, or echo the user's question as a title, header, or intro line (e.g. Do NOT write the question before your answer). Begin directly with the factual answer text.
 - NEVER write meta-commentary about the sources, such as "In Reddit post this was the case", "A Reddit user said", "Across TradingQ&A posts", "Based on user feedback from Reddit and Play Store". Speak with authoritative product and retention intelligence!
 - NEVER output literal bullet characters (•) or emojis at the start of bullet lines. Use standard markdown `- **[Theme Name]:** [Explanation]`.
 - Do NOT evade the question or say "metrics are private" without providing the qualitative and empirical breakdown discovered in our research.

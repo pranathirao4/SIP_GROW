@@ -58,6 +58,33 @@ st.markdown("""
         visibility: hidden !important;
     }
     
+    /* Complete Elimination of Streamlit Stale Dimming, Ghosting & Blur */
+    [data-stale="true"],
+    div[data-stale="true"],
+    .stApp[data-stale="true"],
+    [data-testid="stAppViewContainer"][data-stale="true"],
+    [data-testid="stVerticalBlock"][data-stale="true"],
+    [data-testid="stChatMessage"][data-stale="true"],
+    section.main[data-stale="true"],
+    .main[data-stale="true"],
+    .block-container[data-stale="true"] {
+        opacity: 1 !important;
+        filter: none !important;
+        transition: none !important;
+    }
+    [data-stale="true"] * {
+        opacity: 1 !important;
+        filter: none !important;
+        transition: none !important;
+    }
+    [data-testid="stStatusWidget"],
+    div[data-testid="stStatusWidget"],
+    .stStatusWidget,
+    #stStatusWidget {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
     /* Left Sidebar */
     section[data-testid="stSidebar"] {
         background-color: #FFFFFF !important;
@@ -567,6 +594,32 @@ def inject_input_scroll_listener():
         if (!doc) return;
         
         function attachListener() {
+            // Inject anti-dimming styles directly into parent document head
+            if (!doc.getElementById('anti-dimming-style')) {
+                const s = doc.createElement('style');
+                s.id = 'anti-dimming-style';
+                s.innerHTML = `
+                    [data-stale="true"], div[data-stale="true"], .stApp[data-stale="true"],
+                    [data-testid="stAppViewContainer"][data-stale="true"],
+                    [data-testid="stChatMessage"][data-stale="true"],
+                    section.main[data-stale="true"], .main[data-stale="true"] {
+                        opacity: 1 !important;
+                        filter: none !important;
+                        transition: none !important;
+                    }
+                    [data-stale="true"] * {
+                        opacity: 1 !important;
+                        filter: none !important;
+                        transition: none !important;
+                    }
+                    [data-testid="stStatusWidget"], .stStatusWidget, #stStatusWidget {
+                        display: none !important;
+                        visibility: hidden !important;
+                    }
+                `;
+                doc.head.appendChild(s);
+            }
+
             const chatInput = doc.querySelector('[data-testid="stChatInput"]');
             if (!chatInput) return;
             
@@ -989,6 +1042,7 @@ PRIMARY EVIDENCE RECORDS:
 Your mission is to provide an ACCURATE, HIGHLY DIRECT, AND ACTIONABLE RESPONSE to the exact question asked.
 
 CRITICAL ANTI-PATTERNS (DO NOT DO THIS):
+- NEVER repeat, quote, or echo the user's question as a title, header, or intro line (e.g. Do NOT write the question before your answer). Begin directly with the factual answer text.
 - NEVER write meta-commentary about the sources, such as "In Reddit post this was the case", "A Reddit user said", "Across TradingQ&A posts", "Based on user feedback from Reddit and Play Store". Speak with authoritative product and retention intelligence!
 - NEVER output literal bullet characters (•) or emojis at the start of bullet lines. Use standard markdown `- **[Theme Name]:** [Explanation]`.
 - Do NOT evade the question or say "metrics are private" without providing the qualitative and empirical breakdown discovered in our research.
