@@ -27,32 +27,27 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not GROQ_API_KEY and hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
-# Pre-cache Groq Client Singleton
+# Pre-cache & Pre-warm Groq Client Singleton
 @st.cache_resource
 def get_groq_client():
     if not GROQ_API_KEY:
         return None
     try:
-        return Groq(api_key=GROQ_API_KEY)
+        c = Groq(api_key=GROQ_API_KEY)
+        # Pre-warm connection pool synchronously so first query is 100% warm (<0.15s TTFT)
+        c.chat.completions.create(
+            model="qwen/qwen3.8-27b",
+            messages=[{"role": "user", "content": "1"}],
+            max_tokens=1
+        )
+        return c
     except Exception:
-        return None
+        try:
+            return Groq(api_key=GROQ_API_KEY)
+        except Exception:
+            return None
 
 groq_client = get_groq_client()
-
-def _prewarm_groq():
-    try:
-        if groq_client:
-            groq_client.chat.completions.create(
-                model="qwen/qwen3.8-27b",
-                messages=[{"role": "user", "content": "ping"}],
-                max_tokens=1
-            )
-    except Exception:
-        pass
-
-if "groq_prewarmed" not in st.session_state:
-    st.session_state.groq_prewarmed = True
-    threading.Thread(target=_prewarm_groq, daemon=True).start()
 
 # Page configuration
 st.set_page_config(
@@ -481,6 +476,9 @@ st.markdown("""
         padding: 16px 14px !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
         margin-top: 0.5rem !important;
+        min-width: 260px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     .ref-header-row {
         display: flex !important;
@@ -503,6 +501,7 @@ st.markdown("""
         padding: 10px 12px !important;
         margin-bottom: 9px !important;
         transition: all 0.15s ease !important;
+        box-sizing: border-box !important;
     }
     .ref-item:hover {
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
@@ -519,6 +518,9 @@ st.markdown("""
         font-weight: 600 !important;
         color: #202124 !important;
         line-height: 1.3 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     .ref-item-score {
         font-size: 11px !important;
@@ -533,9 +535,25 @@ st.markdown("""
         font-size: 11.5px !important;
         color: #1A73E8 !important;
         text-decoration: underline !important;
-        word-break: break-all !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
         display: block !important;
         line-height: 1.4 !important;
+        max-width: 100% !important;
+    }
+
+    /* Prevent any horizontal overflow or column squishing */
+    html, body, [data-testid="stAppViewContainer"], section.main, .main, .block-container, [data-testid="stHorizontalBlock"] {
+        overflow-x: hidden !important;
+    }
+    [data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child {
+        flex: 7.2 1 0px !important;
+        min-width: 0 !important;
+    }
+    [data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child {
+        flex: 2.8 1 260px !important;
+        min-width: 260px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -607,18 +625,10 @@ def scroll_to_question():
                 const doc = window.parent.document;
                 if (!doc) return;
                 
-                const qElem = doc.getElementById('latest-user-question');
                 const containers = getScrollContainers(doc);
-
-                if (qElem) {
-                    try {
-                        qElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    } catch (e) {}
-                } else {
-                    for (const c of containers) {
-                        if (c.scrollHeight > c.clientHeight) {
-                            c.scrollTop = c.scrollHeight;
-                        }
+                for (const c of containers) {
+                    if (c.scrollHeight > c.clientHeight) {
+                        c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
                     }
                 }
             } catch (err) {
@@ -675,6 +685,19 @@ def inject_input_scroll_listener():
             ].filter(Boolean);
         }
 
+        function hideHeroImmediately() {
+            try {
+                const heroRef = doc.getElementById('hero-ref-holder');
+                const heroTitle = doc.querySelector('.engine-hero-title');
+                const heroSub = doc.querySelector('.engine-hero-subtitle');
+                const chipBtns = doc.querySelectorAll('.prompt-chip-btn');
+                if (heroRef) heroRef.style.display = 'none';
+                if (heroTitle) heroTitle.style.display = 'none';
+                if (heroSub) heroSub.style.display = 'none';
+                chipBtns.forEach(el => el.style.display = 'none');
+            } catch(e) {}
+        }
+
         let globalSnapInterval = null;
 
         function triggerActiveSnap() {
@@ -684,7 +707,7 @@ def inject_input_scroll_listener():
                 const containers = getScrollContainers();
                 for (const c of containers) {
                     if (c.scrollHeight > c.clientHeight) {
-                        c.scrollTop = c.scrollHeight;
+                        c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
                     }
                 }
             }
@@ -738,49 +761,6 @@ def inject_input_scroll_listener():
                 doc.head.appendChild(s);
             }
 
-            function transitionToChatInstant(userQueryText) {
-                try {
-                    const heroTitle = doc.querySelector('.engine-hero-title');
-                    const heroSub = doc.querySelector('.engine-hero-subtitle');
-                    const chipBtns = doc.querySelectorAll('.prompt-chip-btn');
-                    const heroRef = doc.getElementById('hero-ref-holder');
-                    if (heroTitle) heroTitle.style.display = 'none';
-                    if (heroSub) heroSub.style.display = 'none';
-                    chipBtns.forEach(c => { c.style.display = 'none'; });
-                    if (heroRef) heroRef.style.display = 'none';
-
-                    if (userQueryText && !doc.getElementById('instant-chat-preview')) {
-                        const preview = doc.createElement('div');
-                        preview.id = 'instant-chat-preview';
-                        preview.style.width = '100%';
-                        preview.innerHTML = `
-                            <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem; margin-top: 1rem;">
-                                <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
-                                    ${userQueryText}
-                                </div>
-                            </div>
-                            <div class="reviewing-responses-box" style="margin-top: 1rem;">
-                                <div class="blue-indicator-bar" style="margin-top: 2px;"></div>
-                                <span class="reviewing-text">Reviewing responses</span>
-                                <span class="typing-dot-blue"></span>
-                                <span class="typing-dot-blue"></span>
-                                <span class="typing-dot-blue"></span>
-                            </div>
-                        `;
-                        const mainContainer = doc.querySelector('section.main .block-container') || doc.querySelector('[data-testid="stAppViewContainer"]') || doc.body;
-                        if (mainContainer) {
-                            mainContainer.appendChild(preview);
-                        }
-                    }
-                } catch(e) {}
-            }
-
-            // Remove instant preview once Streamlit's real active query element is mounted
-            const existingPreview = doc.getElementById('instant-chat-preview');
-            if (existingPreview && (doc.getElementById('latest-user-question') || doc.querySelector('[data-testid="stChatMessage"]'))) {
-                existingPreview.remove();
-            }
-
             const chatInput = doc.querySelector('[data-testid="stChatInput"]');
             if (chatInput) {
                 const textarea = chatInput.querySelector('textarea');
@@ -790,8 +770,7 @@ def inject_input_scroll_listener():
                     textarea.dataset.hasScrollListener = "true";
                     textarea.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter' && !e.shiftKey) {
-                            const qText = textarea.value.trim();
-                            if (qText) transitionToChatInstant(qText);
+                            hideHeroImmediately();
                             triggerActiveSnap();
                         }
                     });
@@ -799,8 +778,7 @@ def inject_input_scroll_listener():
                 if (sendBtn && !sendBtn.dataset.hasScrollListener) {
                     sendBtn.dataset.hasScrollListener = "true";
                     sendBtn.addEventListener('click', function() {
-                        const qText = textarea ? textarea.value.trim() : "";
-                        if (qText) transitionToChatInstant(qText);
+                        hideHeroImmediately();
                         triggerActiveSnap();
                     });
                 }
@@ -812,8 +790,7 @@ def inject_input_scroll_listener():
                 if (!btn.dataset.hasSnapListener) {
                     btn.dataset.hasSnapListener = "true";
                     btn.addEventListener('click', function() {
-                        const qText = btn.innerText.trim();
-                        transitionToChatInstant(qText);
+                        hideHeroImmediately();
                         triggerActiveSnap();
                     });
                 }
@@ -1127,12 +1104,6 @@ else:
                     break
 
         # -------------------------
-        # Right Column: References Card
-        # -------------------------
-        with col_refs:
-            st.markdown(render_references_panel(display_refs), unsafe_allow_html=True)
-
-        # -------------------------
         # Left Column: Chat Area (Full Conversational Multi-turn History)
         # -------------------------
         with col_chat:
@@ -1162,6 +1133,18 @@ else:
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
+
+        # -------------------------
+        # Right Column: References Card
+        # -------------------------
+        with col_refs:
+            st.markdown(render_references_panel(display_refs), unsafe_allow_html=True)
+
+        # -------------------------
+        # Left Column: Response Generation
+        # -------------------------
+        with col_chat:
+            if active_query:
 
                 query_lower = active_query.lower()
                 off_topic_keywords = [
@@ -1289,6 +1272,8 @@ PRIMARY EVIDENCE RECORDS:
                         )
 
                         def token_generator():
+                            # Immediate flush so UI elements and typing indicator render in <50ms
+                            yield ""
                             has_started = False
                             for chunk in stream:
                                 if not chunk.choices:
