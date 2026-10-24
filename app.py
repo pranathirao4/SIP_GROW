@@ -43,7 +43,7 @@ def _prewarm_groq():
     try:
         if groq_client:
             groq_client.chat.completions.create(
-                model="openai/gpt-oss-120b",
+                model="qwen/qwen3.8-27b",
                 messages=[{"role": "user", "content": "ping"}],
                 max_tokens=1
             )
@@ -738,7 +738,7 @@ def inject_input_scroll_listener():
                 doc.head.appendChild(s);
             }
 
-            function hideHeroInstant() {
+            function transitionToChatInstant(userQueryText) {
                 try {
                     const heroTitle = doc.querySelector('.engine-hero-title');
                     const heroSub = doc.querySelector('.engine-hero-subtitle');
@@ -748,7 +748,37 @@ def inject_input_scroll_listener():
                     if (heroSub) heroSub.style.display = 'none';
                     chipBtns.forEach(c => { c.style.display = 'none'; });
                     if (heroRef) heroRef.style.display = 'none';
+
+                    if (userQueryText && !doc.getElementById('instant-chat-preview')) {
+                        const preview = doc.createElement('div');
+                        preview.id = 'instant-chat-preview';
+                        preview.style.width = '100%';
+                        preview.innerHTML = `
+                            <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem; margin-top: 1rem;">
+                                <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
+                                    ${userQueryText}
+                                </div>
+                            </div>
+                            <div class="reviewing-responses-box" style="margin-top: 1rem;">
+                                <div class="blue-indicator-bar" style="margin-top: 2px;"></div>
+                                <span class="reviewing-text">Reviewing responses</span>
+                                <span class="typing-dot-blue"></span>
+                                <span class="typing-dot-blue"></span>
+                                <span class="typing-dot-blue"></span>
+                            </div>
+                        `;
+                        const mainContainer = doc.querySelector('section.main .block-container') || doc.querySelector('[data-testid="stAppViewContainer"]') || doc.body;
+                        if (mainContainer) {
+                            mainContainer.appendChild(preview);
+                        }
+                    }
                 } catch(e) {}
+            }
+
+            // Remove instant preview once Streamlit's real active query element is mounted
+            const existingPreview = doc.getElementById('instant-chat-preview');
+            if (existingPreview && (doc.getElementById('latest-user-question') || doc.querySelector('[data-testid="stChatMessage"]'))) {
+                existingPreview.remove();
             }
 
             const chatInput = doc.querySelector('[data-testid="stChatInput"]');
@@ -760,7 +790,8 @@ def inject_input_scroll_listener():
                     textarea.dataset.hasScrollListener = "true";
                     textarea.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter' && !e.shiftKey) {
-                            hideHeroInstant();
+                            const qText = textarea.value.trim();
+                            if (qText) transitionToChatInstant(qText);
                             triggerActiveSnap();
                         }
                     });
@@ -768,7 +799,8 @@ def inject_input_scroll_listener():
                 if (sendBtn && !sendBtn.dataset.hasScrollListener) {
                     sendBtn.dataset.hasScrollListener = "true";
                     sendBtn.addEventListener('click', function() {
-                        hideHeroInstant();
+                        const qText = textarea ? textarea.value.trim() : "";
+                        if (qText) transitionToChatInstant(qText);
                         triggerActiveSnap();
                     });
                 }
@@ -780,7 +812,8 @@ def inject_input_scroll_listener():
                 if (!btn.dataset.hasSnapListener) {
                     btn.dataset.hasSnapListener = "true";
                     btn.addEventListener('click', function() {
-                        hideHeroInstant();
+                        const qText = btn.innerText.trim();
+                        transitionToChatInstant(qText);
                         triggerActiveSnap();
                     });
                 }
@@ -1175,6 +1208,7 @@ else:
                     """, unsafe_allow_html=True)
 
                     answer_placeholder = st.empty()
+                    time.sleep(0.01)
 
                     # Context blocks preparation
                     context_blocks = []
@@ -1245,14 +1279,13 @@ PRIMARY EVIDENCE RECORDS:
                         client = groq_client or Groq(api_key=GROQ_API_KEY)
 
                         stream = client.chat.completions.create(
-                            model="openai/gpt-oss-120b",
+                            model="qwen/qwen3.8-27b",
                             messages=[
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": active_query}
                             ],
                             stream=True,
-                            max_tokens=650,
-                            extra_body={"reasoning_format": "hidden"}
+                            max_tokens=650
                         )
 
                         def token_generator():
