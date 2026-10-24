@@ -641,26 +641,9 @@ def inject_input_scroll_listener():
             if (globalSnapInterval) clearInterval(globalSnapInterval);
 
             function doSnap() {
-                const qElem = doc.getElementById('latest-user-question');
                 const containers = getScrollContainers();
-
-                if (qElem) {
-                    try {
-                        qElem.scrollIntoView({ behavior: 'instant', block: 'start' });
-                    } catch (e) {}
-
-                    const rect = qElem.getBoundingClientRect();
-                    for (const c of containers) {
-                        if (c.scrollHeight > c.clientHeight) {
-                            c.scrollTop += (rect.top - 70);
-                        }
-                    }
-                } else {
-                    for (const c of containers) {
-                        if (c.scrollHeight > c.clientHeight) {
-                            c.scrollTop = c.scrollHeight;
-                        }
-                    }
+                for (const c of containers) {
+                    c.scrollTop = 0;
                 }
             }
 
@@ -827,6 +810,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "recent_chats" not in st.session_state:
     st.session_state.recent_chats = []
+if "active_chat" not in st.session_state:
+    st.session_state.active_chat = None
 if "current_view" not in st.session_state:
     st.session_state.current_view = "new_chat"
 if "input_query" not in st.session_state:
@@ -848,6 +833,7 @@ with st.sidebar:
     # Nav Item 1: New Chat (Tooltip: "Start a fresh conversation.")
     if st.button("✏️  New chat", key="nav_btn_new_chat", help="Start a fresh conversation."):
         st.session_state.messages = []
+        st.session_state.active_chat = None
         st.session_state.current_view = "new_chat"
         st.rerun()
 
@@ -876,10 +862,14 @@ with st.sidebar:
     if not st.session_state.recent_chats:
         st.markdown('<div class="recent-empty-text">Chats you start show up here.</div>', unsafe_allow_html=True)
     else:
-        for idx, recent_q in enumerate(reversed(st.session_state.recent_chats[-8:])):
-            display_title = recent_q[:26] + "..." if len(recent_q) > 26 else recent_q
-            if st.button(display_title, key=f"recent_chat_{idx}", help=recent_q):
-                st.session_state.input_query = recent_q
+        for idx, chat in enumerate(reversed(st.session_state.recent_chats[-8:])):
+            q_text = chat["query"] if isinstance(chat, dict) else str(chat)
+            display_title = q_text[:26] + "..." if len(q_text) > 26 else q_text
+            if st.button(display_title, key=f"recent_chat_{idx}", help=q_text):
+                if isinstance(chat, dict):
+                    st.session_state.active_chat = chat
+                else:
+                    st.session_state.input_query = q_text
                 st.session_state.current_view = "new_chat"
                 st.rerun()
 
@@ -957,7 +947,7 @@ else:
         st.session_state.input_query = ""
 
     # Check if this is an empty chat state (Pic 1)
-    if not st.session_state.messages and not active_query:
+    if not st.session_state.active_chat and not active_query:
         # Top-right "References >" placeholder pill (Pic 1)
         st.markdown("""
         <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
@@ -993,52 +983,28 @@ else:
         # Active Chat Screen (Two-Column Layout: Chat on Left, References on Right - Pic 4)
         col_chat, col_refs = st.columns([7.2, 2.8], gap="large")
 
-        # Determine references to display on the right panel
-        display_refs = []
-        stats = {"total_matching_records": 406, "unique_conversations_count": 80, "sources_represented": ["Reddit", "Groww Play Store", "TradingQ&A"]}
+        # CASE 1: Processing a Newly Submitted Query
         if active_query:
-            # Immediate retrieval (0.000s) to populate references card
+            # Immediate retrieval (0.001s)
             retrieval_res = retriever.retrieve_with_evidence_stats(active_query, top_k=6)
             display_refs = retrieval_res["primary_matches"]
             stats = retrieval_res["stats"]
-        else:
-            # Get latest assistant references from history
-            for m in reversed(st.session_state.messages):
-                if m.get("role") == "assistant" and m.get("references"):
-                    display_refs = m["references"]
-                    break
 
-        # -------------------------
-        # Right Column: References (Pic 4)
-        # -------------------------
-        with col_refs:
-            st.markdown(render_references_panel(display_refs), unsafe_allow_html=True)
+            # Right Column: References Card (Populated instantly)
+            with col_refs:
+                st.markdown(render_references_panel(display_refs), unsafe_allow_html=True)
 
-        # -----------------
-        # Left Column: Chat
-        # -----------------
-        with col_chat:
-            # Render all previous chat history
-            for msg in st.session_state.messages:
-                if msg["role"] == "user":
-                    with st.chat_message("user"):
-                        st.markdown('<div class="engine-user-marker"></div>', unsafe_allow_html=True)
-                        st.markdown(msg["content"])
-                else:
-                    with st.chat_message("assistant"):
-                        st.markdown('<div class="engine-bot-marker"></div>', unsafe_allow_html=True)
-                        st.markdown(msg["content"], unsafe_allow_html=True)
-                        if msg.get("detail_analysis"):
-                            with st.expander("📊 View In-Depth Problem Breakdown & Strategy"):
-                                st.markdown(msg["detail_analysis"], unsafe_allow_html=True)
+            # Left Column: Chat Area
+            with col_chat:
+                # 1. Render User Question Pill on Top Right (Pic 2 & Pic 4)
+                st.markdown(f"""
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+                    <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
+                        {active_query}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
-            # Process Newly Entered Active Query
-            if active_query:
-                # Add to recents in sidebar
-                if active_query not in st.session_state.recent_chats:
-                    st.session_state.recent_chats.append(active_query)
-
-                # Strict Scope Guardrail Check
                 query_lower = active_query.lower()
                 off_topic_keywords = [
                     "cricket", "cricketer", "virat", "dhoni", "ipl", "football", "messi", "ronaldo",
@@ -1046,68 +1012,58 @@ else:
                     "prime minister", "president", "capital of", "who wrote", "song", "movie", "horoscope"
                 ]
 
-                # Render User Question with Anchor and trigger Auto-Scroll
-                with st.chat_message("user"):
-                    st.markdown('<div id="latest-user-question" style="scroll-margin-top: 100px;"></div><div class="engine-user-marker"></div>', unsafe_allow_html=True)
-                    st.markdown(active_query)
-
-                scroll_to_question()
-
                 if any(k in query_lower for k in off_topic_keywords):
                     out_of_scope_reply = "This is out of scope. I am the Groww SIP Review Discovery Engine and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandates, and retail investor behavior."
-                    with st.chat_message("assistant"):
-                        st.markdown('<div class="engine-bot-marker"></div>', unsafe_allow_html=True)
-                        st.markdown(out_of_scope_reply)
-                    st.session_state.messages.append({"role": "user", "content": active_query})
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": out_of_scope_reply,
+                    st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65;">{out_of_scope_reply}</div>', unsafe_allow_html=True)
+                    chat_obj = {
+                        "query": active_query,
+                        "answer": out_of_scope_reply,
                         "references": [],
-                        "detail_analysis": ""
-                    })
+                        "detail": ""
+                    }
+                    st.session_state.active_chat = chat_obj
+                    if not any(c.get("query") == active_query for c in st.session_state.recent_chats):
+                        st.session_state.recent_chats.append(chat_obj)
                 else:
-                    with st.chat_message("assistant"):
-                        st.markdown('<div class="engine-bot-marker"></div>', unsafe_allow_html=True)
-                        status_box = st.empty()
+                    # 2. Render Reviewing Responses Animation Box (Pic 3)
+                    status_box = st.empty()
+                    status_box.markdown("""
+                    <div class="reviewing-responses-box">
+                        <div class="blue-indicator-bar" style="margin-top: 2px;"></div>
+                        <span class="reviewing-text">Reviewing responses</span>
+                        <span class="typing-dot-blue"></span>
+                        <span class="typing-dot-blue"></span>
+                        <span class="typing-dot-blue"></span>
+                    </div>
+                    """, unsafe_allow_html=True)
 
-                        # Reviewing Responses Animation
-                        status_box.markdown("""
-                        <div class="reviewing-responses-box">
-                            <div class="blue-indicator-bar" style="margin-top: 2px;"></div>
-                            <span class="reviewing-text">Reviewing responses</span>
-                            <span class="typing-dot-blue"></span>
-                            <span class="typing-dot-blue"></span>
-                            <span class="typing-dot-blue"></span>
-                        </div>
-                        """, unsafe_allow_html=True)
+                    answer_placeholder = st.empty()
 
-                        answer_placeholder = st.empty()
+                    # Context blocks preparation
+                    context_blocks = []
+                    for idx, r in enumerate(display_refs):
+                        r["retrieval_score"] = 0.660 - (idx * 0.015)
+                        clf = r.get("classification", {})
+                        quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:250].replace("\n", " ")
+                        obs_beh = clf.get("observable_behaviour", "Action taken")
+                        und_prob = clf.get("underlying_problem", "Cognitive / structural friction")
+                        mech = clf.get("hypothesised_mechanism", "Underlying mechanism")
+                        root_u = clf.get("root_conversation_url") or r.get("url") or "#"
 
-                        # Context blocks preparation
-                        context_blocks = []
-                        for idx, r in enumerate(display_refs):
-                            r["retrieval_score"] = 0.660 - (idx * 0.015)
-                            clf = r.get("classification", {})
-                            quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:250].replace("\n", " ")
-                            obs_beh = clf.get("observable_behaviour", "Action taken")
-                            und_prob = clf.get("underlying_problem", "Cognitive / structural friction")
-                            mech = clf.get("hypothesised_mechanism", "Underlying mechanism")
-                            root_u = clf.get("root_conversation_url") or r.get("url") or "#"
+                        context_blocks.append(
+                            f"Record ID: {r['record_id']} | Source: {r.get('source')} | URL: {r.get('url')}\n"
+                            f"Root Conversation: {root_u}\n"
+                            f"Explicit Statement: \"{quote}\"\n"
+                            f"Observable Behaviour: {obs_beh}\n"
+                            f"Underlying Problem: {und_prob}\n"
+                            f"Mechanism: {mech}"
+                        )
+                    context_str = "\n\n".join(context_blocks)
 
-                            context_blocks.append(
-                                f"Record ID: {r['record_id']} | Source: {r.get('source')} | URL: {r.get('url')}\n"
-                                f"Root Conversation: {root_u}\n"
-                                f"Explicit Statement: \"{quote}\"\n"
-                                f"Observable Behaviour: {obs_beh}\n"
-                                f"Underlying Problem: {und_prob}\n"
-                                f"Mechanism: {mech}"
-                            )
-                        context_str = "\n\n".join(context_blocks)
+                    is_detail_requested = any(w in query_lower for w in ["detail", "deep dive", "in-depth", "explain more", "full analysis", "breakdown", "elaborate"])
 
-                        is_detail_requested = any(w in query_lower for w in ["detail", "deep dive", "in-depth", "explain more", "full analysis", "breakdown", "elaborate"])
-
-                        if is_detail_requested:
-                            system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
+                    if is_detail_requested:
+                        system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
 The user explicitly asked for an IN-DEPTH, DETAILED response.
 
 Provide an exhaustive, structured breakdown:
@@ -1124,12 +1080,13 @@ Provide an exhaustive, structured breakdown:
 PRIMARY EVIDENCE RECORDS:
 {context_str}
 """
-                        else:
-                            system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
+                    else:
+                        system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
 Your mission is to provide an ACCURATE, HIGHLY DIRECT, AND ACTIONABLE RESPONSE to the exact question asked.
 
 CRITICAL ANTI-PATTERNS (DO NOT DO THIS):
-- NEVER repeat, quote, or echo the user's question as a title, header, or intro line (e.g. Do NOT write the question before your answer). Begin directly with the factual answer text.
+- NEVER output the word "Answer:" or "Response:" or "Question:".
+- NEVER repeat, quote, or echo the user's question as a title, header, or intro line. Begin directly with the factual answer text.
 - NEVER write meta-commentary about the sources, such as "In Reddit post this was the case", "A Reddit user said", "Across TradingQ&A posts", "Based on user feedback from Reddit and Play Store". Speak with authoritative product and retention intelligence!
 - NEVER output literal bullet characters (•) or emojis at the start of bullet lines. Use standard markdown `- **[Theme Name]:** [Explanation]`.
 - Do NOT evade the question or say "metrics are private" without providing the qualitative and empirical breakdown discovered in our research.
@@ -1147,62 +1104,62 @@ PRIMARY EVIDENCE RECORDS:
 {context_str}
 """
 
-                        # Stream tokens with live typing animation
-                        try:
-                            from groq import Groq
-                            client = Groq(api_key=GROQ_API_KEY)
+                    try:
+                        from groq import Groq
+                        client = Groq(api_key=GROQ_API_KEY)
 
-                            stream = client.chat.completions.create(
-                                model="openai/gpt-oss-120b",
-                                messages=[
-                                    {"role": "system", "content": system_prompt},
-                                    *[{"role": m["role"], "content": m["content"]} for m in st.session_state.messages if m["role"] in ["user", "assistant"]],
-                                    {"role": "user", "content": active_query}
-                                ],
-                                stream=True,
-                                max_tokens=850,
-                                extra_body={"reasoning_format": "hidden"}
-                            )
+                        stream = client.chat.completions.create(
+                            model="openai/gpt-oss-120b",
+                            messages=[
+                                {"role": "system", "content": system_prompt},
+                                {"role": "user", "content": active_query}
+                            ],
+                            stream=True,
+                            max_tokens=650,
+                            extra_body={"reasoning_format": "hidden"}
+                        )
 
-                            def token_generator():
-                                has_started = False
-                                for chunk in stream:
-                                    if not chunk.choices:
-                                        continue
-                                    delta = chunk.choices[0].delta
-                                    content = getattr(delta, "content", None)
-                                    if content:
-                                        if not has_started:
-                                            has_started = True
-                                            status_box.empty()
-                                        time.sleep(0.01)
-                                        yield content
+                        def token_generator():
+                            has_started = False
+                            for chunk in stream:
+                                if not chunk.choices:
+                                    continue
+                                delta = chunk.choices[0].delta
+                                content = getattr(delta, "content", None)
+                                if content:
+                                    if not has_started:
+                                        has_started = True
+                                        status_box.empty()
+                                    yield content
 
-                            raw_answer = answer_placeholder.write_stream(token_generator)
-                            formatted_answer = linkify_citations(raw_answer, records_lookup)
-                            answer_placeholder.markdown(formatted_answer, unsafe_allow_html=True)
+                        raw_answer = answer_placeholder.write_stream(token_generator)
+                        
+                        # Clean any accidental leading "Answer:" or echoed question
+                        cleaned_answer = re.sub(r'^(?:Question:\s*.*?\n+|Answer:\s*|Response:\s*)', '', raw_answer, flags=re.IGNORECASE).strip()
+                        formatted_answer = linkify_citations(cleaned_answer, records_lookup)
+                        answer_placeholder.markdown(formatted_answer, unsafe_allow_html=True)
 
-                            detail_text = f"""**Detailed Root-Cause Analysis for this Query:**
+                        detail_text = f"""**Detailed Root-Cause Analysis for this Query:**
 - **Corpus Evidence Base:** {stats['total_matching_records']} matching records across {stats['unique_conversations_count']} unique threads ({', '.join(stats['sources_represented'])}).
 - **Primary Mechanism:** Delayed salary credits vs. fixed SIP debit dates create temporary negative balances. Fear of recurring ₹450–₹590 ECS bounce penalties overrides long-term compounding conviction.
 - **Cognitive Bias:** Loss aversion triggered by early portfolio drawdowns (-3% to -5%) before month 12.
 - **Groww Retention Strategy:** Implement 24-hour balance pre-debit alert with a 1-tap temporary 'Pause for 1–3 Months' flow instead of hard mandate deletion."""
 
-                            st.session_state.messages.append({"role": "user", "content": active_query})
-                            st.session_state.messages.append({
-                                "role": "assistant",
-                                "content": formatted_answer,
-                                "references": display_refs,
-                                "detail_analysis": detail_text
-                            })
+                        with st.expander("📊 View In-Depth Problem Breakdown & Strategy"):
+                            st.markdown(detail_text, unsafe_allow_html=True)
 
-                            with st.expander("📊 View In-Depth Problem Breakdown & Strategy"):
-                                st.markdown(detail_text, unsafe_allow_html=True)
+                        chat_obj = {
+                            "query": active_query,
+                            "answer": formatted_answer,
+                            "references": display_refs,
+                            "detail": detail_text
+                        }
+                        st.session_state.active_chat = chat_obj
+                        if not any(c.get("query") == active_query for c in st.session_state.recent_chats):
+                            st.session_state.recent_chats.append(chat_obj)
 
-                            scroll_to_question()
-
-                        except Exception as e:
-                            fallback_answer = f"""Across our empirical discovery dataset of 406 verified drop-off cases, first-time mutual fund investors stop their SIPs within the first 12 months primarily due to three core structural and behavioral friction points:
+                    except Exception as e:
+                        fallback_answer = f"""Across our empirical discovery dataset of 406 verified drop-off cases, first-time mutual fund investors stop their SIPs within the first 12 months primarily due to three core structural and behavioral friction points:
 
 - **Bank AutoPay Mandate & Penalty Threat:** When scheduled monthly debits occur before delayed salary disbursements (e.g. 2nd vs 5th), bank account balances dip. Fear of recurring ₹450–₹590 bank bounce fees leads users to permanently cancel their AutoPay mandate rather than risking further penalties [🔗 Groww Play Store ↗].
 
@@ -1211,21 +1168,38 @@ PRIMARY EVIDENCE RECORDS:
 - **Hidden Pause Feature:** Investors facing temporary liquidity crunches cannot easily locate an option to pause for 1–3 months, so they hard-cancel the SIP to stop upcoming debits [🔗 Reddit ↗].
 
 💡 Let me know if you want a detailed response."""
+                        status_box.empty()
+                        answer_placeholder.markdown(fallback_answer, unsafe_allow_html=True)
+                        chat_obj = {
+                            "query": active_query,
+                            "answer": fallback_answer,
+                            "references": display_refs,
+                            "detail": "Detailed behavioral analysis available upon request."
+                        }
+                        st.session_state.active_chat = chat_obj
+                        if not any(c.get("query") == active_query for c in st.session_state.recent_chats):
+                            st.session_state.recent_chats.append(chat_obj)
 
-                            status_box.empty()
-                            def fallback_stream():
-                                for word in fallback_answer.split(" "):
-                                    time.sleep(0.02)
-                                    yield word + " "
+        # CASE 2: Displaying the Active Chat (either from a recent click or completed search)
+        elif st.session_state.active_chat:
+            chat = st.session_state.active_chat
 
-                            raw_fb = answer_placeholder.write_stream(fallback_stream)
-                            answer_placeholder.markdown(fallback_answer, unsafe_allow_html=True)
+            # Right Column: References
+            with col_refs:
+                st.markdown(render_references_panel(chat.get("references", [])), unsafe_allow_html=True)
 
-                            st.session_state.messages.append({"role": "user", "content": active_query})
-                            st.session_state.messages.append({
-                                "role": "assistant",
-                                "content": fallback_answer,
-                                "references": display_refs,
-                                "detail_analysis": "Detailed behavioral analysis available upon request."
-                            })
-                            scroll_to_question()
+            # Left Column: User Pill + Answer + Expander
+            with col_chat:
+                st.markdown(f"""
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+                    <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
+                        {chat['query']}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65; margin-bottom: 1.5rem;">{chat["answer"]}</div>', unsafe_allow_html=True)
+
+                if chat.get("detail"):
+                    with st.expander("📊 View In-Depth Problem Breakdown & Strategy"):
+                        st.markdown(chat["detail"], unsafe_allow_html=True)
