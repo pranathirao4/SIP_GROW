@@ -12,6 +12,8 @@ import json
 import re
 from pathlib import Path
 import streamlit as st
+import threading
+from groq import Groq
 import streamlit.components.v1 as components
 from dotenv import load_dotenv
 from src.pipeline.retriever import SIPRetriever
@@ -24,6 +26,33 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not GROQ_API_KEY and hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+
+# Pre-cache Groq Client Singleton
+@st.cache_resource
+def get_groq_client():
+    if not GROQ_API_KEY:
+        return None
+    try:
+        return Groq(api_key=GROQ_API_KEY)
+    except Exception:
+        return None
+
+groq_client = get_groq_client()
+
+def _prewarm_groq():
+    try:
+        if groq_client:
+            groq_client.chat.completions.create(
+                model="openai/gpt-oss-120b",
+                messages=[{"role": "user", "content": "ping"}],
+                max_tokens=1
+            )
+    except Exception:
+        pass
+
+if "groq_prewarmed" not in st.session_state:
+    st.session_state.groq_prewarmed = True
+    threading.Thread(target=_prewarm_groq, daemon=True).start()
 
 # Page configuration
 st.set_page_config(
@@ -688,6 +717,19 @@ def inject_input_scroll_listener():
                 doc.head.appendChild(s);
             }
 
+            function hideHeroInstant() {
+                try {
+                    const heroTitle = doc.querySelector('.engine-hero-title');
+                    const heroSub = doc.querySelector('.engine-hero-subtitle');
+                    const chipBtns = doc.querySelectorAll('.prompt-chip-btn');
+                    const heroRef = doc.getElementById('hero-ref-holder');
+                    if (heroTitle) heroTitle.style.display = 'none';
+                    if (heroSub) heroSub.style.display = 'none';
+                    chipBtns.forEach(c => { c.style.display = 'none'; });
+                    if (heroRef) heroRef.style.display = 'none';
+                } catch(e) {}
+            }
+
             const chatInput = doc.querySelector('[data-testid="stChatInput"]');
             if (chatInput) {
                 const textarea = chatInput.querySelector('textarea');
@@ -697,6 +739,7 @@ def inject_input_scroll_listener():
                     textarea.dataset.hasScrollListener = "true";
                     textarea.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter' && !e.shiftKey) {
+                            hideHeroInstant();
                             triggerActiveSnap();
                         }
                     });
@@ -704,6 +747,7 @@ def inject_input_scroll_listener():
                 if (sendBtn && !sendBtn.dataset.hasScrollListener) {
                     sendBtn.dataset.hasScrollListener = "true";
                     sendBtn.addEventListener('click', function() {
+                        hideHeroInstant();
                         triggerActiveSnap();
                     });
                 }
@@ -714,7 +758,10 @@ def inject_input_scroll_listener():
             chipButtons.forEach(btn => {
                 if (!btn.dataset.hasSnapListener) {
                     btn.dataset.hasSnapListener = "true";
-                    btn.addEventListener('click', triggerActiveSnap);
+                    btn.addEventListener('click', function() {
+                        hideHeroInstant();
+                        triggerActiveSnap();
+                    });
                 }
             });
         }
@@ -942,10 +989,16 @@ else:
     # Sticky bottom chat input bar (pinned at viewport bottom by Streamlit)
     chat_input_val = st.chat_input("Ask about Groww SIP reviews...")
 
+    def select_prompt_chip(q):
+        st.session_state.active_prompt_query = q
+
     # Determine Active Query (from input bar or prompt chip / recent click)
     active_query = None
     if chat_input_val and chat_input_val.strip():
         active_query = chat_input_val.strip()
+    elif st.session_state.get("active_prompt_query"):
+        active_query = st.session_state.active_prompt_query
+        st.session_state.active_prompt_query = None
     elif st.session_state.get("input_query"):
         active_query = st.session_state.input_query
         st.session_state.input_query = ""
@@ -954,7 +1007,7 @@ else:
     if not st.session_state.messages and not active_query:
         # Top-right "References >" placeholder pill (Pic 1)
         st.markdown("""
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+        <div id="hero-ref-holder" style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
             <div style="background: #FFFFFF; border: 1px solid #DADCE0; border-radius: 12px; padding: 6px 14px; font-size: 13.5px; font-weight: 500; color: #3C4043; cursor: default;">
                 References &nbsp; &gt;
             </div>
@@ -972,15 +1025,24 @@ else:
         col_c1, col_c2 = st.columns([1, 1])
         with col_c1:
             st.markdown('<div class="prompt-chip-btn">', unsafe_allow_html=True)
-            if st.button("Why do first-time investors stop their SIPs?", key="btn_chip_p1"):
-                st.session_state.input_query = "Why do first-time investors stop their SIPs?"
-                st.rerun()
-            if st.button("Do users say auto-pay causes bank penalties?", key="btn_chip_p2"):
-                st.session_state.input_query = "Do users say auto-pay causes bank penalties?"
-                st.rerun()
-            if st.button("What changes after starting a SIP?", key="btn_chip_p3"):
-                st.session_state.input_query = "What changes after starting a SIP?"
-                st.rerun()
+            st.button(
+                "Why do first-time investors stop their SIPs?",
+                key="btn_chip_p1",
+                on_click=select_prompt_chip,
+                args=("Why do first-time investors stop their SIPs?",)
+            )
+            st.button(
+                "Do users say auto-pay causes bank penalties?",
+                key="btn_chip_p2",
+                on_click=select_prompt_chip,
+                args=("Do users say auto-pay causes bank penalties?",)
+            )
+            st.button(
+                "What changes after starting a SIP?",
+                key="btn_chip_p3",
+                on_click=select_prompt_chip,
+                args=("What changes after starting a SIP?",)
+            )
             st.markdown('</div>', unsafe_allow_html=True)
 
     else:
@@ -1151,8 +1213,7 @@ PRIMARY EVIDENCE RECORDS:
 """
 
                     try:
-                        from groq import Groq
-                        client = Groq(api_key=GROQ_API_KEY)
+                        client = groq_client or Groq(api_key=GROQ_API_KEY)
 
                         stream = client.chat.completions.create(
                             model="openai/gpt-oss-120b",
