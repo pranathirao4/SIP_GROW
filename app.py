@@ -696,10 +696,15 @@ def scroll_to_question():
                 const doc = window.parent.document;
                 if (!doc) return;
                 
-                const containers = getScrollContainers(doc);
-                for (const c of containers) {
-                    if (c.scrollHeight > c.clientHeight) {
-                        c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
+                const qElem = doc.getElementById('latest-user-question');
+                if (qElem) {
+                    qElem.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+                } else {
+                    const containers = getScrollContainers(doc);
+                    for (const c of containers) {
+                        if (c.scrollHeight > c.clientHeight) {
+                            c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
+                        }
                     }
                 }
             } catch (err) {
@@ -722,10 +727,11 @@ def scroll_to_question():
             }
         }, 50);
 
-        // Release lock immediately if user scrolls up to read past history
+        // Release lock only if user deliberately scrolls up after 800ms grace period
+        const startTime = Date.now();
         if (window.parent) {
             window.parent.addEventListener('wheel', function(e) {
-                if (e.deltaY < 0) {
+                if (e.deltaY < 0 && (Date.now() - startTime > 800)) {
                     clearInterval(timer);
                 }
             }, { passive: true });
@@ -770,11 +776,18 @@ def inject_input_scroll_listener():
         }
 
         let globalSnapInterval = null;
+        let snapStartTime = 0;
 
         function triggerActiveSnap() {
             if (globalSnapInterval) clearInterval(globalSnapInterval);
+            snapStartTime = Date.now();
 
             function doSnap() {
+                const qElem = doc.getElementById('latest-user-question');
+                if (qElem) {
+                    qElem.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+                    return;
+                }
                 const containers = getScrollContainers();
                 for (const c of containers) {
                     if (c.scrollHeight > c.clientHeight) {
@@ -795,10 +808,10 @@ def inject_input_scroll_listener():
             }, 50);
         }
 
-        // Wheel interrupt on scroll up
+        // Wheel interrupt on scroll up with 800ms grace period so past inertia doesn't kill scroll
         if (window.parent) {
             window.parent.addEventListener('wheel', function(e) {
-                if (e.deltaY < 0 && globalSnapInterval) {
+                if (e.deltaY < 0 && globalSnapInterval && (Date.now() - snapStartTime > 800)) {
                     clearInterval(globalSnapInterval);
                     globalSnapInterval = null;
                 }
@@ -1203,12 +1216,13 @@ else:
             if active_query:
                 # Render newly asked question pill at the bottom
                 st.markdown(f"""
-                <div id="latest-user-question" style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem; margin-top: 1rem;">
+                <div id="latest-user-question" style="scroll-margin-top: 28px; display: flex; justify-content: flex-end; margin-bottom: 1.5rem; margin-top: 1rem;">
                     <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
                         {active_query}
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
+                scroll_to_question()
 
         # -------------------------
         # Right Column: References Card
