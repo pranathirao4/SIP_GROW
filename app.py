@@ -603,6 +603,92 @@ def linkify_citations(text: str, records_map: dict) -> str:
     return re.sub(r'\[?REC[\-\u2010\u2011\u2012\u2013\u2014]\d{5}\]?', repl, text)
 
 
+# ------------------------------------------------------------------
+# Scope & Guardrail Definitions
+# ------------------------------------------------------------------
+EXPLICIT_OFF_TOPIC_TERMS = {
+    # Politics & Political Leaders
+    "modi", "narendra modi", "rahul gandhi", "bjp", "congress", "aap", "election", "elections",
+    "politics", "political", "government", "parliament", "minister", "prime minister", "president",
+    "chief minister", "mla", "mp", "lok sabha", "rajya sabha", "trump", "biden", "putin", "politician",
+    # Sports & Games
+    "cricket", "cricketer", "virat", "rohit", "dhoni", "ipl", "bcci", "football", "messi", "ronaldo",
+    "fifa", "tennis", "badminton", "olympics", "world cup", "match", "score",
+    # Cinema & Entertainment
+    "movie", "movies", "cinema", "film", "films", "actor", "actress", "bollywood", "hollywood",
+    "song", "songs", "music", "lyrics", "singer", "singers", "celebrity", "drama", "series", "netflix",
+    # Weather & Nature
+    "weather", "temperature", "rain", "monsoon", "forecast", "climate", "cyclone",
+    # Food & Lifestyle
+    "recipe", "recipes", "cook", "cooking", "food", "dish", "restaurant", "hotel", "flight",
+    # General Trivia & Academics
+    "capital of", "who is", "who was", "who won", "who invented", "history of", "geography of",
+    "horoscope", "astrology", "zodiac", "joke", "jokes", "riddle", "riddles", "poem", "poems",
+    "essay", "homework", "python code", "javascript code", "write code", "debug code", "calculator"
+}
+
+DOMAIN_ANCHOR_TERMS = {
+    "sip", "sips", "groww", "invest", "investor", "investors", "investing", "investment", "investments",
+    "mutual", "fund", "funds", "autopay", "auto-pay", "mandate", "mandates", "nach", "otm", "bank", "banks",
+    "banking", "penalty", "penalties", "bounce", "bounced", "charge", "charges", "fee", "fees",
+    "pause", "paused", "pausing", "stop", "stopped", "stopping", "cancel", "cancelled", "cancelling",
+    "cancellation", "drop", "drop-off", "dropoff", "retention", "retain", "churn", "churning",
+    "drawdown", "drawdowns", "loss", "losses", "profit", "profits", "return", "returns", "market",
+    "nifty", "sensex", "equity", "debt", "elss", "index", "amc", "amcs", "zerodha", "coin", "kuvera",
+    "etmoney", "cams", "kfintech", "mf central", "portfolio", "portfolios", "redeem", "redeeming",
+    "redemption", "withdraw", "withdrawing", "withdrawal", "salary", "money", "rupee", "rupees",
+    "review", "reviews", "rating", "ratings", "play store", "reddit", "app", "ui", "ux", "onboarding",
+    "kyc", "pan", "account", "debit", "debits", "debited", "credit", "credited", "volatility",
+    "panic", "risk", "behavior", "behaviour", "first-time", "beginner", "beginners", "step-up",
+    "lumpsum", "installment", "installments", "tradingqna", "pay", "payment", "payments", "failure",
+    "failures", "ecs", "upi", "direct plan", "regular plan", "expense ratio", "exit load", "nav",
+    "folio", "statement", "compounding", "wealth", "asset", "allocation", "corpus", "goal", "saving", "savings"
+}
+
+GREETING_TERMS = {
+    "hi", "hello", "hey", "greetings", "good morning", "good afternoon", "good evening",
+    "who are you", "what are you", "what can you do", "help", "start", "introduce"
+}
+
+def classify_query_intent(query: str) -> str:
+    """
+    Classifies a user query into:
+      - 'greeting': General conversational intro
+      - 'in_scope': Legitimate mutual fund / SIP / Groww / retention query
+      - 'out_of_scope': Non-domain query (e.g., politics, sports, general knowledge)
+    """
+    if not query:
+        return "out_of_scope"
+    q_clean = query.lower().strip().rstrip('?!.,')
+    
+    # 1. Check greetings
+    if q_clean in GREETING_TERMS or any(q_clean.startswith(g + " ") for g in ["hi", "hello", "hey"]):
+        return "greeting"
+
+    # 2. Check explicit off-topic blacklist
+    for term in EXPLICIT_OFF_TOPIC_TERMS:
+        if re.search(r'\b' + re.escape(term) + r'\b', q_clean):
+            return "out_of_scope"
+
+    # 3. Check domain anchor presence
+    tokens = set(re.findall(r'\b[a-z0-9\-]+\b', q_clean))
+    for t in tokens:
+        if t in DOMAIN_ANCHOR_TERMS:
+            return "in_scope"
+
+    # 4. Check domain phrases
+    domain_phrases = [
+        "mutual fund", "play store", "auto pay", "bank debit", "drop off",
+        "direct plan", "regular plan", "exit load", "expense ratio", "trading qna"
+    ]
+    for phrase in domain_phrases:
+        if phrase in q_clean:
+            return "in_scope"
+
+    # Any query with zero domain connection is out of scope
+    return "out_of_scope"
+
+
 def scroll_to_question():
     """Instantly snaps the browser down to the newly entered question, removing the upper section from view."""
     js = """
@@ -1091,11 +1177,16 @@ else:
         # Determine references to display on the right panel
         display_refs = []
         stats = {"total_matching_records": 406, "unique_conversations_count": 80, "sources_represented": ["Reddit", "Groww Play Store", "TradingQ&A"]}
+        active_intent = "in_scope"
         if active_query:
-            # Immediate retrieval (0.001s) to populate references card
-            retrieval_res = retriever.retrieve_with_evidence_stats(active_query, top_k=6)
-            display_refs = retrieval_res["primary_matches"]
-            stats = retrieval_res["stats"]
+            active_intent = classify_query_intent(active_query)
+            if active_intent == "in_scope":
+                # Immediate retrieval (0.001s) to populate references card
+                retrieval_res = retriever.retrieve_with_evidence_stats(active_query, top_k=6)
+                display_refs = retrieval_res["primary_matches"]
+                stats = retrieval_res["stats"]
+            else:
+                display_refs = []
         else:
             # Get latest assistant references from messages history
             for m in reversed(st.session_state.messages):
@@ -1146,15 +1237,46 @@ else:
         with col_chat:
             if active_query:
 
-                query_lower = active_query.lower()
-                off_topic_keywords = [
-                    "cricket", "cricketer", "virat", "dhoni", "ipl", "football", "messi", "ronaldo",
-                    "birthday", "weather", "recipe", "cinema", "bollywood", "hollywood", "actor", "actress",
-                    "prime minister", "president", "capital of", "who wrote", "song", "movie", "horoscope"
-                ]
+                if active_intent == "greeting":
+                    greeting_reply = """Hello! I am the **Groww SIP Review Discovery Engine**, developed by Groww Research Lab.
 
-                if any(k in query_lower for k in off_topic_keywords):
-                    out_of_scope_reply = "This is out of scope. I am the Groww SIP Review Discovery Engine and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandates, and retail investor behavior."
+I analyze empirical feedback from 406 verified retail investor discussions across Reddit, Google Play Store, YouTube, and TradingQ&A to help discover why investors stay with their mutual fund SIPs — or stop within 12 months.
+
+**Explore key retention topics with me:**
+- *Why do first-time investors stop their SIPs within 12 months?*
+- *Do users report that AutoPay causes unexpected bank penalties?*
+- *How does salary delay (e.g. 5th vs 2nd) impact SIP active rates?*
+- *What friction do users experience when trying to pause rather than cancel a SIP?*
+
+💡 Let me know what you would like to explore!"""
+                    st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65; margin-bottom: 1.25rem;">{greeting_reply}</div>', unsafe_allow_html=True)
+                    st.session_state.messages.append({"role": "user", "content": active_query})
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": greeting_reply,
+                        "references": [],
+                        "detail": ""
+                    })
+                    if not st.session_state.current_chat_id:
+                        st.session_state.current_chat_id = str(int(time.time() * 1000))
+                    found = False
+                    for c in st.session_state.recent_chats:
+                        if c.get("id") == st.session_state.current_chat_id:
+                            c["messages"] = list(st.session_state.messages)
+                            found = True
+                            break
+                    if not found:
+                        st.session_state.recent_chats.append({
+                            "id": st.session_state.current_chat_id,
+                            "title": active_query,
+                            "messages": list(st.session_state.messages)
+                        })
+                    scroll_to_question()
+
+                elif active_intent == "out_of_scope":
+                    out_of_scope_reply = """This question is out of scope. I am the **Groww SIP Review Discovery Engine** and specialize exclusively in mutual fund SIP retention, drop-off causes, auto-pay/mandate friction, and retail investor behavior.
+
+Please ask a question related to Groww mutual funds, SIP retention, pause/cancellation behavior, or investor reviews."""
                     st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65; margin-bottom: 1.25rem;">{out_of_scope_reply}</div>', unsafe_allow_html=True)
                     st.session_state.messages.append({"role": "user", "content": active_query})
                     st.session_state.messages.append({
@@ -1177,6 +1299,8 @@ else:
                             "title": active_query,
                             "messages": list(st.session_state.messages)
                         })
+                    scroll_to_question()
+
                 else:
                     # Render Reviewing Responses animation box
                     status_box = st.empty()
@@ -1237,6 +1361,11 @@ PRIMARY EVIDENCE RECORDS:
                     else:
                         system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
 Your mission is to provide an ACCURATE, HIGHLY DIRECT, AND ACTIONABLE RESPONSE to the exact question asked.
+
+STRICT DOMAIN SCOPE:
+You are EXCLUSIVELY the Groww SIP Review & Retention Discovery Agent. You may ONLY answer questions regarding mutual funds, SIPs, Groww app features, AutoPay/bank mandates, retention/churn drivers, and retail investor behavior.
+If the question is NOT about mutual funds, SIPs, Groww, investment drop-offs, or mandate friction, decline immediately with:
+"This question is out of scope. I am the Groww SIP Review Discovery Engine and specialize exclusively in mutual fund SIP retention, drop-off causes, auto-pay/mandate friction, and retail investor behavior. Please ask a question related to Groww SIP reviews and retention."
 
 CRITICAL ANTI-PATTERNS (DO NOT DO THIS):
 - NEVER output the word "Answer:" or "Response:" or "Question:".
