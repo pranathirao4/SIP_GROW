@@ -613,14 +613,14 @@ EXPLICIT_OFF_TOPIC_TERMS = {
     "chief minister", "mla", "mp", "lok sabha", "rajya sabha", "trump", "biden", "putin", "politician",
     # Sports & Games
     "cricket", "cricketer", "virat", "rohit", "dhoni", "ipl", "bcci", "football", "messi", "ronaldo",
-    "fifa", "tennis", "badminton", "olympics", "world cup", "match", "score",
+    "fifa", "tennis", "badminton", "olympics", "world cup", "match", "score", "sport", "sports", "fav sport", "favorite sport",
     # Cinema & Entertainment
     "movie", "movies", "cinema", "film", "films", "actor", "actress", "bollywood", "hollywood",
     "song", "songs", "music", "lyrics", "singer", "singers", "celebrity", "drama", "series", "netflix",
     # Weather & Nature
     "weather", "temperature", "rain", "monsoon", "forecast", "climate", "cyclone",
     # Food & Lifestyle
-    "recipe", "recipes", "cook", "cooking", "food", "dish", "restaurant", "hotel", "flight",
+    "recipe", "recipes", "cook", "cooking", "food", "dish", "restaurant", "restaurants", "hotel", "flight",
     # General Trivia & Academics
     "capital of", "who is", "who was", "who won", "who invented", "history of", "geography of",
     "horoscope", "astrology", "zodiac", "joke", "jokes", "riddle", "riddles", "poem", "poems",
@@ -654,39 +654,24 @@ def classify_query_intent(query: str) -> str:
     """
     Classifies a user query into:
       - 'greeting': General conversational intro
-      - 'in_scope': Legitimate mutual fund / SIP / Groww / retention query
-      - 'out_of_scope': Non-domain query (e.g., politics, sports, general knowledge)
+      - 'out_of_scope': Explicit off-topic query (e.g., prime minister, cricket, fav sport, restaurant)
+      - 'in_scope': All SIP, Groww, mutual fund, and investing retention queries
     """
     if not query:
         return "out_of_scope"
     q_clean = query.lower().strip().rstrip('?!.,')
     
     # 1. Check greetings
-    if q_clean in GREETING_TERMS or any(q_clean.startswith(g + " ") for g in ["hi", "hello", "hey"]):
+    if q_clean in GREETING_TERMS or any(q_clean == g or q_clean.startswith(g + " ") for g in ["hi", "hello", "hey"]):
         return "greeting"
 
-    # 2. Check explicit off-topic blacklist
+    # 2. Check explicit off-topic blacklist (prime minister, cricket, sports, restaurants, etc.)
     for term in EXPLICIT_OFF_TOPIC_TERMS:
         if re.search(r'\b' + re.escape(term) + r'\b', q_clean):
             return "out_of_scope"
 
-    # 3. Check domain anchor presence
-    tokens = set(re.findall(r'\b[a-z0-9\-]+\b', q_clean))
-    for t in tokens:
-        if t in DOMAIN_ANCHOR_TERMS:
-            return "in_scope"
-
-    # 4. Check domain phrases
-    domain_phrases = [
-        "mutual fund", "play store", "auto pay", "bank debit", "drop off",
-        "direct plan", "regular plan", "exit load", "expense ratio", "trading qna"
-    ]
-    for phrase in domain_phrases:
-        if phrase in q_clean:
-            return "in_scope"
-
-    # Any query with zero domain connection is out of scope
-    return "out_of_scope"
+    # 3. Everything else is in scope for the Groww SIP Discovery Engine
+    return "in_scope"
 
 
 def scroll_to_question():
@@ -1236,6 +1221,7 @@ else:
         # -------------------------
         with col_chat:
             if active_query:
+                query_lower = active_query.lower()
 
                 if active_intent == "greeting":
                     greeting_reply = """Hello! I am the **Groww SIP Review Discovery Engine**, developed by Groww Research Lab.
