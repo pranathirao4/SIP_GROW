@@ -56,8 +56,8 @@ if "groq_prewarmed" not in st.session_state:
 
 # Page configuration
 st.set_page_config(
-    page_title="SIP Review Engine - Groww Research Lab",
-    page_icon="https://assets-netstorage.groww.in/web-assets/big_logo.png",
+    page_title="SIP Insight - Groww Research Lab",
+    page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -126,24 +126,45 @@ st.markdown("""
         padding-right: 0.85rem !important;
     }
     
-    /* Sidebar Brand Header */
+    /* Sidebar Brand Header (Matching Picture 1) */
     .brand-header {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         padding: 0.5rem 0.5rem 1.25rem 0.5rem;
     }
-    .brand-logo-pinwheel {
-        width: 30px;
-        height: 30px;
-        object-fit: contain;
+    .brand-icon-box {
+        width: 36px;
+        height: 36px;
+        background-color: #E6F8F0;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .brand-text-col {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     .brand-title-text {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 16px;
+        font-size: 16.5px;
         font-weight: 700;
-        color: #202124;
-        letter-spacing: -0.01em;
+        color: #111827;
+        letter-spacing: -0.015em;
+        line-height: 1.2;
+    }
+    .brand-subtitle-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 9.5px;
+        font-weight: 700;
+        color: #4B5563;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        line-height: 1.2;
+        margin-top: 2px;
     }
     
     /* Sidebar Navigation Buttons */
@@ -861,11 +882,19 @@ if "input_query" not in st.session_state:
 # Sidebar (Matching Google Photos Review Engine Pic 1, 2, 3, 4)
 # ------------------------------------------------------------------
 with st.sidebar:
-    # App Logo & Title
+    # App Logo & Title (Matching Picture 1: SIP Insight | GROWW RESEARCH LAB)
     st.markdown("""
     <div class="brand-header">
-        <img class="brand-logo-pinwheel" src="https://assets-netstorage.groww.in/web-assets/big_logo.png" alt="SIP Logo" />
-        <span class="brand-title-text">SIP Review Engine</span>
+        <div class="brand-icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00D09C" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+        </div>
+        <div class="brand-text-col">
+            <span class="brand-title-text">SIP Insight</span>
+            <span class="brand-subtitle-text">GROWW RESEARCH LAB</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
