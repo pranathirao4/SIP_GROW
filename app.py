@@ -562,16 +562,8 @@ def scroll_to_question():
 
                 if (qElem) {
                     try {
-                        qElem.scrollIntoView({ behavior: 'instant', block: 'start' });
+                        qElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     } catch (e) {}
-
-                    const rect = qElem.getBoundingClientRect();
-                    // Instantly shift scroll containers so question is pinned at top (70px margin)
-                    for (const c of containers) {
-                        if (c.scrollHeight > c.clientHeight) {
-                            c.scrollTop += (rect.top - 70);
-                        }
-                    }
                 } else {
                     for (const c of containers) {
                         if (c.scrollHeight > c.clientHeight) {
@@ -584,30 +576,28 @@ def scroll_to_question():
             }
         }
         
-        // Snap immediately across multiple animation frames and timeouts
         snapToQuestion();
         requestAnimationFrame(snapToQuestion);
-        setTimeout(snapToQuestion, 25);
-        setTimeout(snapToQuestion, 60);
-        setTimeout(snapToQuestion, 120);
-        setTimeout(snapToQuestion, 250);
-        setTimeout(snapToQuestion, 500);
+        setTimeout(snapToQuestion, 30);
+        setTimeout(snapToQuestion, 80);
+        setTimeout(snapToQuestion, 200);
 
-        // Keep view pinned firmly during active token streaming
         let pollCount = 0;
         let timer = setInterval(function() {
             snapToQuestion();
             pollCount++;
-            if (pollCount > 100) { // 100 * 60ms = 6 seconds
+            if (pollCount > 35) { // 35 * 50ms = 1.75s
                 clearInterval(timer);
             }
-        }, 60);
+        }, 50);
 
-        // Release lock if user manually touches scroll wheel
+        // Release lock immediately if user scrolls up to read past history
         if (window.parent) {
-            window.parent.addEventListener('wheel', function() {
-                clearInterval(timer);
-            }, { passive: true, once: true });
+            window.parent.addEventListener('wheel', function(e) {
+                if (e.deltaY < 0) {
+                    clearInterval(timer);
+                }
+            }, { passive: true });
         }
     })();
     </script>
@@ -643,7 +633,9 @@ def inject_input_scroll_listener():
             function doSnap() {
                 const containers = getScrollContainers();
                 for (const c of containers) {
-                    c.scrollTop = 0;
+                    if (c.scrollHeight > c.clientHeight) {
+                        c.scrollTop = c.scrollHeight;
+                    }
                 }
             }
 
@@ -652,17 +644,17 @@ def inject_input_scroll_listener():
             globalSnapInterval = setInterval(function() {
                 doSnap();
                 count++;
-                if (count > 120) { // 120 * 50ms = 6s
+                if (count > 40) { // 40 * 50ms = 2s
                     clearInterval(globalSnapInterval);
                     globalSnapInterval = null;
                 }
             }, 50);
         }
 
-        // Wheel interrupt
+        // Wheel interrupt on scroll up
         if (window.parent) {
-            window.parent.addEventListener('wheel', function() {
-                if (globalSnapInterval) {
+            window.parent.addEventListener('wheel', function(e) {
+                if (e.deltaY < 0 && globalSnapInterval) {
                     clearInterval(globalSnapInterval);
                     globalSnapInterval = null;
                 }
@@ -810,8 +802,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "recent_chats" not in st.session_state:
     st.session_state.recent_chats = []
-if "active_chat" not in st.session_state:
-    st.session_state.active_chat = None
+if "current_chat_id" not in st.session_state:
+    st.session_state.current_chat_id = None
 if "current_view" not in st.session_state:
     st.session_state.current_view = "new_chat"
 if "input_query" not in st.session_state:
@@ -833,7 +825,8 @@ with st.sidebar:
     # Nav Item 1: New Chat (Tooltip: "Start a fresh conversation.")
     if st.button("✏️  New chat", key="nav_btn_new_chat", help="Start a fresh conversation."):
         st.session_state.messages = []
-        st.session_state.active_chat = None
+        st.session_state.current_chat_id = None
+        st.session_state.input_query = ""
         st.session_state.current_view = "new_chat"
         st.rerun()
 
@@ -863,11 +856,22 @@ with st.sidebar:
         st.markdown('<div class="recent-empty-text">Chats you start show up here.</div>', unsafe_allow_html=True)
     else:
         for idx, chat in enumerate(reversed(st.session_state.recent_chats[-8:])):
-            q_text = chat["query"] if isinstance(chat, dict) else str(chat)
+            if isinstance(chat, dict):
+                q_text = chat.get("title") or chat.get("query") or "Chat"
+            else:
+                q_text = str(chat)
             display_title = q_text[:26] + "..." if len(q_text) > 26 else q_text
             if st.button(display_title, key=f"recent_chat_{idx}", help=q_text):
                 if isinstance(chat, dict):
-                    st.session_state.active_chat = chat
+                    if "messages" in chat:
+                        st.session_state.messages = list(chat["messages"])
+                        st.session_state.current_chat_id = chat.get("id")
+                    elif "query" in chat and "answer" in chat:
+                        st.session_state.messages = [
+                            {"role": "user", "content": chat["query"]},
+                            {"role": "assistant", "content": chat["answer"], "references": chat.get("references", []), "detail": chat.get("detail", "")}
+                        ]
+                        st.session_state.current_chat_id = chat.get("id")
                 else:
                     st.session_state.input_query = q_text
                 st.session_state.current_view = "new_chat"
@@ -947,7 +951,7 @@ else:
         st.session_state.input_query = ""
 
     # Check if this is an empty chat state (Pic 1)
-    if not st.session_state.active_chat and not active_query:
+    if not st.session_state.messages and not active_query:
         # Top-right "References >" placeholder pill (Pic 1)
         st.markdown("""
         <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
@@ -983,22 +987,52 @@ else:
         # Active Chat Screen (Two-Column Layout: Chat on Left, References on Right - Pic 4)
         col_chat, col_refs = st.columns([7.2, 2.8], gap="large")
 
-        # CASE 1: Processing a Newly Submitted Query
+        # Determine references to display on the right panel
+        display_refs = []
+        stats = {"total_matching_records": 406, "unique_conversations_count": 80, "sources_represented": ["Reddit", "Groww Play Store", "TradingQ&A"]}
         if active_query:
-            # Immediate retrieval (0.001s)
+            # Immediate retrieval (0.001s) to populate references card
             retrieval_res = retriever.retrieve_with_evidence_stats(active_query, top_k=6)
             display_refs = retrieval_res["primary_matches"]
             stats = retrieval_res["stats"]
+        else:
+            # Get latest assistant references from messages history
+            for m in reversed(st.session_state.messages):
+                if m.get("role") == "assistant" and m.get("references"):
+                    display_refs = m["references"]
+                    break
 
-            # Right Column: References Card (Populated instantly)
-            with col_refs:
-                st.markdown(render_references_panel(display_refs), unsafe_allow_html=True)
+        # -------------------------
+        # Right Column: References Card
+        # -------------------------
+        with col_refs:
+            st.markdown(render_references_panel(display_refs), unsafe_allow_html=True)
 
-            # Left Column: Chat Area
-            with col_chat:
-                # 1. Render User Question Pill on Top Right (Pic 2 & Pic 4)
+        # -------------------------
+        # Left Column: Chat Area (Full Conversational Multi-turn History)
+        # -------------------------
+        with col_chat:
+            # 1. Render all past messages in this ongoing conversation (scrollable history)
+            for idx, msg in enumerate(st.session_state.messages):
+                if msg["role"] == "user":
+                    st.markdown(f"""
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem; margin-top: 1rem;">
+                        <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
+                            {msg['content']}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65; margin-bottom: 1.25rem;">{msg["content"]}</div>', unsafe_allow_html=True)
+                    if msg.get("detail"):
+                        with st.expander("📊 View In-Depth Problem Breakdown & Strategy", key=f"hist_exp_{idx}"):
+                            st.markdown(msg["detail"], unsafe_allow_html=True)
+
+            # 2. Process active query (new conversational turn)
+            if active_query:
+                # Render newly asked question pill at the bottom
                 st.markdown(f"""
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+                <div id="latest-user-question" style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem; margin-top: 1rem;">
                     <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
                         {active_query}
                     </div>
@@ -1014,18 +1048,30 @@ else:
 
                 if any(k in query_lower for k in off_topic_keywords):
                     out_of_scope_reply = "This is out of scope. I am the Groww SIP Review Discovery Engine and can only assist with questions regarding Groww mutual fund SIP retention, drop-off causes, auto-pay/mandates, and retail investor behavior."
-                    st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65;">{out_of_scope_reply}</div>', unsafe_allow_html=True)
-                    chat_obj = {
-                        "query": active_query,
-                        "answer": out_of_scope_reply,
+                    st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65; margin-bottom: 1.25rem;">{out_of_scope_reply}</div>', unsafe_allow_html=True)
+                    st.session_state.messages.append({"role": "user", "content": active_query})
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": out_of_scope_reply,
                         "references": [],
                         "detail": ""
-                    }
-                    st.session_state.active_chat = chat_obj
-                    if not any(c.get("query") == active_query for c in st.session_state.recent_chats):
-                        st.session_state.recent_chats.append(chat_obj)
+                    })
+                    if not st.session_state.current_chat_id:
+                        st.session_state.current_chat_id = str(int(time.time() * 1000))
+                    found = False
+                    for c in st.session_state.recent_chats:
+                        if c.get("id") == st.session_state.current_chat_id:
+                            c["messages"] = list(st.session_state.messages)
+                            found = True
+                            break
+                    if not found:
+                        st.session_state.recent_chats.append({
+                            "id": st.session_state.current_chat_id,
+                            "title": active_query,
+                            "messages": list(st.session_state.messages)
+                        })
                 else:
-                    # 2. Render Reviewing Responses Animation Box (Pic 3)
+                    # Render Reviewing Responses animation box
                     status_box = st.empty()
                     status_box.markdown("""
                     <div class="reviewing-responses-box">
@@ -1133,7 +1179,7 @@ PRIMARY EVIDENCE RECORDS:
                                     yield content
 
                         raw_answer = answer_placeholder.write_stream(token_generator)
-                        
+
                         # Clean any accidental leading "Answer:" or echoed question
                         cleaned_answer = re.sub(r'^(?:Question:\s*.*?\n+|Answer:\s*|Response:\s*)', '', raw_answer, flags=re.IGNORECASE).strip()
                         formatted_answer = linkify_citations(cleaned_answer, records_lookup)
@@ -1145,18 +1191,36 @@ PRIMARY EVIDENCE RECORDS:
 - **Cognitive Bias:** Loss aversion triggered by early portfolio drawdowns (-3% to -5%) before month 12.
 - **Groww Retention Strategy:** Implement 24-hour balance pre-debit alert with a 1-tap temporary 'Pause for 1–3 Months' flow instead of hard mandate deletion."""
 
-                        with st.expander("📊 View In-Depth Problem Breakdown & Strategy"):
+                        with st.expander("📊 View In-Depth Problem Breakdown & Strategy", key=f"active_exp_{len(st.session_state.messages)}"):
                             st.markdown(detail_text, unsafe_allow_html=True)
 
-                        chat_obj = {
-                            "query": active_query,
-                            "answer": formatted_answer,
+                        st.session_state.messages.append({
+                            "role": "user",
+                            "content": active_query
+                        })
+                        st.session_state.messages.append({
+                            "role": "assistant",
+                            "content": formatted_answer,
                             "references": display_refs,
                             "detail": detail_text
-                        }
-                        st.session_state.active_chat = chat_obj
-                        if not any(c.get("query") == active_query for c in st.session_state.recent_chats):
-                            st.session_state.recent_chats.append(chat_obj)
+                        })
+
+                        if not st.session_state.current_chat_id:
+                            st.session_state.current_chat_id = str(int(time.time() * 1000))
+                        found = False
+                        for c in st.session_state.recent_chats:
+                            if c.get("id") == st.session_state.current_chat_id:
+                                c["messages"] = list(st.session_state.messages)
+                                found = True
+                                break
+                        if not found:
+                            st.session_state.recent_chats.append({
+                                "id": st.session_state.current_chat_id,
+                                "title": active_query,
+                                "messages": list(st.session_state.messages)
+                            })
+
+                        scroll_to_question()
 
                     except Exception as e:
                         fallback_answer = f"""Across our empirical discovery dataset of 406 verified drop-off cases, first-time mutual fund investors stop their SIPs within the first 12 months primarily due to three core structural and behavioral friction points:
@@ -1170,36 +1234,35 @@ PRIMARY EVIDENCE RECORDS:
 💡 Let me know if you want a detailed response."""
                         status_box.empty()
                         answer_placeholder.markdown(fallback_answer, unsafe_allow_html=True)
-                        chat_obj = {
-                            "query": active_query,
-                            "answer": fallback_answer,
+
+                        detail_fallback = "Detailed behavioral analysis available upon request."
+                        with st.expander("📊 View In-Depth Problem Breakdown & Strategy", key=f"fallback_exp_{len(st.session_state.messages)}"):
+                            st.markdown(detail_fallback, unsafe_allow_html=True)
+
+                        st.session_state.messages.append({
+                            "role": "user",
+                            "content": active_query
+                        })
+                        st.session_state.messages.append({
+                            "role": "assistant",
+                            "content": fallback_answer,
                             "references": display_refs,
-                            "detail": "Detailed behavioral analysis available upon request."
-                        }
-                        st.session_state.active_chat = chat_obj
-                        if not any(c.get("query") == active_query for c in st.session_state.recent_chats):
-                            st.session_state.recent_chats.append(chat_obj)
+                            "detail": detail_fallback
+                        })
 
-        # CASE 2: Displaying the Active Chat (either from a recent click or completed search)
-        elif st.session_state.active_chat:
-            chat = st.session_state.active_chat
+                        if not st.session_state.current_chat_id:
+                            st.session_state.current_chat_id = str(int(time.time() * 1000))
+                        found = False
+                        for c in st.session_state.recent_chats:
+                            if c.get("id") == st.session_state.current_chat_id:
+                                c["messages"] = list(st.session_state.messages)
+                                found = True
+                                break
+                        if not found:
+                            st.session_state.recent_chats.append({
+                                "id": st.session_state.current_chat_id,
+                                "title": active_query,
+                                "messages": list(st.session_state.messages)
+                            })
 
-            # Right Column: References
-            with col_refs:
-                st.markdown(render_references_panel(chat.get("references", [])), unsafe_allow_html=True)
-
-            # Left Column: User Pill + Answer + Expander
-            with col_chat:
-                st.markdown(f"""
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
-                    <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
-                        {chat['query']}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-                st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65; margin-bottom: 1.5rem;">{chat["answer"]}</div>', unsafe_allow_html=True)
-
-                if chat.get("detail"):
-                    with st.expander("📊 View In-Depth Problem Breakdown & Strategy"):
-                        st.markdown(chat["detail"], unsafe_allow_html=True)
+                        scroll_to_question()
