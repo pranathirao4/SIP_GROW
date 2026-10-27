@@ -21,6 +21,7 @@ from src.pipeline.agent_core import (
     OFF_TOPIC_MESSAGE,
     check_query_scope,
     rewrite_query_with_history,
+    expand_query,
     format_reviews_for_prompt,
     build_system_prompt,
     linkify_citations,
@@ -1194,6 +1195,21 @@ else:
             for idx, msg in enumerate(st.session_state.messages):
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"], unsafe_allow_html=True)
+                    if msg.get("role") == "assistant" and msg.get("references"):
+                        with st.expander(f"Show retrieved reviews ({len(msg['references'])} reviews)", expanded=False):
+                            for r_idx, r in enumerate(msg["references"], 1):
+                                src_lbl = get_source_label(r.get("source", ""))
+                                rec_id = r.get("record_id", f"REC-{r_idx:05d}")
+                                u = r.get("url") or "#"
+                                clf = r.get("classification", {})
+                                act = clf.get("observable_behaviour") or f"Action: {clf.get('action', 'Action taken').title()} SIP"
+                                trig = clf.get("trigger_context") or clf.get("underlying_problem") or "Investor discussion"
+                                quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:250].replace("\n", " ")
+                                st.markdown(
+                                    f"**[{r_idx}] {rec_id}** — **{src_lbl}** ({r.get('published_at', '')[:10]}) | [🔗 Source ↗]({u})\n\n"
+                                    f"- **{act}** | Reason: *{trig}*\n"
+                                    f"- *\"{quote}\"*\n\n---"
+                                )
 
             # 2. Process active query (new conversational turn)
             if active_query:
@@ -1228,9 +1244,11 @@ else:
                                 st.session_state.messages,
                                 groq_client
                             )
-                            # 2b. Retrieve top matching reviews
-                            retrieval_res = retriever.retrieve_with_evidence_stats(standalone_q, top_k=6)
-                            retrieved_records = retrieval_res["primary_matches"][:6]
+                            # 2b. Expand standalone question into 4-5 phrases real users write
+                            expanded_queries = expand_query(standalone_q, groq_client)
+                            # 2c. Retrieve top 20 personal-experience matching reviews
+                            retrieval_res = retriever.retrieve_with_evidence_stats(expanded_queries, top_k=20)
+                            retrieved_records = retrieval_res["primary_matches"][:20]
                             display_refs = retrieved_records
                             status.update(label=f"Found {len(retrieved_records)} relevant reviews", state="complete")
 
@@ -1257,7 +1275,7 @@ else:
                                 messages=llm_messages,
                                 stream=True,
                                 temperature=0.1,
-                                max_tokens=700
+                                max_tokens=750
                             )
 
                             def token_stream():
@@ -1289,6 +1307,23 @@ else:
                             )
                             st.markdown(fallback_answer, unsafe_allow_html=True)
                             final_answer = fallback_answer
+
+                        # Render "Show retrieved reviews" panel under answer
+                        if display_refs:
+                            with st.expander(f"Show retrieved reviews ({len(display_refs)} reviews)", expanded=False):
+                                for r_idx, r in enumerate(display_refs, 1):
+                                    src_lbl = get_source_label(r.get("source", ""))
+                                    rec_id = r.get("record_id", f"REC-{r_idx:05d}")
+                                    u = r.get("url") or "#"
+                                    clf = r.get("classification", {})
+                                    act = clf.get("observable_behaviour") or f"Action: {clf.get('action', 'Action taken').title()} SIP"
+                                    trig = clf.get("trigger_context") or clf.get("underlying_problem") or "Investor discussion"
+                                    quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:250].replace("\n", " ")
+                                    st.markdown(
+                                        f"**[{r_idx}] {rec_id}** — **{src_lbl}** ({r.get('published_at', '')[:10]}) | [🔗 Source ↗]({u})\n\n"
+                                        f"- **{act}** | Reason: *{trig}*\n"
+                                        f"- *\"{quote}\"*\n\n---"
+                                    )
 
                         # Save to session state
                         st.session_state.messages.append({"role": "user", "content": active_query})

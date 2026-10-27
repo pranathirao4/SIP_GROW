@@ -202,6 +202,54 @@ def rewrite_query_with_history(query: str, history: List[Dict[str, str]], groq_c
         return f"{past_user_queries[-1]} {query}"
 
 
+def expand_query(query: str, groq_client: Any = None) -> List[str]:
+    """
+    Expands question into 4-5 phrases real users write, such as:
+    'stopped my SIP', 'paused my SIP', 'SIP failed autopay', 'SIP in loss'
+    """
+    phrases = [query]
+    q_lower = query.lower()
+
+    # Domain phrase mappings
+    if "stop" in q_lower or "cancel" in q_lower or "quit" in q_lower:
+        phrases.extend(["stopped my SIP", "cancelled SIP in loss", "SIP failed autopay", "discontinued SIP", "Groww SIP stopped"])
+    elif "pause" in q_lower:
+        phrases.extend(["paused my SIP", "unable to pause SIP", "pause button Groww", "SIP hold option", "skip instalment"])
+    elif "fall" in q_lower or "loss" in q_lower or "negative" in q_lower or "down" in q_lower or "crash" in q_lower:
+        phrases.extend(["SIP in loss", "SIP not giving returns", "negative return after months", "market down panic", "stopped SIP in loss"])
+    elif "groww" in q_lower or "problem" in q_lower or "friction" in q_lower or "issue" in q_lower:
+        phrases.extend(["Groww SIP not working", "Groww SIP failed", "Groww autopay rejected", "Groww pause SIP option", "Groww penalty charges"])
+    elif "continue" in q_lower or "stay" in q_lower:
+        phrases.extend(["continued investing in crash", "holding SIP through drawdown", "stayed invested long term", "DCA discipline"])
+
+    # If groq client available, enrich with LLM phrase generation
+    if groq_client:
+        try:
+            prompt = (
+                "You are an expert search query expander for retail mutual fund investor research in India.\n"
+                "Given the user question, generate 4 short natural search phrases that real Indian investors write in reviews or reddit posts "
+                "(e.g. 'stopped my SIP', 'SIP autopay bounced penalty', 'Groww mandate failed', 'paused my SIP in loss').\n"
+                "Output ONLY the 4 phrases, one per line. No numbers, no bullet points, no extra text.\n\n"
+                f"Question: {query}\n"
+                "Phrases:"
+            )
+            res = call_groq_with_retry(
+                groq_client,
+                model="qwen/qwen3.8-27b",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=60,
+                temperature=0.0
+            )
+            lines = [l.strip().strip("-*•12345. ") for l in res.choices[0].message.content.split("\n") if l.strip()]
+            for l in lines:
+                if len(l) > 3 and l not in phrases:
+                    phrases.append(l)
+        except Exception:
+            pass
+
+    return phrases[:5]
+
+
 def get_source_label(src: str) -> str:
     """Return clean standard source name."""
     s = str(src).lower()
@@ -227,13 +275,13 @@ def format_reviews_for_prompt(records: List[Dict[str, Any]]) -> str:
         
         clf = r.get("classification", {})
         quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:350].replace("\n", " ")
-        felt = clf.get("underlying_problem") or "Emotional/cognitive friction"
-        did = clf.get("observable_behaviour") or "Action taken regarding SIP"
+        felt = clf.get("underlying_problem") or clf.get("trigger_context") or "Emotional/cognitive friction"
+        did = clf.get("observable_behaviour") or f"Action: {clf.get('action', 'Action taken').title()} SIP"
         
         blocks.append(
             f"Review [{idx}] ID: {rec_id} | Source: {src} | Date: {dt} | Link: [🔗 {src} ↗]({url})\n"
-            f"  - What user felt: {felt}\n"
-            f"  - What user did: {did}\n"
+            f"  - Action taken: {did}\n"
+            f"  - What user felt / Reason: {felt}\n"
             f"  - User statement: \"{quote}\""
         )
     return "\n\n".join(blocks)

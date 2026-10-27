@@ -75,9 +75,22 @@ class SIPRetriever:
 
         self.avg_doc_len = sum(self.doc_lens) / max(1, self.doc_count)
 
-    def _score_records(self, query: str) -> List[Tuple[float, Dict[str, Any]]]:
-        query_tokens = self._tokenize(query)
-        if not query_tokens:
+    def _score_records(self, query: Any) -> List[Tuple[float, Dict[str, Any]]]:
+        # Handle string or list of expanded query phrases
+        if isinstance(query, list):
+            primary_query = query[0] if query else ""
+            expanded_queries = query[1:] if len(query) > 1 else []
+        else:
+            primary_query = str(query)
+            expanded_queries = []
+
+        primary_tokens = self._tokenize(primary_query)
+        expanded_tokens = []
+        for eq in expanded_queries:
+            expanded_tokens.extend(self._tokenize(eq))
+
+        all_query_tokens = set(primary_tokens + expanded_tokens)
+        if not all_query_tokens:
             return [(1.0, r) for r in self.records]
 
         k1 = 1.5
@@ -90,71 +103,88 @@ class SIPRetriever:
             for t in tokens:
                 token_counts[t] = token_counts.get(t, 0) + 1
 
-            for q in query_tokens:
+            for q in all_query_tokens:
                 if q in token_counts:
                     tf = token_counts[q]
                     doc_freq = self.df.get(q, 1)
-                    # IDF formula
                     idf = math.log((self.doc_count - doc_freq + 0.5) / (doc_freq + 0.5) + 1.0)
-                    # BM25 term weighting
                     denom = tf + k1 * (1 - b + b * (doc_len / self.avg_doc_len))
-                    score += idf * (tf * (k1 + 1)) / denom
+                    weight = 1.0 if q in primary_tokens else 0.55
+                    score += weight * (idf * (tf * (k1 + 1)) / denom)
 
-            # Boost high-signal records (Tier 1 & Tier 3)
-            tier = self.records[i].get('relevance_tier')
+            # Boost Personal Experience records significantly
+            r = self.records[i]
+            tag = r.get("primary_tag") or r.get("classification", {}).get("primary_intent")
+            if tag == "PERSONAL_EXPERIENCE":
+                score *= 3.0
+            elif tag == "OFF_TOPIC":
+                score *= 0.1
+
+            # Source / Tier adjustments
+            tier = r.get('relevance_tier')
             if tier == "Tier 1: Directly Relevant" or tier == 1:
                 score *= 1.35
             elif tier == "Tier 3: In-App & Mandate Friction" or tier == 3:
                 score *= 1.25
 
-            scores.append((score, self.records[i]))
+            scores.append((score, r))
 
         scores.sort(key=lambda x: x[0], reverse=True)
         return scores
 
-    def retrieve(self, query: str, top_k: int = 6) -> List[Dict[str, Any]]:
+    def retrieve(self, query: Any, top_k: int = 20) -> List[Dict[str, Any]]:
         """Standard retriever interface returning top_k records."""
         scores = self._score_records(query)
         positive = [record for score, record in scores if score > 0]
+        # Prefer personal experience items
+        pe_records = [r for r in positive if r.get("primary_tag") == "PERSONAL_EXPERIENCE"]
+        if len(pe_records) >= top_k:
+            return pe_records[:top_k]
         return positive[:top_k] if positive else self.records[:top_k]
 
-    def retrieve_with_evidence_stats(self, query: str, top_k: int = 6) -> Dict[str, Any]:
+    def retrieve_with_evidence_stats(self, query: Any, top_k: int = 20) -> Dict[str, Any]:
         """
         Enriched retriever interface returning:
-          - primary_matches: top_k records
+          - primary_matches: top_k records (personal experience ranked highest)
           - counterevidence_matches: records showing users who stayed invested / continued
           - prevalence_stats: exact matching count, unique conversation count, data sufficiency flag
         """
         scores = self._score_records(query)
         positive_records = [record for score, record in scores if score > 0]
-        
-        # If no positive matches, fall back to default
-        if not positive_records:
-            positive_records = self.records[:top_k]
 
-        primary_matches = positive_records[:top_k]
+        # Prioritize PERSONAL_EXPERIENCE items
+        pe_matches = [r for r in positive_records if r.get("primary_tag") == "PERSONAL_EXPERIENCE"]
+        other_matches = [r for r in positive_records if r.get("primary_tag") != "PERSONAL_EXPERIENCE"]
+
+        combined_candidates = pe_matches + other_matches
+        if not combined_candidates:
+            combined_candidates = self.records[:top_k]
+
+        primary_matches = combined_candidates[:top_k]
 
         # Calculate exact conversation counts across ALL positive matching records
         all_conv_urls = set()
         sources_found = set()
         counterevidence_candidates = []
 
-        for r in positive_records:
+        for r in combined_candidates:
             u = r.get("url", "")
             root_u = clean_root_url(u)
             if root_u != "unknown_conversation":
                 all_conv_urls.add(root_u)
-            
+
             src = r.get("source", "unknown")
             sources_found.add(src)
 
-            # Check for counterevidence in positive matches or whole dataset
+            # Check for counterevidence (continued / maintained active SIP)
+            clf = r.get("classification", {})
+            action = clf.get("action", "").lower()
             combined_txt = f"{r.get('title', '')} {r.get('raw_text', '')}".lower()
-            if any(w in combined_txt for w in ["continued", "stayed invested", "did not stop", "still investing", "restarted", "success"]):
-                if len(counterevidence_candidates) < 2 and r["record_id"] not in [p["record_id"] for p in primary_matches]:
+            if action == "continued" or any(w in combined_txt for w in ["continued", "stayed invested", "did not stop", "still investing", "restarted", "success"]):
+                if len(counterevidence_candidates) < 3 and r["record_id"] not in [p["record_id"] for p in primary_matches]:
                     counterevidence_candidates.append(r)
 
-        total_matching = len(positive_records)
+        total_matching = len(combined_candidates)
         unique_conv_count = len(all_conv_urls) if all_conv_urls else max(1, len(primary_matches))
 
         # Data Sufficiency Assessment
