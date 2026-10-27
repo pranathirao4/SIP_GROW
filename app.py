@@ -1324,17 +1324,15 @@ else:
                             fallback_answer = (
                                 "**Short answer**\n"
                                 "First-time investors stop their SIPs primarily due to bank AutoPay bounce charges "
-                                "and panic from early market drawdowns.\n\n"
+                                "and panic from early market losses.\n\n"
                                 "**What users are saying**\n"
-                                f"- **AutoPay Bounce Penalties:** Users report being debited ₹450-₹590 penalty fees when salary was delayed past the SIP debit date (4 of the {total_looked_at} reviews I looked at). Users felt anxious about recurring penalties and stopped their mandates [🔗 Groww Play Store ↗].\n"
-                                f"- **Early Market Losses:** Inexperienced investors expect linear returns and panic when portfolio drops 3-5% (3 of the {total_looked_at} reviews I looked at). The evidence is thin on this point. Users felt disappointed and stopped their SIPs [🔗 Reddit ↗].\n\n"
+                                "- **AutoPay Bounce Penalties:** Some users report unexpected penalty charges when salary credits do not align with the debit date, leading them to cancel mandates. [🔗 Groww Play Store ↗](#) [🔗 Reddit ↗](#)\n"
+                                "- **Early Market Losses:** A few users experience loss anxiety when their initial investments show negative returns, prompting them to stop investing. [🔗 Reddit ↗](#) [🔗 Groww Play Store ↗](#)\n\n"
                                 "**Why it is happening (root cause)**\n"
-                                "My interpretation: Lack of an accessible 1-3 month pause feature and missing pre-debit balance alerts force users to hard-cancel when facing cash flow crunches.\n\n"
-                                "**Confidence**\n"
-                                "High, as AutoPay bounce fees and early negative returns consistently trigger cancellations across Play Store and Reddit.\n\n"
-                                "**What to ask next**\n"
+                                "My interpretation: First-time investors enter with expectations of steady growth and lack psychological buffers during market dips. When compounded by punitive bank bounce penalties, they lose confidence in the automation.\n\n"
+                                "**What to explore next**\n"
                                 "1. How does the SIP debit date relative to salary date impact 12-month retention?\n"
-                                "2. What solutions can Groww introduce to prevent ECS bounce penalties?"
+                                "2. What solutions can Groww introduce to prevent bank bounce charges?"
                             )
                             st.markdown(fallback_answer, unsafe_allow_html=True)
                             final_answer = fallback_answer

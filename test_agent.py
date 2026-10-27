@@ -384,16 +384,16 @@ def run_tests():
         else: # Normal In-Scope
             has_short_ans = "**Short answer**" in ans or "Short answer" in ans
             has_saying = "**What users are saying**" in ans or "What users are saying" in ans
-            has_root = "why it is happening" in ans.lower() or "my interpretation" in ans.lower() or "root cause" in ans.lower()
-            has_conf = "**Confidence**" in ans or "confidence" in ans.lower()
-            has_next = "**What to ask next**" in ans or "what to ask next" in ans.lower()
+            has_root = "why it is happening" in ans.lower() or "my interpretation" in ans.lower()
+            has_next = "what to explore next" in ans.lower() or "what to ask next" in ans.lower()
+            has_no_counts = "reviews i looked at" not in ans.lower()
             has_citations = "🔗" in ans or "http" in ans or "REC-" in ans
-            if status == "in_scope" and has_short_ans and has_saying and has_root and has_citations and has_conf and has_next:
+            if status == "in_scope" and has_short_ans and has_saying and has_root and has_citations and has_next and has_no_counts:
                 passed = True
-                notes = "5-part structure verified with evidence citations and counts"
+                notes = "New 4-part structure verified without review counts; links provided"
             else:
                 passed = False
-                notes = f"In-scope format incomplete (status={status})"
+                notes = f"In-scope format incomplete (status={status}, no_counts={has_no_counts})"
 
         result_row = {
             "id": qid,
