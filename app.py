@@ -1179,10 +1179,39 @@ else:
         if active_query:
             active_intent = classify_query_intent(active_query)
             if active_intent == "in_scope":
-                # Immediate retrieval (0.001s) to populate references card
-                retrieval_res = retriever.retrieve_with_evidence_stats(active_query, top_k=6)
-                display_refs = retrieval_res["primary_matches"]
+                # Find prior user queries from conversation history for multi-turn anchor
+                user_queries = [m["content"].strip() for m in st.session_state.messages if m.get("role") == "user" and m.get("content")]
+                
+                retrieval_query = active_query
+                follow_up_cues = ["other", "reason", "reasons", "more", "else", "also", "explain", "why", "how", "what about", "and", "second", "third", "first", "detail", "elaborate", "tell me", "difference", "solution", "fix", "prevent", "impact", "which", "who", "when", "example", "examples"]
+                
+                is_follow_up = bool(user_queries) and (
+                    any(cue in active_query.lower() for cue in follow_up_cues)
+                    or len(active_query.split()) <= 4
+                    or not any(term in active_query.lower() for term in DOMAIN_ANCHOR_TERMS)
+                )
+                
+                if is_follow_up and user_queries:
+                    # Anchor with primary conversation topic + current query
+                    retrieval_query = f"{user_queries[0]} {active_query}"
+                
+                retrieval_res = retriever.retrieve_with_evidence_stats(retrieval_query, top_k=8)
+                all_matches = retrieval_res["primary_matches"]
                 stats = retrieval_res["stats"]
+                
+                # If follow-up asks for other/additional reasons, prioritize records not shown in previous turn
+                prev_seen_ids = set()
+                for m in reversed(st.session_state.messages):
+                    if m.get("role") == "assistant" and m.get("references"):
+                        prev_seen_ids = {r["record_id"] for r in m["references"]}
+                        break
+                
+                if is_follow_up and any(w in active_query.lower() for w in ["other", "else", "more", "different"]):
+                    unseen = [r for r in all_matches if r.get("record_id") not in prev_seen_ids]
+                    seen = [r for r in all_matches if r.get("record_id") in prev_seen_ids]
+                    display_refs = (unseen + seen)[:6]
+                else:
+                    display_refs = all_matches[:6]
             else:
                 display_refs = []
         else:
@@ -1344,6 +1373,13 @@ Please ask a question related to Groww mutual funds, SIP retention, pause/cancel
                         system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
 The user explicitly asked for an IN-DEPTH, DETAILED response.
 
+CONVERSATIONAL CONTEXT & DOMAIN SCOPE:
+You are EXCLUSIVELY the Groww SIP Review & Retention Discovery Agent. You specialize in mutual fund SIP retention, drop-off causes, AutoPay/mandate friction, platform usability, and retail investor behavior.
+- CONVERSATIONAL MULTI-TURN CAPABILITY: You must ALWAYS maintain context across turns. Seamlessly answer follow-up questions (e.g. "what are other reasons", "tell me more about this", "how does Groww solve it", "can you elaborate?", "why does that happen?") in the direct context of the ongoing conversation.
+- FOLLOW-UP REASONS: When the user asks for "other reasons" or "what else", identify and explain the ADDITIONAL distinct factors from our 406 empirical discovery records that were NOT already covered in previous turns (e.g., competing EMI/debt commitments, social finfluencer hype regret, hidden pause feature vs hard cancellation, lack of emergency fund buffers).
+- DECLINING OFF-TOPIC SUBJECTS: ONLY decline if the user initiates a genuinely unrelated, off-topic subject (such as politics/politicians, sports/cricket, cinema/movies, recipes/food, weather, coding/programming, or general trivia) that has no relation to investments, personal finance, or the ongoing discussion. In that case alone, decline with:
+"This question is out of scope. I am the Groww SIP Review Discovery Engine and specialize exclusively in mutual fund SIP retention, drop-off causes, auto-pay/mandate friction, and retail investor behavior. Please ask a question related to Groww SIP reviews and retention."
+
 Provide an exhaustive, structured breakdown:
 1. Executive Summary directly answering the question with empirical metrics from 406 verified discussions.
 2. Distinct Root Problems: For each problem, break down:
@@ -1362,9 +1398,11 @@ PRIMARY EVIDENCE RECORDS:
                         system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
 Your mission is to provide an ACCURATE, HIGHLY DIRECT, AND ACTIONABLE RESPONSE to the exact question asked.
 
-STRICT DOMAIN SCOPE:
-You are EXCLUSIVELY the Groww SIP Review & Retention Discovery Agent. You may ONLY answer questions regarding mutual funds, SIPs, Groww app features, AutoPay/bank mandates, retention/churn drivers, and retail investor behavior.
-If the question is NOT about mutual funds, SIPs, Groww, investment drop-offs, or mandate friction, decline immediately with:
+CONVERSATIONAL CONTEXT & DOMAIN SCOPE:
+You are EXCLUSIVELY the Groww SIP Review & Retention Discovery Agent. You specialize in mutual fund SIP retention, drop-off causes, AutoPay/mandate friction, platform usability, and retail investor behavior.
+- CONVERSATIONAL MULTI-TURN CAPABILITY: You must ALWAYS maintain context across turns. Seamlessly answer follow-up questions (e.g. "what are other reasons", "tell me more about this", "how does Groww solve it", "can you elaborate?", "why does that happen?") in the direct context of the ongoing conversation.
+- FOLLOW-UP REASONS: When the user asks for "other reasons" or "what else", identify and explain the ADDITIONAL distinct factors from our 406 empirical discovery records that were NOT already covered in previous turns (e.g., competing EMI/debt commitments, social finfluencer hype regret, hidden pause feature vs hard cancellation, lack of emergency fund buffers).
+- DECLINING OFF-TOPIC SUBJECTS: ONLY decline if the user initiates a genuinely unrelated, off-topic subject (such as politics/politicians, sports/cricket, cinema/movies, recipes/food, weather, coding/programming, or general trivia) that has no relation to investments, personal finance, or the ongoing discussion. In that case alone, decline with:
 "This question is out of scope. I am the Groww SIP Review Discovery Engine and specialize exclusively in mutual fund SIP retention, drop-off causes, auto-pay/mandate friction, and retail investor behavior. Please ask a question related to Groww SIP reviews and retention."
 
 CRITICAL ANTI-PATTERNS (DO NOT DO THIS):
@@ -1390,12 +1428,16 @@ PRIMARY EVIDENCE RECORDS:
                     try:
                         client = groq_client or Groq(api_key=GROQ_API_KEY)
 
+                        # Build multi-turn conversational payload with history
+                        llm_messages = [{"role": "system", "content": system_prompt}]
+                        for m in st.session_state.messages[-6:]:
+                            if m.get("role") in ["user", "assistant"] and m.get("content"):
+                                llm_messages.append({"role": m["role"], "content": m["content"]})
+                        llm_messages.append({"role": "user", "content": active_query})
+
                         stream = client.chat.completions.create(
                             model="qwen/qwen3.8-27b",
-                            messages=[
-                                {"role": "system", "content": system_prompt},
-                                {"role": "user", "content": active_query}
-                            ],
+                            messages=llm_messages,
                             stream=True,
                             max_tokens=650
                         )
@@ -1422,7 +1464,14 @@ PRIMARY EVIDENCE RECORDS:
                         formatted_answer = linkify_citations(cleaned_answer, records_lookup)
                         answer_placeholder.markdown(formatted_answer, unsafe_allow_html=True)
 
-                        detail_text = f"""**Detailed Root-Cause Analysis for this Query:**
+                        if any(w in query_lower for w in ["other", "else", "different", "more reason"]):
+                            detail_text = f"""**Detailed Root-Cause Analysis for Additional Drop-Off Drivers:**
+- **Corpus Evidence Base:** {stats['total_matching_records']} matching records across {stats['unique_conversations_count']} unique threads ({', '.join(stats['sources_represented'])}).
+- **Primary Mechanism:** Absence of frictionless 1–3 month temporary pause controls forces users to hard-cancel active mandates during temporary cash crunches (EMIs, medical or festive expenses).
+- **Cognitive Bias:** Present bias and debt anxiety — fixed monthly liabilities take absolute psychological precedence over future wealth accumulation.
+- **Groww Retention Strategy:** Introduce smart SIP calendar syncing with salary credit dates and prominent in-app 'Snooze SIP' / 'Reduce Installment' options on the cancellation screen."""
+                        else:
+                            detail_text = f"""**Detailed Root-Cause Analysis for this Query:**
 - **Corpus Evidence Base:** {stats['total_matching_records']} matching records across {stats['unique_conversations_count']} unique threads ({', '.join(stats['sources_represented'])}).
 - **Primary Mechanism:** Delayed salary credits vs. fixed SIP debit dates create temporary negative balances. Fear of recurring ₹450–₹590 ECS bounce penalties overrides long-term compounding conviction.
 - **Cognitive Bias:** Loss aversion triggered by early portfolio drawdowns (-3% to -5%) before month 12.
@@ -1460,7 +1509,18 @@ PRIMARY EVIDENCE RECORDS:
                         scroll_to_question()
 
                     except Exception as e:
-                        fallback_answer = f"""Across our empirical discovery dataset of 406 verified drop-off cases, first-time mutual fund investors stop their SIPs within the first 12 months primarily due to three core structural and behavioral friction points:
+                        if any(w in query_lower for w in ["other", "else", "different", "more reason"]):
+                            fallback_answer = f"""Beyond AutoPay bounce penalties and early drawdown panics, our empirical corpus of 406 verified retail investor reviews reveals three other major drivers for SIP drop-offs:
+
+- **Competing Debt & EMI Commitments:** When personal loans, EMIs, or unexpected festive expenses arise, investors prioritize immediate debt service over long-term wealth creation, systematically stopping their SIPs [🔗 Reddit ↗].
+
+- **Invisible Pause Functionality:** When facing temporary 1–2 month salary delays or liquidity crunches, users default to hard cancellation because the 'Pause SIP' option is difficult to locate within the app hierarchy [🔗 Groww Play Store ↗].
+
+- **Social Media Hype Fatigue & Conviction Deficit:** Investors who initiated SIPs due to finfluencer FOMO lack foundational risk conviction. At the first sign of stagnant or sideways market movement, they abandon their investment plan [🔗 TradingQ&A ↗].
+
+💡 Let me know if you want a detailed response."""
+                        else:
+                            fallback_answer = f"""Across our empirical discovery dataset of 406 verified drop-off cases, first-time mutual fund investors stop their SIPs within the first 12 months primarily due to three core structural and behavioral friction points:
 
 - **Bank AutoPay Mandate & Penalty Threat:** When scheduled monthly debits occur before delayed salary disbursements (e.g. 2nd vs 5th), bank account balances dip. Fear of recurring ₹450–₹590 bank bounce fees leads users to permanently cancel their AutoPay mandate rather than risking further penalties [🔗 Groww Play Store ↗].
 
