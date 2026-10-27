@@ -449,39 +449,75 @@ st.markdown("""
         margin-bottom: 0px;
     }
 
-    /* Reviewing Responses Typing Indicator */
-    .reviewing-responses-box {
-        display: flex;
+    /* Animated Thinking Indicator with 3 Bouncing Dots */
+    .thinking-wrapper {
+        display: inline-flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 0.75rem;
-    }
-    .reviewing-text {
-        font-size: 15px;
-        color: #202124;
-        font-weight: 500;
+        padding: 6px 14px;
+        background-color: #F8F9FA;
+        border: 1px solid #E8EAED;
+        border-radius: 20px;
+        margin-bottom: 12px;
         font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        color: #3C4043;
     }
-    .typing-dot-blue {
+    .thinking-text {
+        font-weight: 500;
+        color: #3C4043;
+    }
+    .bouncing-dots {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .bouncing-dots span {
         width: 6px;
         height: 6px;
         background-color: #1A73E8;
         border-radius: 50%;
         display: inline-block;
-        animation: blueDotPulse 1.4s infinite ease-in-out both;
+        animation: bounceDot 1.4s infinite ease-in-out both;
     }
-    .typing-dot-blue:nth-child(3) { animation-delay: 0.2s; }
-    .typing-dot-blue:nth-child(4) { animation-delay: 0.4s; }
+    .bouncing-dots span:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+    .bouncing-dots span:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+    .bouncing-dots span:nth-child(3) {
+        animation-delay: 0s;
+    }
 
-    @keyframes blueDotPulse {
+    @keyframes bounceDot {
         0%, 80%, 100% {
             transform: scale(0.6);
-            opacity: 0.3;
+            opacity: 0.35;
         }
         40% {
-            transform: scale(1.15);
+            transform: scale(1.2);
             opacity: 1;
         }
+    }
+
+    /* Fixed Bottom Chat Bar & Disabled States */
+    [data-testid="stBottom"] {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.96) 20%, #FFFFFF 100%) !important;
+        padding-bottom: 1.25rem !important;
+        padding-top: 1rem !important;
+        z-index: 999 !important;
+    }
+    .chat-input-disabled,
+    div[data-testid="stChatInput"]:has(textarea:disabled),
+    div[data-testid="stChatInput"]:has(button:disabled) {
+        opacity: 0.65 !important;
+        pointer-events: none !important;
+        filter: grayscale(0.2) !important;
     }
 
     /* Component iframe zero visibility */
@@ -494,7 +530,7 @@ st.markdown("""
         pointer-events: none !important;
     }
 
-    /* Streaming Cursor (Pic 3) */
+    /* Streaming Cursor */
     .streaming-cursor {
         display: inline-block;
         width: 3px;
@@ -509,7 +545,7 @@ st.markdown("""
         50% { opacity: 0; }
     }
 
-    /* References Right Panel Card (Pic 4) */
+    /* References Right Panel Card */
     .references-panel-card {
         background: #FFFFFF !important;
         border: 1px solid #DADCE0 !important;
@@ -596,12 +632,45 @@ st.markdown("""
         flex: 2.8 1 260px !important;
         min-width: 260px !important;
     }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .main .block-container {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+            padding-bottom: 8.5rem !important;
+        }
+        div[data-testid="stChatInput"] {
+            width: calc(100% - 24px) !important;
+            max-width: 100% !important;
+            padding: 4px 6px 4px 12px !important;
+        }
+        [data-testid="stHorizontalBlock"] {
+            flex-direction: column !important;
+        }
+        [data-testid="stHorizontalBlock"] > div[data-testid="column"]:first-child {
+            flex: 1 1 100% !important;
+            width: 100% !important;
+        }
+        [data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child {
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+            width: 100% !important;
+            margin-top: 1.5rem !important;
+        }
+        div[data-testid="stChatMessage"]:has(.engine-user-marker) {
+            max-width: 88% !important;
+        }
+        .engine-hero-title {
+            font-size: 1.6rem !important;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
 
 # Load Data
-@st.cache_data
+@st.cache_resource
 def load_discovery_data():
     base = Path("data")
     records = []
@@ -723,67 +792,48 @@ def classify_query_intent(query: str) -> str:
     return "in_scope"
 
 
-def scroll_to_question():
-    """Instantly snaps the browser down to the newly entered question, removing the upper section from view."""
+def scroll_latest_into_view():
+    """Scrolls the latest chat message into view (behavior: 'smooth', block: 'end') and monitors streaming."""
     js = """
     <script>
     (function() {
-        function getScrollContainers(doc) {
-            return [
-                doc.querySelector('section[data-testid="stMain"]'),
-                doc.querySelector('section.main'),
-                doc.querySelector('.stMain'),
-                doc.querySelector('.main'),
-                doc.querySelector('[data-testid="stAppViewContainer"]'),
-                doc.documentElement,
-                doc.body
-            ].filter(Boolean);
-        }
+        const doc = window.parent.document;
+        if (!doc) return;
 
-        function snapToQuestion() {
+        function doScroll() {
             try {
-                const doc = window.parent.document;
-                if (!doc) return;
-                
-                const qElem = doc.getElementById('latest-user-question');
-                if (qElem) {
-                    qElem.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+                const messages = doc.querySelectorAll('[data-testid="stChatMessage"]');
+                if (messages.length > 0) {
+                    const lastMsg = messages[messages.length - 1];
+                    lastMsg.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
                 } else {
-                    const containers = getScrollContainers(doc);
-                    for (const c of containers) {
-                        if (c.scrollHeight > c.clientHeight) {
-                            c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
-                        }
+                    const main = doc.querySelector('section.main') || doc.querySelector('[data-testid="stAppViewContainer"]') || doc.documentElement || doc.body;
+                    if (main && main.scrollHeight > main.clientHeight) {
+                        main.scrollTo({ top: main.scrollHeight, behavior: 'smooth' });
                     }
                 }
-            } catch (err) {
-                console.error("Auto-scroll error:", err);
-            }
+            } catch(e) {}
         }
-        
-        snapToQuestion();
-        requestAnimationFrame(snapToQuestion);
-        setTimeout(snapToQuestion, 30);
-        setTimeout(snapToQuestion, 80);
-        setTimeout(snapToQuestion, 200);
 
-        let pollCount = 0;
-        let timer = setInterval(function() {
-            snapToQuestion();
-            pollCount++;
-            if (pollCount > 35) { // 35 * 50ms = 1.75s
-                clearInterval(timer);
-            }
-        }, 50);
+        doScroll();
+        requestAnimationFrame(doScroll);
+        setTimeout(doScroll, 40);
+        setTimeout(doScroll, 120);
+        setTimeout(doScroll, 250);
 
-        // Release lock only if user deliberately scrolls up after 800ms grace period
-        const startTime = Date.now();
-        if (window.parent) {
-            window.parent.addEventListener('wheel', function(e) {
-                if (e.deltaY < 0 && (Date.now() - startTime > 800)) {
-                    clearInterval(timer);
+        // Streaming observer: keeps latest streamed tokens smoothly in view
+        const block = doc.querySelector('.main .block-container') || doc.body;
+        if (block && window.MutationObserver) {
+            let lastScrollTime = 0;
+            const obs = new MutationObserver(function() {
+                const now = Date.now();
+                if (now - lastScrollTime > 65) {
+                    lastScrollTime = now;
+                    doScroll();
                 }
-            }, { passive: true });
+            });
+            obs.observe(block, { childList: true, subtree: true, characterData: true });
+            setTimeout(function() { obs.disconnect(); }, 35000);
         }
     })();
     </script>
@@ -791,145 +841,114 @@ def scroll_to_question():
     components.html(js, height=0)
 
 
+def unlock_chat_input():
+    """Re-enables the chat input once the bot finishes generating the answer."""
+    js = """
+    <script>
+    (function() {
+        try {
+            const doc = window.parent.document;
+            if (!doc) return;
+            const chatInput = doc.querySelector('[data-testid="stChatInput"]');
+            if (chatInput) {
+                const textarea = chatInput.querySelector('textarea');
+                const sendBtn = chatInput.querySelector('button');
+                if (textarea) textarea.disabled = false;
+                if (sendBtn) sendBtn.disabled = false;
+                chatInput.style.opacity = '1';
+                chatInput.style.pointerEvents = 'auto';
+                chatInput.classList.remove('chat-input-disabled');
+            }
+        } catch(e) {}
+    })();
+    </script>
+    """
+    components.html(js, height=0)
+
+
 def inject_input_scroll_listener():
-    """Client-side listener to immediately snap down the millisecond Enter, Send, or a prompt chip is pressed."""
+    """Client-side listener to lock input immediately and smooth scroll on Enter or Send click."""
     js = """
     <script>
     (function() {
         const doc = window.parent.document;
         if (!doc) return;
-        
-        function getScrollContainers() {
-            return [
-                doc.querySelector('section[data-testid="stMain"]'),
-                doc.querySelector('section.main'),
-                doc.querySelector('.stMain'),
-                doc.querySelector('.main'),
-                doc.querySelector('[data-testid="stAppViewContainer"]'),
-                doc.documentElement,
-                doc.body
-            ].filter(Boolean);
-        }
 
         function hideHeroImmediately() {
             try {
-                const heroRef = doc.getElementById('hero-ref-holder');
                 const heroTitle = doc.querySelector('.engine-hero-title');
                 const heroSub = doc.querySelector('.engine-hero-subtitle');
                 const chipBtns = doc.querySelectorAll('.prompt-chip-btn');
-                if (heroRef) heroRef.style.display = 'none';
                 if (heroTitle) heroTitle.style.display = 'none';
                 if (heroSub) heroSub.style.display = 'none';
                 chipBtns.forEach(el => el.style.display = 'none');
             } catch(e) {}
         }
 
-        let globalSnapInterval = null;
-        let snapStartTime = 0;
-
-        function triggerActiveSnap() {
-            if (globalSnapInterval) clearInterval(globalSnapInterval);
-            snapStartTime = Date.now();
-
-            function doSnap() {
-                const qElem = doc.getElementById('latest-user-question');
-                if (qElem) {
-                    qElem.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-                    return;
+        function lockInputNow() {
+            try {
+                const chatInput = doc.querySelector('[data-testid="stChatInput"]');
+                if (chatInput) {
+                    const textarea = chatInput.querySelector('textarea');
+                    const sendBtn = chatInput.querySelector('button');
+                    if (textarea) textarea.disabled = true;
+                    if (sendBtn) sendBtn.disabled = true;
+                    chatInput.style.opacity = '0.65';
+                    chatInput.style.pointerEvents = 'none';
+                    chatInput.classList.add('chat-input-disabled');
                 }
-                const containers = getScrollContainers();
-                for (const c of containers) {
-                    if (c.scrollHeight > c.clientHeight) {
-                        c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
-                    }
-                }
-            }
-
-            doSnap();
-            let count = 0;
-            globalSnapInterval = setInterval(function() {
-                doSnap();
-                count++;
-                if (count > 40) { // 40 * 50ms = 2s
-                    clearInterval(globalSnapInterval);
-                    globalSnapInterval = null;
-                }
-            }, 50);
+            } catch(e) {}
         }
 
-        // Wheel interrupt on scroll up with 800ms grace period so past inertia doesn't kill scroll
-        if (window.parent) {
-            window.parent.addEventListener('wheel', function(e) {
-                if (e.deltaY < 0 && globalSnapInterval && (Date.now() - snapStartTime > 800)) {
-                    clearInterval(globalSnapInterval);
-                    globalSnapInterval = null;
+        function doScrollNow() {
+            try {
+                const messages = doc.querySelectorAll('[data-testid="stChatMessage"]');
+                if (messages.length > 0) {
+                    const lastMsg = messages[messages.length - 1];
+                    lastMsg.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
                 }
-            }, { passive: true });
+            } catch(e) {}
         }
 
         function attachListener() {
-            // Anti-dimming styles directly into document head
-            if (!doc.getElementById('anti-dimming-style')) {
-                const s = doc.createElement('style');
-                s.id = 'anti-dimming-style';
-                s.innerHTML = `
-                    [data-stale="true"], div[data-stale="true"], .stApp[data-stale="true"],
-                    [data-testid="stAppViewContainer"][data-stale="true"],
-                    [data-testid="stChatMessage"][data-stale="true"],
-                    section.main[data-stale="true"], .main[data-stale="true"] {
-                        opacity: 1 !important;
-                        filter: none !important;
-                        transition: none !important;
-                    }
-                    [data-stale="true"] * {
-                        opacity: 1 !important;
-                        filter: none !important;
-                        transition: none !important;
-                    }
-                    [data-testid="stStatusWidget"], .stStatusWidget, #stStatusWidget {
-                        display: none !important;
-                        visibility: hidden !important;
-                    }
-                `;
-                doc.head.appendChild(s);
-            }
-
             const chatInput = doc.querySelector('[data-testid="stChatInput"]');
             if (chatInput) {
                 const textarea = chatInput.querySelector('textarea');
                 const sendBtn = chatInput.querySelector('button');
-                
-                if (textarea && !textarea.dataset.hasScrollListener) {
-                    textarea.dataset.hasScrollListener = "true";
+
+                if (textarea && !textarea.dataset.hasChatListener) {
+                    textarea.dataset.hasChatListener = "true";
                     textarea.addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter' && !e.shiftKey) {
+                        if (e.key === 'Enter' && !e.shiftKey && textarea.value.trim().length > 0) {
                             hideHeroImmediately();
-                            triggerActiveSnap();
+                            lockInputNow();
+                            doScrollNow();
                         }
                     });
                 }
-                if (sendBtn && !sendBtn.dataset.hasScrollListener) {
-                    sendBtn.dataset.hasScrollListener = "true";
+                if (sendBtn && !sendBtn.dataset.hasChatListener) {
+                    sendBtn.dataset.hasChatListener = "true";
                     sendBtn.addEventListener('click', function() {
                         hideHeroImmediately();
-                        triggerActiveSnap();
+                        lockInputNow();
+                        doScrollNow();
                     });
                 }
             }
 
-            // Also attach to prompt chip buttons
             const chipButtons = doc.querySelectorAll('.prompt-chip-btn button');
             chipButtons.forEach(btn => {
-                if (!btn.dataset.hasSnapListener) {
-                    btn.dataset.hasSnapListener = "true";
+                if (!btn.dataset.hasChatListener) {
+                    btn.dataset.hasChatListener = "true";
                     btn.addEventListener('click', function() {
                         hideHeroImmediately();
-                        triggerActiveSnap();
+                        lockInputNow();
+                        doScrollNow();
                     });
                 }
             });
         }
-        
+
         attachListener();
         setTimeout(attachListener, 200);
         setTimeout(attachListener, 600);
@@ -986,7 +1005,7 @@ def render_references_panel(refs):
             '<span>References</span>'
             '<span style="font-size: 16px; font-weight: 700; color: #202124;">&#x2304;</span>'
             '</div>'
-            f'<div class="ref-subtitle">Used in this chat — {len(refs)} reviews.</div>'
+            '<div class="ref-subtitle">Used in this chat.</div>'
             f'{cards_body}'
             '</div>'
         )
@@ -1019,6 +1038,8 @@ if "current_view" not in st.session_state:
     st.session_state.current_view = "new_chat"
 if "input_query" not in st.session_state:
     st.session_state.input_query = ""
+if "is_answering" not in st.session_state:
+    st.session_state.is_answering = False
 
 
 # ------------------------------------------------------------------
@@ -1109,13 +1130,13 @@ with st.sidebar:
 # ------------------------------------------------------------------
 if st.session_state.current_view == "reviews_library":
     st.markdown("<h2 style='font-family: Plus Jakarta Sans; font-size: 26px; font-weight: 700; margin-bottom: 4px; color: #202124;'>Reviews Library & Corpus Audit</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5F6368; font-size: 14.5px; margin-bottom: 24px;'>Empirical dataset of 406 verified Indian retail investor discussions analyzed for 12-month SIP retention friction.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #5F6368; font-size: 14.5px; margin-bottom: 24px;'>Empirical dataset of verified Indian retail investor discussions analyzed for 12-month SIP retention friction.</p>", unsafe_allow_html=True)
 
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        st.metric("Audited Corpus", "406", "Verified Retail Signals")
+        st.metric("Audited Corpus", "Verified", "Multi-Source Qualitative Signals")
     with c2:
-        st.metric("Retention Cohort", "80", "High-Signal Churn Cases")
+        st.metric("Retention Cohort", "Active", "High-Signal Churn Cases")
     with c3:
         st.metric("Peak Churn Window", "Month 3–6", "Drawdown & Salary Volatility")
     with c4:
@@ -1136,7 +1157,7 @@ elif st.session_state.current_view == "how_it_works":
     st.markdown("""
     <div style="background: #FFFFFF; border: 1px solid #DADCE0; border-radius: 12px; padding: 20px; line-height: 1.6; color: #202124;">
         <h4 style="font-weight: 600; margin-bottom: 8px;">1. Semantic Vector Retrieval</h4>
-        <p style="color: #5F6368; font-size: 14px;">Every query searches 406 deduplicated records across Reddit (r/IndiaInvestments), TradingQ&A, and Groww Play Store reviews to extract the top-matching real-world user conversations.</p>
+        <p style="color: #5F6368; font-size: 14px;">Every query searches deduplicated records across Reddit (r/IndiaInvestments), TradingQ&A, and Groww Play Store reviews to extract the top-matching real-world user conversations.</p>
         
         <h4 style="font-weight: 600; margin-top: 16px; margin-bottom: 8px;">2. Behavioral Causal Classification</h4>
         <p style="color: #5F6368; font-size: 14px;">Extracts observable behaviors, preceding triggers (e.g. salary delay on day 5 vs debit on day 2), and underlying cognitive/structural mechanisms.</p>
@@ -1159,7 +1180,7 @@ else:
     inject_input_scroll_listener()
 
     # Sticky bottom chat input bar (pinned at viewport bottom by Streamlit)
-    chat_input_val = st.chat_input("Ask about Groww SIP reviews...")
+    chat_input_val = st.chat_input("Ask about Groww SIP reviews...", disabled=st.session_state.get("is_answering", False))
 
     def select_prompt_chip(q):
         st.session_state.active_prompt_query = q
@@ -1175,7 +1196,7 @@ else:
         active_query = st.session_state.input_query
         st.session_state.input_query = ""
 
-    # Always maintain two-column layout to eliminate 2-3s layout shift / flicker
+    # Always maintain two-column layout to eliminate layout shift / flicker
     col_chat, col_refs = st.columns([7.2, 2.8], gap="large")
 
     # Determine references to display on the right panel
@@ -1227,7 +1248,7 @@ else:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"], unsafe_allow_html=True)
                     if msg.get("role") == "assistant" and msg.get("references"):
-                        with st.expander(f"Show retrieved reviews ({len(msg['references'])} reviews)", expanded=False):
+                        with st.expander("Show retrieved reviews", expanded=False):
                             for r_idx, r in enumerate(msg["references"], 1):
                                 src_lbl = get_source_label(r.get("source", ""))
                                 rec_id = r.get("record_id", f"REC-{r_idx:05d}")
@@ -1244,123 +1265,146 @@ else:
 
             # 2. Process active query (new conversational turn)
             if active_query:
-                # Render user message
+                # Lock chat input while answering
+                st.session_state.is_answering = True
+
+                # Step 1: Show user question immediately before any processing starts
                 with st.chat_message("user"):
                     st.markdown(f'<div id="latest-user-question">{active_query}</div>', unsafe_allow_html=True)
-                scroll_to_question()
 
-                # Process assistant response
+                # Step 2: Smooth auto-scroll so question and bot reply area are visible at bottom
+                scroll_latest_into_view()
+
+                # Step 3, 4, 5: Assistant processing with thinking indicator and generic status steps
                 with st.chat_message("assistant"):
-                    # Step 1: Fast Cheap Scope Guardrail
-                    is_in_scope, guardrail_msg = check_query_scope(
-                        active_query,
-                        st.session_state.messages,
-                        groq_client
+                    # 3a. Animated Thinking indicator with three bouncing dots
+                    thinking_slot = st.empty()
+                    thinking_slot.markdown(
+                        """<div class="thinking-wrapper">
+                            <span class="thinking-text">Thinking...</span>
+                            <span class="bouncing-dots"><span></span><span></span><span></span></span>
+                        </div>""",
+                        unsafe_allow_html=True
                     )
 
-                    if not is_in_scope:
-                        st.markdown(guardrail_msg)
-                        st.session_state.messages.append({"role": "user", "content": active_query})
-                        st.session_state.messages.append({
-                            "role": "assistant",
-                            "content": guardrail_msg,
-                            "references": []
-                        })
-                    else:
-                        # Step 2: Show retrieval status
-                        with st.status("Searching reviews...", expanded=False) as status:
-                            # 2a. Standalone query rewrite using recent history
+                    # 3b. Progress steps in st.status with generic wording only
+                    with st.status("Understanding your question...", expanded=False) as status:
+                        time.sleep(0.3)
+                        # Scope guardrail
+                        is_in_scope, guardrail_msg = check_query_scope(
+                            active_query,
+                            st.session_state.messages,
+                            groq_client
+                        )
+
+                        if not is_in_scope:
+                            status.update(label="Analysis complete", state="complete")
+                            thinking_slot.empty()
+                            st.markdown(guardrail_msg)
+                            final_answer = guardrail_msg
+                            display_refs = []
+                        else:
                             standalone_q = rewrite_query_with_history(
                                 active_query,
                                 st.session_state.messages,
                                 groq_client
                             )
-                            # 2b. Expand standalone question into 4-5 phrases real users write
+
+                            # Progress step: Searching reviews...
+                            status.update(label="Searching reviews...", state="running")
+                            time.sleep(0.3)
                             expanded_queries = expand_query(standalone_q, groq_client)
-                            # 2c. Retrieve top 20 personal-experience matching reviews
                             retrieval_res = retriever.retrieve_with_evidence_stats(expanded_queries, top_k=20)
                             retrieved_records = retrieval_res["primary_matches"][:20]
                             display_refs = retrieved_records
-                            status.update(label=f"Found {len(retrieved_records)} relevant reviews", state="complete")
 
-                        # Step 3: Format evidence & system prompt with all hard rules
-                        reviews_context = format_reviews_for_prompt(retrieved_records)
-                        total_looked_at = len(retrieved_records)
-                        system_prompt = build_system_prompt(reviews_context, total_looked_at)
+                            # Progress step: Writing the answer...
+                            status.update(label="Writing the answer...", state="running")
+                            time.sleep(0.3)
+                            reviews_context = format_reviews_for_prompt(retrieved_records)
+                            system_prompt = build_system_prompt(reviews_context)
 
-                        # Step 4: Build message payload with recent 6 messages of history
-                        recent_history = []
-                        for m in st.session_state.messages[-6:]:
-                            if m.get("role") in ["user", "assistant"] and m.get("content"):
-                                recent_history.append({"role": m["role"], "content": m["content"]})
+                            recent_history = []
+                            for m in st.session_state.messages[-6:]:
+                                if m.get("role") in ["user", "assistant"] and m.get("content"):
+                                    recent_history.append({"role": m["role"], "content": m["content"]})
 
-                        llm_messages = [{"role": "system", "content": system_prompt}]
-                        llm_messages.extend(recent_history)
-                        llm_messages.append({"role": "user", "content": active_query})
+                            llm_messages = [{"role": "system", "content": system_prompt}]
+                            llm_messages.extend(recent_history)
+                            llm_messages.append({"role": "user", "content": active_query})
 
-                        # Step 5: Call Groq and stream using st.write_stream at temperature <= 0.2
-                        try:
-                            client = groq_client or Groq(api_key=GROQ_API_KEY)
-                            stream = client.chat.completions.create(
-                                model="qwen/qwen3.8-27b",
-                                messages=llm_messages,
-                                stream=True,
-                                temperature=0.1,
-                                max_tokens=750
-                            )
+                            # Progress step: Analysis complete
+                            status.update(label="Analysis complete", state="complete")
 
-                            def token_stream():
-                                for chunk in stream:
-                                    if chunk.choices and chunk.choices[0].delta.content:
-                                        yield chunk.choices[0].delta.content
+                            # Step 4: Replace thinking indicator with answer streamed word by word
+                            thinking_slot.empty()
 
-                            raw_answer = st.write_stream(token_stream)
-                            formatted_answer = linkify_citations(raw_answer, records_lookup)
-                            if formatted_answer != raw_answer:
-                                st.markdown(formatted_answer, unsafe_allow_html=True)
-                            final_answer = formatted_answer
+                            try:
+                                client = groq_client or Groq(api_key=GROQ_API_KEY)
+                                stream = client.chat.completions.create(
+                                    model="qwen/qwen3.8-27b",
+                                    messages=llm_messages,
+                                    stream=True,
+                                    temperature=0.1,
+                                    max_tokens=750
+                                )
 
-                        except Exception as e:
-                            fallback_answer = (
-                                "**Short answer**\n"
-                                "First-time investors stop their SIPs primarily due to bank AutoPay bounce charges "
-                                "and panic from early market losses.\n\n"
-                                "**What users are saying**\n"
-                                "- **AutoPay Bounce Penalties:** Some users report unexpected penalty charges when salary credits do not align with the debit date, leading them to cancel mandates. [🔗 Groww Play Store ↗](#) [🔗 Reddit ↗](#)\n"
-                                "- **Early Market Losses:** A few users experience loss anxiety when their initial investments show negative returns, prompting them to stop investing. [🔗 Reddit ↗](#) [🔗 Groww Play Store ↗](#)\n\n"
-                                "**Why it is happening (root cause)**\n"
-                                "My interpretation: First-time investors enter with expectations of steady growth and lack psychological buffers during market dips. When compounded by punitive bank bounce penalties, they lose confidence in the automation.\n\n"
-                                "**What to explore next**\n"
-                                "1. How does the SIP debit date relative to salary date impact 12-month retention?\n"
-                                "2. What solutions can Groww introduce to prevent bank bounce charges?"
-                            )
-                            st.markdown(fallback_answer, unsafe_allow_html=True)
-                            final_answer = fallback_answer
+                                def token_stream():
+                                    for chunk in stream:
+                                        if chunk.choices and chunk.choices[0].delta.content:
+                                            yield chunk.choices[0].delta.content
 
-                        # Render "Show retrieved reviews" panel under answer
-                        if display_refs:
-                            with st.expander(f"Show retrieved reviews ({len(display_refs)} reviews)", expanded=False):
-                                for r_idx, r in enumerate(display_refs, 1):
-                                    src_lbl = get_source_label(r.get("source", ""))
-                                    rec_id = r.get("record_id", f"REC-{r_idx:05d}")
-                                    u = r.get("url") or "#"
-                                    clf = r.get("classification", {})
-                                    act = clf.get("observable_behaviour") or f"Action: {clf.get('action', 'Action taken').title()} SIP"
-                                    trig = clf.get("trigger_context") or clf.get("underlying_problem") or "Investor discussion"
-                                    quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:250].replace("\n", " ")
-                                    st.markdown(
-                                        f"**[{r_idx}] {rec_id}** — **{src_lbl}** ({r.get('published_at', '')[:10]}) | [🔗 Source ↗]({u})\n\n"
-                                        f"- **{act}** | Reason: *{trig}*\n"
-                                        f"- *\"{quote}\"*\n\n---"
-                                    )
+                                raw_answer = st.write_stream(token_stream)
+                                formatted_answer = linkify_citations(raw_answer, records_lookup)
+                                if formatted_answer != raw_answer:
+                                    st.markdown(formatted_answer, unsafe_allow_html=True)
+                                final_answer = formatted_answer
 
-                        # Save to session state
-                        st.session_state.messages.append({"role": "user", "content": active_query})
-                        st.session_state.messages.append({
-                            "role": "assistant",
-                            "content": final_answer,
-                            "references": display_refs
-                        })
+                            except Exception as e:
+                                fallback_answer = (
+                                    "**Short answer**\n"
+                                    "First-time investors stop their SIPs primarily due to bank AutoPay bounce charges "
+                                    "and panic from early market losses.\n\n"
+                                    "**What users are saying**\n"
+                                    "- **AutoPay Bounce Penalties:** Some users report unexpected penalty charges when salary credits do not align with the debit date, leading them to cancel mandates. [🔗 Groww Play Store ↗](#) [🔗 Reddit ↗](#)\n"
+                                    "- **Early Market Losses:** A few users experience loss anxiety when their initial investments show negative returns, prompting them to stop investing. [🔗 Reddit ↗](#) [🔗 Groww Play Store ↗](#)\n\n"
+                                    "**Why it is happening (root cause)**\n"
+                                    "My interpretation: First-time investors enter with expectations of steady growth and lack psychological buffers during market dips. When compounded by punitive bank bounce penalties, they lose confidence in the automation.\n\n"
+                                    "**What to explore next**\n"
+                                    "1. How does the SIP debit date relative to salary date impact 12-month retention?\n"
+                                    "2. What solutions can Groww introduce to prevent bank bounce charges?"
+                                )
+                                st.markdown(fallback_answer, unsafe_allow_html=True)
+                                final_answer = fallback_answer
+
+                    # Step 5: After answer finishes, remove thinking indicator and show links and retrieved reviews
+                    thinking_slot.empty()
+                    if display_refs:
+                        with st.expander("Show retrieved reviews", expanded=False):
+                            for r_idx, r in enumerate(display_refs, 1):
+                                src_lbl = get_source_label(r.get("source", ""))
+                                rec_id = r.get("record_id", f"REC-{r_idx:05d}")
+                                u = r.get("url") or "#"
+                                clf = r.get("classification", {})
+                                act = clf.get("observable_behaviour") or f"Action: {clf.get('action', 'Action taken').title()} SIP"
+                                trig = clf.get("trigger_context") or clf.get("underlying_problem") or "Investor discussion"
+                                quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:250].replace("\n", " ")
+                                st.markdown(
+                                    f"**[{r_idx}] {rec_id}** — **{src_lbl}** ({r.get('published_at', '')[:10]}) | [🔗 Source ↗]({u})\n\n"
+                                    f"- **{act}** | Reason: *{trig}*\n"
+                                    f"- *\"{quote}\"*\n\n---"
+                                )
+
+                    # Save conversation turns in session state
+                    st.session_state.messages.append({"role": "user", "content": active_query})
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": final_answer,
+                        "references": display_refs
+                    })
+
+                    # Step 6: Re-enable chat input
+                    st.session_state.is_answering = False
 
                 # Maintain recent chats in sidebar
                 if not st.session_state.current_chat_id:
@@ -1378,7 +1422,8 @@ else:
                         "messages": list(st.session_state.messages)
                     })
 
-                scroll_to_question()
+                scroll_latest_into_view()
+                unlock_chat_input()
 
     # -------------------------
     # Right Column: References Card

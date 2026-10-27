@@ -295,7 +295,7 @@ Your job is to analyze real user reviews and discussions (Google Play Store, App
 CRITICAL RULES YOU MUST OBEY:
 1. STRICTLY NO COUNTS OR NUMBERS ABOUT REVIEWS:
    Do NOT show any counts, numbers, fractions, or percentages about reviews anywhere in your answer.
-   NEVER write "X of the {total_reviews_looked_at} reviews I looked at", "X of N", percentages, or "most reviews said".
+   NEVER write "X of the reviews I looked at", "X of N", percentages, or "most reviews said".
    I only want review links as evidence.
 2. CITATIONS:
    After each theme, place 2-3 clickable review links using this format: [🔗 Source ↗](url). Keep all review link references intact.
