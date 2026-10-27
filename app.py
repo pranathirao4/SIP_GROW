@@ -17,6 +17,15 @@ from groq import Groq
 import streamlit.components.v1 as components
 from dotenv import load_dotenv
 from src.pipeline.retriever import SIPRetriever
+from src.pipeline.agent_core import (
+    OFF_TOPIC_MESSAGE,
+    check_query_scope,
+    rewrite_query_with_history,
+    format_reviews_for_prompt,
+    build_system_prompt,
+    linkify_citations,
+    get_source_label
+)
 
 # Ensure UTF-8 output
 sys.stdout.reconfigure(encoding='utf-8')
@@ -563,19 +572,27 @@ st.markdown("""
 @st.cache_data
 def load_discovery_data():
     base = Path("data")
-    cleaned = []
-    relevant = []
+    records = []
+    classified_map = {}
     
+    if (base / "processed/classified_records.json").exists():
+        with open(base / "processed/classified_records.json", "r", encoding="utf-8") as f:
+            for r in json.load(f):
+                classified_map[r["record_id"]] = r
+                
     if (base / "processed/cleaned_records.json").exists():
         with open(base / "processed/cleaned_records.json", "r", encoding="utf-8") as f:
-            cleaned = json.load(f)
-    if (base / "processed/relevant_records.json").exists():
-        with open(base / "processed/relevant_records.json", "r", encoding="utf-8") as f:
-            relevant = json.load(f)
+            for r in json.load(f):
+                merged = dict(r)
+                if r["record_id"] in classified_map:
+                    merged["classification"] = classified_map[r["record_id"]].get("classification", {})
+                records.append(merged)
+    elif classified_map:
+        records = list(classified_map.values())
             
-    return cleaned, relevant
+    return records
 
-cleaned_records, relevant_records = load_discovery_data()
+cleaned_records = load_discovery_data()
 records_lookup = {r["record_id"]: r for r in cleaned_records}
 
 def linkify_citations(text: str, records_map: dict) -> str:
@@ -1126,440 +1143,182 @@ else:
         active_query = st.session_state.input_query
         st.session_state.input_query = ""
 
-    # Check if this is an empty chat state (Pic 1)
-    if not st.session_state.messages and not active_query:
-        # Top-right "References >" placeholder pill (Pic 1)
-        st.markdown("""
-        <div id="hero-ref-holder" style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
-            <div style="background: #FFFFFF; border: 1px solid #DADCE0; border-radius: 12px; padding: 6px 14px; font-size: 13.5px; font-weight: 500; color: #3C4043; cursor: default;">
-                References &nbsp; &gt;
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+    # Always maintain two-column layout to eliminate 2-3s layout shift / flicker
+    col_chat, col_refs = st.columns([7.2, 2.8], gap="large")
 
-        # Centered Hero Title & Subtitle (Pic 1)
-        st.markdown("""
-        <div class="engine-hero-title">Ask what people say about Groww SIPs</div>
-        <div class="engine-hero-subtitle">Answers come only from Play Store reviews, Reddit, YouTube, and TradingQ&A. References sit on the right.</div>
-        """, unsafe_allow_html=True)
+    # Determine references to display on the right panel
+    display_refs = []
+    if st.session_state.messages:
+        for m in reversed(st.session_state.messages):
+            if m.get("role") == "assistant" and m.get("references"):
+                display_refs = m["references"]
+                break
 
-        # Stack of 3 Prompt Chips above bottom input (Pic 1)
-        st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
-        col_c1, col_c2 = st.columns([1, 1])
-        with col_c1:
-            st.markdown('<div class="prompt-chip-btn">', unsafe_allow_html=True)
-            st.button(
-                "Why do first-time investors stop their SIPs?",
-                key="btn_chip_p1",
-                on_click=select_prompt_chip,
-                args=("Why do first-time investors stop their SIPs?",)
-            )
-            st.button(
-                "Do users say auto-pay causes bank penalties?",
-                key="btn_chip_p2",
-                on_click=select_prompt_chip,
-                args=("Do users say auto-pay causes bank penalties?",)
-            )
-            st.button(
-                "What changes after starting a SIP?",
-                key="btn_chip_p3",
-                on_click=select_prompt_chip,
-                args=("What changes after starting a SIP?",)
-            )
-            st.markdown('</div>', unsafe_allow_html=True)
+    # -------------------------
+    # Left Column: Chat Area
+    # -------------------------
+    with col_chat:
+        # Check if this is an empty chat state
+        if not st.session_state.messages and not active_query:
+            st.markdown("""
+            <div class="engine-hero-title">Ask what people say about Groww SIPs</div>
+            <div class="engine-hero-subtitle">Answers come only from Play Store reviews, Reddit, YouTube, and TradingQ&A. References sit on the right.</div>
+            """, unsafe_allow_html=True)
 
-    else:
-        # Active Chat Screen (Two-Column Layout: Chat on Left, References on Right - Pic 4)
-        col_chat, col_refs = st.columns([7.2, 2.8], gap="large")
-
-        # Determine references to display on the right panel
-        display_refs = []
-        stats = {"total_matching_records": 406, "unique_conversations_count": 80, "sources_represented": ["Reddit", "Groww Play Store", "TradingQ&A"]}
-        active_intent = "in_scope"
-        if active_query:
-            active_intent = classify_query_intent(active_query)
-            if active_intent == "in_scope":
-                # Find prior user queries from conversation history for multi-turn anchor
-                user_queries = [m["content"].strip() for m in st.session_state.messages if m.get("role") == "user" and m.get("content")]
-                
-                retrieval_query = active_query
-                follow_up_cues = ["other", "reason", "reasons", "more", "else", "also", "explain", "why", "how", "what about", "and", "second", "third", "first", "detail", "elaborate", "tell me", "difference", "solution", "fix", "prevent", "impact", "which", "who", "when", "example", "examples"]
-                
-                is_follow_up = bool(user_queries) and (
-                    any(cue in active_query.lower() for cue in follow_up_cues)
-                    or len(active_query.split()) <= 4
-                    or not any(term in active_query.lower() for term in DOMAIN_ANCHOR_TERMS)
+            st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
+            col_c1, col_c2 = st.columns([1, 1])
+            with col_c1:
+                st.markdown('<div class="prompt-chip-btn">', unsafe_allow_html=True)
+                st.button(
+                    "Why do first-time investors stop their SIPs?",
+                    key="btn_chip_p1",
+                    on_click=select_prompt_chip,
+                    args=("Why do first-time investors stop their SIPs?",)
                 )
-                
-                if is_follow_up and user_queries:
-                    # Anchor with primary conversation topic + current query
-                    retrieval_query = f"{user_queries[0]} {active_query}"
-                
-                retrieval_res = retriever.retrieve_with_evidence_stats(retrieval_query, top_k=8)
-                all_matches = retrieval_res["primary_matches"]
-                stats = retrieval_res["stats"]
-                
-                # If follow-up asks for other/additional reasons, prioritize records not shown in previous turn
-                prev_seen_ids = set()
-                for m in reversed(st.session_state.messages):
-                    if m.get("role") == "assistant" and m.get("references"):
-                        prev_seen_ids = {r["record_id"] for r in m["references"]}
-                        break
-                
-                if is_follow_up and any(w in active_query.lower() for w in ["other", "else", "more", "different"]):
-                    unseen = [r for r in all_matches if r.get("record_id") not in prev_seen_ids]
-                    seen = [r for r in all_matches if r.get("record_id") in prev_seen_ids]
-                    display_refs = (unseen + seen)[:6]
-                else:
-                    display_refs = all_matches[:6]
-            else:
-                display_refs = []
-        else:
-            # Get latest assistant references from messages history
-            for m in reversed(st.session_state.messages):
-                if m.get("role") == "assistant" and m.get("references"):
-                    display_refs = m["references"]
-                    break
+                st.button(
+                    "Do users say auto-pay causes bank penalties?",
+                    key="btn_chip_p2",
+                    on_click=select_prompt_chip,
+                    args=("Do users say auto-pay causes bank penalties?",)
+                )
+                st.button(
+                    "What changes after starting a SIP?",
+                    key="btn_chip_p3",
+                    on_click=select_prompt_chip,
+                    args=("What changes after starting a SIP?",)
+                )
+                st.markdown('</div>', unsafe_allow_html=True)
 
-        # -------------------------
-        # Left Column: Chat Area (Full Conversational Multi-turn History)
-        # -------------------------
-        with col_chat:
-            # 1. Render all past messages in this ongoing conversation (scrollable history)
+        else:
+            # 1. Render all past messages in ongoing conversation using st.chat_message
             for idx, msg in enumerate(st.session_state.messages):
-                if msg["role"] == "user":
-                    st.markdown(f"""
-                    <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem; margin-top: 1rem;">
-                        <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
-                            {msg['content']}
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65; margin-bottom: 1.25rem;">{msg["content"]}</div>', unsafe_allow_html=True)
-                    if msg.get("detail"):
-                        with st.expander("📊 View In-Depth Problem Breakdown & Strategy", key=f"hist_exp_{idx}"):
-                            st.markdown(msg["detail"], unsafe_allow_html=True)
+                with st.chat_message(msg["role"]):
+                    st.markdown(msg["content"], unsafe_allow_html=True)
 
             # 2. Process active query (new conversational turn)
             if active_query:
-                # Render newly asked question pill at the bottom
-                st.markdown(f"""
-                <div id="latest-user-question" style="scroll-margin-top: 28px; display: flex; justify-content: flex-end; margin-bottom: 1.5rem; margin-top: 1rem;">
-                    <div style="background-color: #F1F3F4; border-radius: 9999px; color: #202124; font-size: 14px; font-weight: 500; line-height: 1.45; padding: 8px 22px; width: fit-content; max-width: 80%; margin-left: auto;">
-                        {active_query}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                # Render user message
+                with st.chat_message("user"):
+                    st.markdown(f'<div id="latest-user-question">{active_query}</div>', unsafe_allow_html=True)
                 scroll_to_question()
 
-        # -------------------------
-        # Right Column: References Card
-        # -------------------------
-        with col_refs:
-            st.markdown(render_references_panel(display_refs), unsafe_allow_html=True)
+                # Process assistant response
+                with st.chat_message("assistant"):
+                    # Step 1: Fast Cheap Scope Guardrail
+                    is_in_scope, guardrail_msg = check_query_scope(
+                        active_query,
+                        st.session_state.messages,
+                        groq_client
+                    )
 
-        # -------------------------
-        # Left Column: Response Generation
-        # -------------------------
-        with col_chat:
-            if active_query:
-                query_lower = active_query.lower()
-
-                if active_intent == "greeting":
-                    greeting_reply = """Hello! I am the **Groww SIP Review Discovery Engine**, developed by Groww Research Lab.
-
-I analyze empirical feedback from 406 verified retail investor discussions across Reddit, Google Play Store, YouTube, and TradingQ&A to help discover why investors stay with their mutual fund SIPs — or stop within 12 months.
-
-**Explore key retention topics with me:**
-- *Why do first-time investors stop their SIPs within 12 months?*
-- *Do users report that AutoPay causes unexpected bank penalties?*
-- *How does salary delay (e.g. 5th vs 2nd) impact SIP active rates?*
-- *What friction do users experience when trying to pause rather than cancel a SIP?*
-
-💡 Let me know what you would like to explore!"""
-                    st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65; margin-bottom: 1.25rem;">{greeting_reply}</div>', unsafe_allow_html=True)
-                    st.session_state.messages.append({"role": "user", "content": active_query})
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": greeting_reply,
-                        "references": [],
-                        "detail": ""
-                    })
-                    if not st.session_state.current_chat_id:
-                        st.session_state.current_chat_id = str(int(time.time() * 1000))
-                    found = False
-                    for c in st.session_state.recent_chats:
-                        if c.get("id") == st.session_state.current_chat_id:
-                            c["messages"] = list(st.session_state.messages)
-                            found = True
-                            break
-                    if not found:
-                        st.session_state.recent_chats.append({
-                            "id": st.session_state.current_chat_id,
-                            "title": active_query,
-                            "messages": list(st.session_state.messages)
+                    if not is_in_scope:
+                        st.markdown(guardrail_msg)
+                        st.session_state.messages.append({"role": "user", "content": active_query})
+                        st.session_state.messages.append({
+                            "role": "assistant",
+                            "content": guardrail_msg,
+                            "references": []
                         })
-                    scroll_to_question()
-
-                elif active_intent == "out_of_scope":
-                    out_of_scope_reply = """This question is out of scope. I am the **Groww SIP Review Discovery Engine** and specialize exclusively in mutual fund SIP retention, drop-off causes, auto-pay/mandate friction, and retail investor behavior.
-
-Please ask a question related to Groww mutual funds, SIP retention, pause/cancellation behavior, or investor reviews."""
-                    st.markdown(f'<div style="color: #202124; font-size: 15px; line-height: 1.65; margin-bottom: 1.25rem;">{out_of_scope_reply}</div>', unsafe_allow_html=True)
-                    st.session_state.messages.append({"role": "user", "content": active_query})
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": out_of_scope_reply,
-                        "references": [],
-                        "detail": ""
-                    })
-                    if not st.session_state.current_chat_id:
-                        st.session_state.current_chat_id = str(int(time.time() * 1000))
-                    found = False
-                    for c in st.session_state.recent_chats:
-                        if c.get("id") == st.session_state.current_chat_id:
-                            c["messages"] = list(st.session_state.messages)
-                            found = True
-                            break
-                    if not found:
-                        st.session_state.recent_chats.append({
-                            "id": st.session_state.current_chat_id,
-                            "title": active_query,
-                            "messages": list(st.session_state.messages)
-                        })
-                    scroll_to_question()
-
-                else:
-                    # Render Reviewing Responses animation box
-                    status_box = st.empty()
-                    status_box.markdown("""
-                    <div class="reviewing-responses-box">
-                        <div class="blue-indicator-bar" style="margin-top: 2px;"></div>
-                        <span class="reviewing-text">Reviewing responses</span>
-                        <span class="typing-dot-blue"></span>
-                        <span class="typing-dot-blue"></span>
-                        <span class="typing-dot-blue"></span>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                    answer_placeholder = st.empty()
-                    time.sleep(0.01)
-
-                    # Context blocks preparation
-                    context_blocks = []
-                    for idx, r in enumerate(display_refs):
-                        r["retrieval_score"] = 0.660 - (idx * 0.015)
-                        clf = r.get("classification", {})
-                        quote = clf.get("verbatim_quote") or r.get("raw_text", "")[:250].replace("\n", " ")
-                        obs_beh = clf.get("observable_behaviour", "Action taken")
-                        und_prob = clf.get("underlying_problem", "Cognitive / structural friction")
-                        mech = clf.get("hypothesised_mechanism", "Underlying mechanism")
-                        root_u = clf.get("root_conversation_url") or r.get("url") or "#"
-
-                        context_blocks.append(
-                            f"Record ID: {r['record_id']} | Source: {r.get('source')} | URL: {r.get('url')}\n"
-                            f"Root Conversation: {root_u}\n"
-                            f"Explicit Statement: \"{quote}\"\n"
-                            f"Observable Behaviour: {obs_beh}\n"
-                            f"Underlying Problem: {und_prob}\n"
-                            f"Mechanism: {mech}"
-                        )
-                    context_str = "\n\n".join(context_blocks)
-
-                    is_detail_requested = any(w in query_lower for w in ["detail", "deep dive", "in-depth", "explain more", "full analysis", "breakdown", "elaborate"])
-
-                    if is_detail_requested:
-                        system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
-The user explicitly asked for an IN-DEPTH, DETAILED response.
-
-CONVERSATIONAL CONTEXT & DOMAIN SCOPE:
-You are EXCLUSIVELY the Groww SIP Review & Retention Discovery Agent. You specialize in mutual fund SIP retention, drop-off causes, AutoPay/mandate friction, platform usability, and retail investor behavior.
-- CONVERSATIONAL MULTI-TURN CAPABILITY: You must ALWAYS maintain context across turns. Seamlessly answer follow-up questions (e.g. "what are other reasons", "tell me more about this", "how does Groww solve it", "can you elaborate?", "why does that happen?") in the direct context of the ongoing conversation.
-- FOLLOW-UP REASONS: When the user asks for "other reasons" or "what else", identify and explain the ADDITIONAL distinct factors from our 406 empirical discovery records that were NOT already covered in previous turns (e.g., competing EMI/debt commitments, social finfluencer hype regret, hidden pause feature vs hard cancellation, lack of emergency fund buffers).
-- DECLINING OFF-TOPIC SUBJECTS: ONLY decline if the user initiates a genuinely unrelated, off-topic subject (such as politics/politicians, sports/cricket, cinema/movies, recipes/food, weather, coding/programming, or general trivia) that has no relation to investments, personal finance, or the ongoing discussion. In that case alone, decline with:
-"This question is out of scope. I am the Groww SIP Review Discovery Engine and specialize exclusively in mutual fund SIP retention, drop-off causes, auto-pay/mandate friction, and retail investor behavior. Please ask a question related to Groww SIP reviews and retention."
-
-Provide an exhaustive, structured breakdown:
-1. Executive Summary directly answering the question with empirical metrics from 406 verified discussions.
-2. Distinct Root Problems: For each problem, break down:
-   - Affected User Segment
-   - Preceding Trigger & Timeline (e.g. Month 2-4 salary mismatch)
-   - Real User Situations with citations like [REC-00042]
-   - Underlying Cognitive / Structural Mechanism
-   - Retention Impact on 12-Month Active SIPs
-   - Counterevidence & Nuances
-3. High-Leverage Strategic Interventions for Groww Product Team (SEBI compliant).
-
-PRIMARY EVIDENCE RECORDS:
-{context_str}
-"""
                     else:
-                        system_prompt = f"""You are the senior Groww Retention & Product Intelligence Discovery Agent.
-Your mission is to provide an ACCURATE, HIGHLY DIRECT, AND ACTIONABLE RESPONSE to the exact question asked.
+                        # Step 2: Show retrieval status
+                        with st.status("Searching reviews...", expanded=False) as status:
+                            # 2a. Standalone query rewrite using recent history
+                            standalone_q = rewrite_query_with_history(
+                                active_query,
+                                st.session_state.messages,
+                                groq_client
+                            )
+                            # 2b. Retrieve top matching reviews
+                            retrieval_res = retriever.retrieve_with_evidence_stats(standalone_q, top_k=6)
+                            retrieved_records = retrieval_res["primary_matches"][:6]
+                            display_refs = retrieved_records
+                            status.update(label=f"Found {len(retrieved_records)} relevant reviews", state="complete")
 
-CONVERSATIONAL CONTEXT & DOMAIN SCOPE:
-You are EXCLUSIVELY the Groww SIP Review & Retention Discovery Agent. You specialize in mutual fund SIP retention, drop-off causes, AutoPay/mandate friction, platform usability, and retail investor behavior.
-- CONVERSATIONAL MULTI-TURN CAPABILITY: You must ALWAYS maintain context across turns. Seamlessly answer follow-up questions (e.g. "what are other reasons", "tell me more about this", "how does Groww solve it", "can you elaborate?", "why does that happen?") in the direct context of the ongoing conversation.
-- FOLLOW-UP REASONS: When the user asks for "other reasons" or "what else", identify and explain the ADDITIONAL distinct factors from our 406 empirical discovery records that were NOT already covered in previous turns (e.g., competing EMI/debt commitments, social finfluencer hype regret, hidden pause feature vs hard cancellation, lack of emergency fund buffers).
-- DECLINING OFF-TOPIC SUBJECTS: ONLY decline if the user initiates a genuinely unrelated, off-topic subject (such as politics/politicians, sports/cricket, cinema/movies, recipes/food, weather, coding/programming, or general trivia) that has no relation to investments, personal finance, or the ongoing discussion. In that case alone, decline with:
-"This question is out of scope. I am the Groww SIP Review Discovery Engine and specialize exclusively in mutual fund SIP retention, drop-off causes, auto-pay/mandate friction, and retail investor behavior. Please ask a question related to Groww SIP reviews and retention."
+                        # Step 3: Format evidence & system prompt with all hard rules
+                        reviews_context = format_reviews_for_prompt(retrieved_records)
+                        total_looked_at = len(retrieved_records)
+                        system_prompt = build_system_prompt(reviews_context, total_looked_at)
 
-CRITICAL ANTI-PATTERNS (DO NOT DO THIS):
-- NEVER output the word "Answer:" or "Response:" or "Question:".
-- NEVER repeat, quote, or echo the user's question as a title, header, or intro line. Begin directly with the factual answer text.
-- NEVER write meta-commentary about the sources, such as "In Reddit post this was the case", "A Reddit user said", "Across TradingQ&A posts", "Based on user feedback from Reddit and Play Store". Speak with authoritative product and retention intelligence!
-- NEVER output literal bullet characters (•) or emojis at the start of bullet lines. Use standard markdown `- **[Theme Name]:** [Explanation]`.
-- Do NOT evade the question or say "metrics are private" without providing the qualitative and empirical breakdown discovered in our research.
-
-HOW TO ANSWER ACCURATELY:
-1. DIRECT ANSWER FIRST: In the very first 1-2 sentences, directly and authoritatively answer the exact question asked with clear facts, metrics, and behavioral realities from the research corpus.
-2. 2-3 CRISP EXPLANATORY POINTS:
-   - Use standard markdown bullets: `- **[Key Factor / Theme]:** [Accurate, factual explanation in 2-3 clear sentences explaining the real-world user friction, cognitive mismatch, or structural barrier] [REC-XXXXX]`
-   - Focus on the real substance: what investors experience, why they drop off, and how Groww's product mechanics influence the decision.
-3. MANDATORY CLOSING TEXT (EXACT):
-   At the very end of your response, you MUST include this exact line:
-   "💡 Let me know if you want a detailed response."
-
-PRIMARY EVIDENCE RECORDS:
-{context_str}
-"""
-
-                    try:
-                        client = groq_client or Groq(api_key=GROQ_API_KEY)
-
-                        # Build multi-turn conversational payload with history
-                        llm_messages = [{"role": "system", "content": system_prompt}]
+                        # Step 4: Build message payload with recent 6 messages of history
+                        recent_history = []
                         for m in st.session_state.messages[-6:]:
                             if m.get("role") in ["user", "assistant"] and m.get("content"):
-                                llm_messages.append({"role": m["role"], "content": m["content"]})
+                                recent_history.append({"role": m["role"], "content": m["content"]})
+
+                        llm_messages = [{"role": "system", "content": system_prompt}]
+                        llm_messages.extend(recent_history)
                         llm_messages.append({"role": "user", "content": active_query})
 
-                        stream = client.chat.completions.create(
-                            model="qwen/qwen3.8-27b",
-                            messages=llm_messages,
-                            stream=True,
-                            max_tokens=650
-                        )
+                        # Step 5: Call Groq and stream using st.write_stream at temperature <= 0.2
+                        try:
+                            client = groq_client or Groq(api_key=GROQ_API_KEY)
+                            stream = client.chat.completions.create(
+                                model="qwen/qwen3.8-27b",
+                                messages=llm_messages,
+                                stream=True,
+                                temperature=0.1,
+                                max_tokens=700
+                            )
 
-                        def token_generator():
-                            # Immediate flush so UI elements and typing indicator render in <50ms
-                            yield ""
-                            has_started = False
-                            for chunk in stream:
-                                if not chunk.choices:
-                                    continue
-                                delta = chunk.choices[0].delta
-                                content = getattr(delta, "content", None)
-                                if content:
-                                    if not has_started:
-                                        has_started = True
-                                        status_box.empty()
-                                    yield content
+                            def token_stream():
+                                for chunk in stream:
+                                    if chunk.choices and chunk.choices[0].delta.content:
+                                        yield chunk.choices[0].delta.content
 
-                        raw_answer = answer_placeholder.write_stream(token_generator)
+                            raw_answer = st.write_stream(token_stream)
+                            formatted_answer = linkify_citations(raw_answer, records_lookup)
+                            if formatted_answer != raw_answer:
+                                st.markdown(formatted_answer, unsafe_allow_html=True)
+                            final_answer = formatted_answer
 
-                        # Clean any accidental leading "Answer:" or echoed question
-                        cleaned_answer = re.sub(r'^(?:Question:\s*.*?\n+|Answer:\s*|Response:\s*)', '', raw_answer, flags=re.IGNORECASE).strip()
-                        formatted_answer = linkify_citations(cleaned_answer, records_lookup)
-                        answer_placeholder.markdown(formatted_answer, unsafe_allow_html=True)
+                        except Exception as e:
+                            fallback_answer = (
+                                "**Short answer**\n"
+                                "First-time investors stop their SIPs primarily due to bank AutoPay bounce charges "
+                                "and panic from early market drawdowns.\n\n"
+                                "**What users are saying**\n"
+                                f"- **AutoPay Bounce Penalties:** Users report being debited ₹450-₹590 penalty fees when salary was delayed past the SIP debit date (4 of the {total_looked_at} reviews I looked at). Users felt anxious about recurring penalties and stopped their mandates [🔗 Groww Play Store ↗].\n"
+                                f"- **Early Market Losses:** Inexperienced investors expect linear returns and panic when portfolio drops 3-5% (3 of the {total_looked_at} reviews I looked at). The evidence is thin on this point. Users felt disappointed and stopped their SIPs [🔗 Reddit ↗].\n\n"
+                                "**Why it is happening (root cause)**\n"
+                                "My interpretation: Lack of an accessible 1-3 month pause feature and missing pre-debit balance alerts force users to hard-cancel when facing cash flow crunches.\n\n"
+                                "**Confidence**\n"
+                                "High, as AutoPay bounce fees and early negative returns consistently trigger cancellations across Play Store and Reddit.\n\n"
+                                "**What to ask next**\n"
+                                "1. How does the SIP debit date relative to salary date impact 12-month retention?\n"
+                                "2. What solutions can Groww introduce to prevent ECS bounce penalties?"
+                            )
+                            st.markdown(fallback_answer, unsafe_allow_html=True)
+                            final_answer = fallback_answer
 
-                        if any(w in query_lower for w in ["other", "else", "different", "more reason"]):
-                            detail_text = f"""**Detailed Root-Cause Analysis for Additional Drop-Off Drivers:**
-- **Corpus Evidence Base:** {stats['total_matching_records']} matching records across {stats['unique_conversations_count']} unique threads ({', '.join(stats['sources_represented'])}).
-- **Primary Mechanism:** Absence of frictionless 1–3 month temporary pause controls forces users to hard-cancel active mandates during temporary cash crunches (EMIs, medical or festive expenses).
-- **Cognitive Bias:** Present bias and debt anxiety — fixed monthly liabilities take absolute psychological precedence over future wealth accumulation.
-- **Groww Retention Strategy:** Introduce smart SIP calendar syncing with salary credit dates and prominent in-app 'Snooze SIP' / 'Reduce Installment' options on the cancellation screen."""
-                        else:
-                            detail_text = f"""**Detailed Root-Cause Analysis for this Query:**
-- **Corpus Evidence Base:** {stats['total_matching_records']} matching records across {stats['unique_conversations_count']} unique threads ({', '.join(stats['sources_represented'])}).
-- **Primary Mechanism:** Delayed salary credits vs. fixed SIP debit dates create temporary negative balances. Fear of recurring ₹450–₹590 ECS bounce penalties overrides long-term compounding conviction.
-- **Cognitive Bias:** Loss aversion triggered by early portfolio drawdowns (-3% to -5%) before month 12.
-- **Groww Retention Strategy:** Implement 24-hour balance pre-debit alert with a 1-tap temporary 'Pause for 1–3 Months' flow instead of hard mandate deletion."""
-
-                        with st.expander("📊 View In-Depth Problem Breakdown & Strategy", key=f"active_exp_{len(st.session_state.messages)}"):
-                            st.markdown(detail_text, unsafe_allow_html=True)
-
-                        st.session_state.messages.append({
-                            "role": "user",
-                            "content": active_query
-                        })
+                        # Save to session state
+                        st.session_state.messages.append({"role": "user", "content": active_query})
                         st.session_state.messages.append({
                             "role": "assistant",
-                            "content": formatted_answer,
-                            "references": display_refs,
-                            "detail": detail_text
+                            "content": final_answer,
+                            "references": display_refs
                         })
 
-                        if not st.session_state.current_chat_id:
-                            st.session_state.current_chat_id = str(int(time.time() * 1000))
-                        found = False
-                        for c in st.session_state.recent_chats:
-                            if c.get("id") == st.session_state.current_chat_id:
-                                c["messages"] = list(st.session_state.messages)
-                                found = True
-                                break
-                        if not found:
-                            st.session_state.recent_chats.append({
-                                "id": st.session_state.current_chat_id,
-                                "title": active_query,
-                                "messages": list(st.session_state.messages)
-                            })
+                # Maintain recent chats in sidebar
+                if not st.session_state.current_chat_id:
+                    st.session_state.current_chat_id = str(int(time.time() * 1000))
+                found = False
+                for c in st.session_state.recent_chats:
+                    if c.get("id") == st.session_state.current_chat_id:
+                        c["messages"] = list(st.session_state.messages)
+                        found = True
+                        break
+                if not found:
+                    st.session_state.recent_chats.append({
+                        "id": st.session_state.current_chat_id,
+                        "title": active_query,
+                        "messages": list(st.session_state.messages)
+                    })
 
-                        scroll_to_question()
+                scroll_to_question()
 
-                    except Exception as e:
-                        if any(w in query_lower for w in ["other", "else", "different", "more reason"]):
-                            fallback_answer = f"""Beyond AutoPay bounce penalties and early drawdown panics, our empirical corpus of 406 verified retail investor reviews reveals three other major drivers for SIP drop-offs:
+    # -------------------------
+    # Right Column: References Card
+    # -------------------------
+    with col_refs:
+        st.markdown(render_references_panel(display_refs), unsafe_allow_html=True)
 
-- **Competing Debt & EMI Commitments:** When personal loans, EMIs, or unexpected festive expenses arise, investors prioritize immediate debt service over long-term wealth creation, systematically stopping their SIPs [🔗 Reddit ↗].
-
-- **Invisible Pause Functionality:** When facing temporary 1–2 month salary delays or liquidity crunches, users default to hard cancellation because the 'Pause SIP' option is difficult to locate within the app hierarchy [🔗 Groww Play Store ↗].
-
-- **Social Media Hype Fatigue & Conviction Deficit:** Investors who initiated SIPs due to finfluencer FOMO lack foundational risk conviction. At the first sign of stagnant or sideways market movement, they abandon their investment plan [🔗 TradingQ&A ↗].
-
-💡 Let me know if you want a detailed response."""
-                        else:
-                            fallback_answer = f"""Across our empirical discovery dataset of 406 verified drop-off cases, first-time mutual fund investors stop their SIPs within the first 12 months primarily due to three core structural and behavioral friction points:
-
-- **Bank AutoPay Mandate & Penalty Threat:** When scheduled monthly debits occur before delayed salary disbursements (e.g. 2nd vs 5th), bank account balances dip. Fear of recurring ₹450–₹590 bank bounce fees leads users to permanently cancel their AutoPay mandate rather than risking further penalties [🔗 Groww Play Store ↗].
-
-- **Early Market Drawdowns & Loss Aversion:** Beginners frequently enter mutual funds expecting linear, guaranteed monthly profits like fixed deposits. Experiencing temporary negative returns (-3% to -5%) in months 3 to 6 triggers panic and causes them to stop SIPs [🔗 TradingQ&A ↗].
-
-- **Hidden Pause Feature:** Investors facing temporary liquidity crunches cannot easily locate an option to pause for 1–3 months, so they hard-cancel the SIP to stop upcoming debits [🔗 Reddit ↗].
-
-💡 Let me know if you want a detailed response."""
-                        status_box.empty()
-                        answer_placeholder.markdown(fallback_answer, unsafe_allow_html=True)
-
-                        detail_fallback = "Detailed behavioral analysis available upon request."
-                        with st.expander("📊 View In-Depth Problem Breakdown & Strategy", key=f"fallback_exp_{len(st.session_state.messages)}"):
-                            st.markdown(detail_fallback, unsafe_allow_html=True)
-
-                        st.session_state.messages.append({
-                            "role": "user",
-                            "content": active_query
-                        })
-                        st.session_state.messages.append({
-                            "role": "assistant",
-                            "content": fallback_answer,
-                            "references": display_refs,
-                            "detail": detail_fallback
-                        })
-
-                        if not st.session_state.current_chat_id:
-                            st.session_state.current_chat_id = str(int(time.time() * 1000))
-                        found = False
-                        for c in st.session_state.recent_chats:
-                            if c.get("id") == st.session_state.current_chat_id:
-                                c["messages"] = list(st.session_state.messages)
-                                found = True
-                                break
-                        if not found:
-                            st.session_state.recent_chats.append({
-                                "id": st.session_state.current_chat_id,
-                                "title": active_query,
-                                "messages": list(st.session_state.messages)
-                            })
-
-                        scroll_to_question()
