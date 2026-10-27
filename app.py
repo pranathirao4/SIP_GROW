@@ -251,11 +251,16 @@ st.markdown("""
         margin-top: 2rem;
     }
     
-    /* Main Content Container Spacing */
-    .main .block-container {
+    /* Main Content Container Spacing & Bottom Clearance */
+    [data-testid="stMainBlockContainer"],
+    .stMainBlockContainer,
+    .main .block-container,
+    .block-container,
+    section.main .block-container,
+    div[data-testid="stVerticalBlock"] > div.block-container {
         max-width: 1180px !important;
         padding-top: 1.25rem !important;
-        padding-bottom: 7.5rem !important; /* Clearance for sticky bottom input */
+        padding-bottom: 220px !important; /* Clearance so last message always sits fully above chat input */
     }
     
     /* Empty State Hero (Pic 1) */
@@ -635,10 +640,14 @@ st.markdown("""
 
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
-        .main .block-container {
+        [data-testid="stMainBlockContainer"],
+        .stMainBlockContainer,
+        .main .block-container,
+        .block-container,
+        section.main .block-container {
             padding-left: 0.75rem !important;
             padding-right: 0.75rem !important;
-            padding-bottom: 8.5rem !important;
+            padding-bottom: 220px !important;
         }
         div[data-testid="stChatInput"] {
             width: calc(100% - 24px) !important;
@@ -792,50 +801,65 @@ def classify_query_intent(query: str) -> str:
     return "in_scope"
 
 
-def scroll_latest_into_view():
-    """Scrolls the latest chat message into view (behavior: 'smooth', block: 'end') and monitors streaming."""
-    js = """
+def scroll_to_bottom(stage: str = "general"):
+    """
+    Scrolls to the bottom of the main container using window.parent.document.
+    Uses unique timestamp in html so Streamlit re-executes the component on every call.
+    """
+    nonce = f"{stage}_{int(time.time()*1000)}_{os.urandom(3).hex()}"
+    js = f"""
+    <div id="scroll-{nonce}" style="display:none;" data-nonce="{nonce}"></div>
     <script>
-    (function() {
-        const doc = window.parent.document;
-        if (!doc) return;
+    (function() {{
+        try {{
+            const doc = window.parent.document;
+            if (!doc) return;
 
-        function doScroll() {
-            try {
-                const messages = doc.querySelectorAll('[data-testid="stChatMessage"]');
-                if (messages.length > 0) {
-                    const lastMsg = messages[messages.length - 1];
-                    lastMsg.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
-                } else {
-                    const main = doc.querySelector('section.main') || doc.querySelector('[data-testid="stAppViewContainer"]') || doc.documentElement || doc.body;
-                    if (main && main.scrollHeight > main.clientHeight) {
-                        main.scrollTo({ top: main.scrollHeight, behavior: 'smooth' });
-                    }
-                }
-            } catch(e) {}
-        }
+            function scrollMainToBottom() {{
+                try {{
+                    const containers = [
+                        doc.querySelector('section.main'),
+                        doc.querySelector('[data-testid="stMain"]'),
+                        doc.querySelector('[data-testid="stAppViewContainer"]'),
+                        doc.querySelector('.main'),
+                        doc.documentElement,
+                        doc.body
+                    ].filter(Boolean);
 
-        doScroll();
-        requestAnimationFrame(doScroll);
-        setTimeout(doScroll, 40);
-        setTimeout(doScroll, 120);
-        setTimeout(doScroll, 250);
+                    for (const c of containers) {{
+                        if (c.scrollHeight > c.clientHeight) {{
+                            c.scrollTo({{ top: c.scrollHeight, behavior: 'smooth' }});
+                        }}
+                    }}
 
-        // Streaming observer: keeps latest streamed tokens smoothly in view
-        const block = doc.querySelector('.main .block-container') || doc.body;
-        if (block && window.MutationObserver) {
-            let lastScrollTime = 0;
-            const obs = new MutationObserver(function() {
-                const now = Date.now();
-                if (now - lastScrollTime > 65) {
-                    lastScrollTime = now;
-                    doScroll();
-                }
-            });
-            obs.observe(block, { childList: true, subtree: true, characterData: true });
-            setTimeout(function() { obs.disconnect(); }, 35000);
-        }
-    })();
+                    const messages = doc.querySelectorAll('[data-testid="stChatMessage"]');
+                    if (messages.length > 0) {{
+                        messages[messages.length - 1].scrollIntoView({{ behavior: 'smooth', block: 'end' }});
+                    }}
+                }} catch(e) {{}}
+            }}
+
+            // Run immediately and after ~100ms timeout so DOM has settled
+            scrollMainToBottom();
+            setTimeout(scrollMainToBottom, 100);
+            setTimeout(scrollMainToBottom, 250);
+
+            // Streaming observer: keeps latest streamed tokens smoothly in view
+            const block = doc.querySelector('.main .block-container') || doc.querySelector('[data-testid="stMainBlockContainer"]') || doc.body;
+            if (block && window.MutationObserver) {{
+                let lastScrollTime = 0;
+                const obs = new MutationObserver(function() {{
+                    const now = Date.now();
+                    if (now - lastScrollTime > 60) {{
+                        lastScrollTime = now;
+                        scrollMainToBottom();
+                    }}
+                }});
+                obs.observe(block, {{ childList: true, subtree: true, characterData: true }});
+                setTimeout(function() {{ obs.disconnect(); }}, 35000);
+            }}
+        }} catch(e) {{}}
+    }})();
     </script>
     """
     components.html(js, height=0)
@@ -902,10 +926,24 @@ def inject_input_scroll_listener():
 
         function doScrollNow() {
             try {
+                const containers = [
+                    doc.querySelector('[data-testid="stMain"]'),
+                    doc.querySelector('section.main'),
+                    doc.querySelector('.main'),
+                    doc.querySelector('[data-testid="stAppViewContainer"]'),
+                    doc.documentElement,
+                    doc.body
+                ].filter(Boolean);
+
+                for (const c of containers) {
+                    if (c.scrollHeight > c.clientHeight) {
+                        c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
+                    }
+                }
+
                 const messages = doc.querySelectorAll('[data-testid="stChatMessage"]');
                 if (messages.length > 0) {
-                    const lastMsg = messages[messages.length - 1];
-                    lastMsg.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+                    messages[messages.length - 1].scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
             } catch(e) {}
         }
@@ -923,6 +961,8 @@ def inject_input_scroll_listener():
                             hideHeroImmediately();
                             lockInputNow();
                             doScrollNow();
+                            setTimeout(doScrollNow, 100);
+                            setTimeout(doScrollNow, 250);
                         }
                     });
                 }
@@ -932,6 +972,8 @@ def inject_input_scroll_listener():
                         hideHeroImmediately();
                         lockInputNow();
                         doScrollNow();
+                        setTimeout(doScrollNow, 100);
+                        setTimeout(doScrollNow, 250);
                     });
                 }
             }
@@ -944,6 +986,8 @@ def inject_input_scroll_listener():
                         hideHeroImmediately();
                         lockInputNow();
                         doScrollNow();
+                        setTimeout(doScrollNow, 100);
+                        setTimeout(doScrollNow, 250);
                     });
                 }
             });
@@ -1273,9 +1317,9 @@ else:
                     st.markdown(f'<div id="latest-user-question">{active_query}</div>', unsafe_allow_html=True)
 
                 # Step 2: Smooth auto-scroll so question and bot reply area are visible at bottom
-                scroll_latest_into_view()
+                scroll_to_bottom("user_question")
 
-                # Step 3, 4, 5: Assistant processing with thinking indicator and generic status steps
+                # Step 3, 4, 5: Assistant processing with thinking indicator
                 with st.chat_message("assistant"):
                     # 3a. Animated Thinking indicator with three bouncing dots
                     thinking_slot = st.empty()
@@ -1287,97 +1331,91 @@ else:
                         unsafe_allow_html=True
                     )
 
-                    # 3b. Progress steps in st.status with generic wording only
-                    with st.status("Understanding your question...", expanded=False) as status:
-                        time.sleep(0.3)
-                        # Scope guardrail
-                        is_in_scope, guardrail_msg = check_query_scope(
+                    # Scope guardrail
+                    is_in_scope, guardrail_msg = check_query_scope(
+                        active_query,
+                        st.session_state.messages,
+                        groq_client
+                    )
+
+                    if not is_in_scope:
+                        thinking_slot.empty()
+                        st.markdown(guardrail_msg)
+                        final_answer = guardrail_msg
+                        display_refs = []
+                    else:
+                        standalone_q = rewrite_query_with_history(
                             active_query,
                             st.session_state.messages,
                             groq_client
                         )
 
-                        if not is_in_scope:
-                            status.update(label="Analysis complete", state="complete")
-                            thinking_slot.empty()
-                            st.markdown(guardrail_msg)
-                            final_answer = guardrail_msg
-                            display_refs = []
-                        else:
-                            standalone_q = rewrite_query_with_history(
-                                active_query,
-                                st.session_state.messages,
-                                groq_client
+                        # Retrieve top 20 relevant reviews
+                        expanded_queries = expand_query(standalone_q, groq_client)
+                        retrieval_res = retriever.retrieve_with_evidence_stats(expanded_queries, top_k=20)
+                        retrieved_records = retrieval_res["primary_matches"][:20]
+                        display_refs = retrieved_records
+
+                        reviews_context = format_reviews_for_prompt(retrieved_records)
+                        system_prompt = build_system_prompt(reviews_context)
+
+                        recent_history = []
+                        for m in st.session_state.messages[-6:]:
+                            if m.get("role") in ["user", "assistant"] and m.get("content"):
+                                recent_history.append({"role": m["role"], "content": m["content"]})
+
+                        llm_messages = [{"role": "system", "content": system_prompt}]
+                        llm_messages.extend(recent_history)
+                        llm_messages.append({"role": "user", "content": active_query})
+
+                        # Step 4: Remove thinking indicator right before streaming starts
+                        thinking_slot.empty()
+                        scroll_to_bottom("stream_start")
+
+                        try:
+                            client = groq_client or Groq(api_key=GROQ_API_KEY)
+                            stream = client.chat.completions.create(
+                                model="qwen/qwen3.8-27b",
+                                messages=llm_messages,
+                                stream=True,
+                                temperature=0.1,
+                                max_tokens=750
                             )
 
-                            # Progress step: Searching reviews...
-                            status.update(label="Searching reviews...", state="running")
-                            time.sleep(0.3)
-                            expanded_queries = expand_query(standalone_q, groq_client)
-                            retrieval_res = retriever.retrieve_with_evidence_stats(expanded_queries, top_k=20)
-                            retrieved_records = retrieval_res["primary_matches"][:20]
-                            display_refs = retrieved_records
+                            def token_stream():
+                                for chunk in stream:
+                                    if chunk.choices and chunk.choices[0].delta.content:
+                                        yield chunk.choices[0].delta.content
 
-                            # Progress step: Writing the answer...
-                            status.update(label="Writing the answer...", state="running")
-                            time.sleep(0.3)
-                            reviews_context = format_reviews_for_prompt(retrieved_records)
-                            system_prompt = build_system_prompt(reviews_context)
+                            # Directly stream visible answer inside the bot chat message
+                            answer_slot = st.empty()
+                            raw_answer = answer_slot.write_stream(token_stream)
+                            formatted_answer = linkify_citations(raw_answer, records_lookup)
+                            if formatted_answer != raw_answer:
+                                answer_slot.markdown(formatted_answer, unsafe_allow_html=True)
+                            final_answer = formatted_answer
 
-                            recent_history = []
-                            for m in st.session_state.messages[-6:]:
-                                if m.get("role") in ["user", "assistant"] and m.get("content"):
-                                    recent_history.append({"role": m["role"], "content": m["content"]})
+                        except Exception as e:
+                            fallback_answer = (
+                                "**Short answer**\n"
+                                "First-time investors stop their SIPs primarily due to bank AutoPay bounce charges "
+                                "and panic from early market losses.\n\n"
+                                "**What users are saying**\n"
+                                "- **AutoPay Bounce Penalties:** Some users report unexpected penalty charges when salary credits do not align with the debit date, leading them to cancel mandates. [🔗 Groww Play Store ↗](#) [🔗 Reddit ↗](#)\n"
+                                "- **Early Market Losses:** A few users experience loss anxiety when their initial investments show negative returns, prompting them to stop investing. [🔗 Reddit ↗](#) [🔗 Groww Play Store ↗](#)\n\n"
+                                "**Why it is happening (root cause)**\n"
+                                "My interpretation: First-time investors enter with expectations of steady growth and lack psychological buffers during market dips. When compounded by punitive bank bounce penalties, they lose confidence in the automation.\n\n"
+                                "**What to explore next**\n"
+                                "1. How does the SIP debit date relative to salary date impact 12-month retention?\n"
+                                "2. What solutions can Groww introduce to prevent bank bounce charges?"
+                            )
+                            answer_slot = st.empty()
+                            answer_slot.markdown(fallback_answer, unsafe_allow_html=True)
+                            final_answer = fallback_answer
 
-                            llm_messages = [{"role": "system", "content": system_prompt}]
-                            llm_messages.extend(recent_history)
-                            llm_messages.append({"role": "user", "content": active_query})
+                        scroll_to_bottom("stream_end")
 
-                            # Progress step: Analysis complete
-                            status.update(label="Analysis complete", state="complete")
-
-                            # Step 4: Replace thinking indicator with answer streamed word by word
-                            thinking_slot.empty()
-
-                            try:
-                                client = groq_client or Groq(api_key=GROQ_API_KEY)
-                                stream = client.chat.completions.create(
-                                    model="qwen/qwen3.8-27b",
-                                    messages=llm_messages,
-                                    stream=True,
-                                    temperature=0.1,
-                                    max_tokens=750
-                                )
-
-                                def token_stream():
-                                    for chunk in stream:
-                                        if chunk.choices and chunk.choices[0].delta.content:
-                                            yield chunk.choices[0].delta.content
-
-                                raw_answer = st.write_stream(token_stream)
-                                formatted_answer = linkify_citations(raw_answer, records_lookup)
-                                if formatted_answer != raw_answer:
-                                    st.markdown(formatted_answer, unsafe_allow_html=True)
-                                final_answer = formatted_answer
-
-                            except Exception as e:
-                                fallback_answer = (
-                                    "**Short answer**\n"
-                                    "First-time investors stop their SIPs primarily due to bank AutoPay bounce charges "
-                                    "and panic from early market losses.\n\n"
-                                    "**What users are saying**\n"
-                                    "- **AutoPay Bounce Penalties:** Some users report unexpected penalty charges when salary credits do not align with the debit date, leading them to cancel mandates. [🔗 Groww Play Store ↗](#) [🔗 Reddit ↗](#)\n"
-                                    "- **Early Market Losses:** A few users experience loss anxiety when their initial investments show negative returns, prompting them to stop investing. [🔗 Reddit ↗](#) [🔗 Groww Play Store ↗](#)\n\n"
-                                    "**Why it is happening (root cause)**\n"
-                                    "My interpretation: First-time investors enter with expectations of steady growth and lack psychological buffers during market dips. When compounded by punitive bank bounce penalties, they lose confidence in the automation.\n\n"
-                                    "**What to explore next**\n"
-                                    "1. How does the SIP debit date relative to salary date impact 12-month retention?\n"
-                                    "2. What solutions can Groww introduce to prevent bank bounce charges?"
-                                )
-                                st.markdown(fallback_answer, unsafe_allow_html=True)
-                                final_answer = fallback_answer
-
-                    # Step 5: After answer finishes, remove thinking indicator and show links and retrieved reviews
+                    # Step 5: After answer finishes, show links and retrieved reviews
                     thinking_slot.empty()
                     if display_refs:
                         with st.expander("Show retrieved reviews", expanded=False):
@@ -1394,6 +1432,8 @@ else:
                                     f"- **{act}** | Reason: *{trig}*\n"
                                     f"- *\"{quote}\"*\n\n---"
                                 )
+
+                    scroll_to_bottom("after_reviews")
 
                     # Save conversation turns in session state
                     st.session_state.messages.append({"role": "user", "content": active_query})
@@ -1422,8 +1462,11 @@ else:
                         "messages": list(st.session_state.messages)
                     })
 
-                scroll_latest_into_view()
+                scroll_to_bottom("final")
                 unlock_chat_input()
+
+            # Bottom clearance spacer so the last message always sits comfortably above fixed chat input
+            st.markdown('<div class="chat-bottom-clearance" style="height: 180px; min-height: 180px; width: 100%;"></div>', unsafe_allow_html=True)
 
     # -------------------------
     # Right Column: References Card
