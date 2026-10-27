@@ -202,13 +202,20 @@ def rewrite_query_with_history(query: str, history: List[Dict[str, str]], groq_c
         return f"{past_user_queries[-1]} {query}"
 
 
-def expand_query(query: str, groq_client: Any = None) -> List[str]:
+def expand_query(query: Any, groq_client: Any = None) -> List[str]:
     """
     Expands question into 4-5 phrases real users write, such as:
     'stopped my SIP', 'paused my SIP', 'SIP failed autopay', 'SIP in loss'
     """
-    phrases = [query]
-    q_lower = query.lower()
+    if isinstance(query, (list, tuple)):
+        q_str = str(query[0]) if query else "SIP"
+    elif not query:
+        q_str = "SIP"
+    else:
+        q_str = str(query)
+
+    phrases = [q_str]
+    q_lower = q_str.lower()
 
     # Domain phrase mappings
     if "stop" in q_lower or "cancel" in q_lower or "quit" in q_lower:
@@ -230,7 +237,7 @@ def expand_query(query: str, groq_client: Any = None) -> List[str]:
                 "Given the user question, generate 4 short natural search phrases that real Indian investors write in reviews or reddit posts "
                 "(e.g. 'stopped my SIP', 'SIP autopay bounced penalty', 'Groww mandate failed', 'paused my SIP in loss').\n"
                 "Output ONLY the 4 phrases, one per line. No numbers, no bullet points, no extra text.\n\n"
-                f"Question: {query}\n"
+                f"Question: {q_str}\n"
                 "Phrases:"
             )
             res = call_groq_with_retry(
@@ -247,7 +254,7 @@ def expand_query(query: str, groq_client: Any = None) -> List[str]:
         except Exception:
             pass
 
-    return phrases[:5]
+    return [str(p) for p in phrases[:5] if p]
 
 
 def get_source_label(src: str) -> str:

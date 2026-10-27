@@ -43,9 +43,16 @@ class SIPRetriever:
         self.records = records
         self._build_index()
 
-    def _tokenize(self, text: str) -> List[str]:
+    def _tokenize(self, text: Any) -> List[str]:
         if not text:
             return []
+        if isinstance(text, (list, tuple, set)):
+            tokens = []
+            for item in text:
+                tokens.extend(self._tokenize(item))
+            return tokens
+        if not isinstance(text, str):
+            text = str(text)
         text = text.lower()
         tokens = re.findall(r'\b[a-z0-9]{2,}\b', text)
         stopwords = {
@@ -76,13 +83,19 @@ class SIPRetriever:
         self.avg_doc_len = sum(self.doc_lens) / max(1, self.doc_count)
 
     def _score_records(self, query: Any) -> List[Tuple[float, Dict[str, Any]]]:
-        # Handle string or list of expanded query phrases
-        if isinstance(query, list):
-            primary_query = query[0] if query else ""
-            expanded_queries = query[1:] if len(query) > 1 else []
-        else:
-            primary_query = str(query)
-            expanded_queries = []
+        # Handle string, list of strings, nested list, or arbitrary query
+        query_list = []
+        if isinstance(query, (list, tuple, set)):
+            for item in query:
+                if isinstance(item, (list, tuple, set)):
+                    query_list.extend([str(sub) for sub in item if sub])
+                elif item:
+                    query_list.append(str(item))
+        elif query:
+            query_list.append(str(query))
+
+        primary_query = query_list[0] if query_list else ""
+        expanded_queries = query_list[1:] if len(query_list) > 1 else []
 
         primary_tokens = self._tokenize(primary_query)
         expanded_tokens = []

@@ -1064,12 +1064,14 @@ def render_references_panel(refs):
             '</div>'
         )
 
-# Initialize Retriever
+# Initialize Retriever with versioned cache key to prevent stale bytecode execution
+RETRIEVER_VERSION = "2.2.0"
+
 @st.cache_resource
-def get_retriever():
+def get_retriever(_version: str = RETRIEVER_VERSION):
     return SIPRetriever(cleaned_records)
 
-retriever = get_retriever()
+retriever = get_retriever(RETRIEVER_VERSION)
 
 # Initialize Session State
 if "messages" not in st.session_state:
@@ -1352,7 +1354,16 @@ else:
 
                         # Retrieve top 20 relevant reviews
                         expanded_queries = expand_query(standalone_q, groq_client)
-                        retrieval_res = retriever.retrieve_with_evidence_stats(expanded_queries, top_k=20)
+                        try:
+                            retrieval_res = retriever.retrieve_with_evidence_stats(expanded_queries, top_k=20)
+                        except Exception:
+                            try:
+                                fresh_retriever = SIPRetriever(cleaned_records)
+                                retrieval_res = fresh_retriever.retrieve_with_evidence_stats(expanded_queries, top_k=20)
+                            except Exception:
+                                fresh_retriever = SIPRetriever(cleaned_records)
+                                retrieval_res = fresh_retriever.retrieve_with_evidence_stats(str(standalone_q), top_k=20)
+
                         retrieved_records = retrieval_res["primary_matches"][:20]
                         display_refs = retrieved_records
 
