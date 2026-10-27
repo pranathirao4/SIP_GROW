@@ -7,26 +7,48 @@ Faithfully designed to match the Google Photos Review Engine aesthetic.
 
 import os
 import sys
+from pathlib import Path
+
+# Ensure root directory is at the front of sys.path on Streamlit Cloud Linux containers
+ROOT_DIR = Path(__file__).resolve().parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 import time
 import json
 import re
-from pathlib import Path
 import streamlit as st
 import threading
 from groq import Groq
 import streamlit.components.v1 as components
 from dotenv import load_dotenv
-from src.pipeline.retriever import SIPRetriever
-from src.pipeline.agent_core import (
-    OFF_TOPIC_MESSAGE,
-    check_query_scope,
-    rewrite_query_with_history,
-    expand_query,
-    format_reviews_for_prompt,
-    build_system_prompt,
-    linkify_citations,
-    get_source_label
-)
+
+try:
+    from src.pipeline.retriever import SIPRetriever
+    from src.pipeline.agent_core import (
+        OFF_TOPIC_MESSAGE,
+        check_query_scope,
+        rewrite_query_with_history,
+        expand_query,
+        format_reviews_for_prompt,
+        build_system_prompt,
+        linkify_citations,
+        get_source_label
+    )
+except ImportError:
+    sys.path.insert(0, os.path.abspath("."))
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from src.pipeline.retriever import SIPRetriever
+    from src.pipeline.agent_core import (
+        OFF_TOPIC_MESSAGE,
+        check_query_scope,
+        rewrite_query_with_history,
+        expand_query,
+        format_reviews_for_prompt,
+        build_system_prompt,
+        linkify_citations,
+        get_source_label
+    )
 
 # Ensure UTF-8 output
 sys.stdout.reconfigure(encoding='utf-8')
