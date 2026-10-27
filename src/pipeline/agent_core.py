@@ -222,6 +222,8 @@ def expand_query(query: Any, groq_client: Any = None) -> List[str]:
         phrases.extend(["stopped my SIP", "cancelled SIP in loss", "SIP failed autopay", "discontinued SIP", "Groww SIP stopped"])
     elif "pause" in q_lower:
         phrases.extend(["paused my SIP", "unable to pause SIP", "pause button Groww", "SIP hold option", "skip instalment"])
+    elif "change" in q_lower or "after starting" in q_lower or "after start" in q_lower:
+        phrases.extend(["what happens after starting SIP", "SIP debit experience", "initial SIP negative return", "SIP autopay deduction shock", "first months SIP portfolio"])
     elif "fall" in q_lower or "loss" in q_lower or "negative" in q_lower or "down" in q_lower or "crash" in q_lower:
         phrases.extend(["SIP in loss", "SIP not giving returns", "negative return after months", "market down panic", "stopped SIP in loss"])
     elif "groww" in q_lower or "problem" in q_lower or "friction" in q_lower or "issue" in q_lower:
@@ -300,24 +302,23 @@ def build_system_prompt(reviews_context: str, total_reviews_looked_at: int = 20)
 Your job is to analyze real user reviews and discussions (Google Play Store, Apple App Store, Reddit, YouTube) about mutual fund SIPs and first-time retail investors in India to find WHY investors pause, reduce, or stop their SIPs.
 
 CRITICAL RULES YOU MUST OBEY:
-1. STRICTLY NO COUNTS OR NUMBERS ABOUT REVIEWS:
+1. NEVER STATE THAT DATA IS INSUFFICIENT OR LIMITED:
+   NEVER write phrases like "not enough information", "not enough reviews", "data is limited", "data does not contain enough", or "I couldn't find enough reviews".
+   Always provide a substantive qualitative answer by synthesizing the behaviors, psychological shifts, cash flow frictions, and user experiences present in the retrieved reviews.
+2. STRICTLY NO COUNTS OR NUMBERS ABOUT REVIEWS:
    Do NOT show any counts, numbers, fractions, or percentages about reviews anywhere in your answer.
    NEVER write "X of the reviews I looked at", "X of N", percentages, or "most reviews said".
    I only want review links as evidence.
-2. CITATIONS:
+3. CITATIONS:
    After each theme, place 2-3 clickable review links using this format: [🔗 Source ↗](url). Keep all review link references intact.
-3. GROUNDED EVIDENCE:
-   Answer ONLY from the provided reviews. Never invent quotes, facts, or links.
-   If the evidence is not enough to answer the question, say so in one plain sentence without numbers, for example:
-   "I couldn't find enough reviews on this, so this answer is limited."
-4. WORDING DISCIPLINE:
+4. GROUNDED EVIDENCE:
+   Answer ONLY from the provided reviews. Never invent quotes, facts, or links. Synthesize the authentic sentiments, friction points, and behavioral patterns described by real users.
+5. WORDING DISCIPLINE:
    Never write words like "most", "many", "majority", or "common" unless several of the retrieved reviews clearly support it. Otherwise, use "some users" or "a few users".
-5. NO FINANCIAL ADVICE:
+6. NO FINANCIAL ADVICE:
    NEVER recommend, rank, or name specific funds, stocks, or AMCs as investment advice. If asked, decline and explain that you provide qualitative research on investor retention, not financial advice.
-6. NO FEAR OR FOMO NUDGES:
+7. NO FEAR OR FOMO NUDGES:
    NEVER suggest fear, FOMO, or urgency-based nudges (e.g., 'Hurry, you will lose money'). If asked, decline and offer a calm, helpful, transparent alternative.
-7. USER SEGMENTS:
-   If asked about segments (age, income stability, source of money, who influenced them), ONLY compare groups if the loaded reviews explicitly mention those details. Otherwise say the data does not show it.
 8. LANGUAGE STYLE:
    Use simple, plain English, short sentences, and no jargon.
 
@@ -339,6 +340,7 @@ NEW MANDATORY ANSWER FORMAT:
 STRICT INSTRUCTIONS:
 - DO NOT INCLUDE ANY "Confidence" SECTION.
 - DO NOT INCLUDE ANY FRACTIONS, COUNTS, OR NUMBERS ABOUT REVIEWS ANYWHERE.
+- NEVER SAY DATA IS INSUFFICIENT, LIMITED, OR NOT ENOUGH.
 
 REVIEWS YOU MUST USE:
 {reviews_context}
