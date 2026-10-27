@@ -14,17 +14,29 @@ ROOT_DIR = Path(__file__).resolve().parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+# Evict stale modules from memory during Streamlit hot-reloads
+for mod_name in list(sys.modules.keys()):
+    if mod_name.startswith("src.pipeline"):
+        sys.modules.pop(mod_name, None)
+
 import time
 import json
 import re
+import importlib
 import streamlit as st
 import threading
 from groq import Groq
 import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
+# Safe dynamic import
 try:
     from src.pipeline.retriever import SIPRetriever
+except ImportError:
+    sys.path.insert(0, os.path.abspath("."))
+    from src.pipeline.retriever import SIPRetriever
+
+try:
     from src.pipeline.agent_core import (
         OFF_TOPIC_MESSAGE,
         check_query_scope,
@@ -36,19 +48,16 @@ try:
         get_source_label
     )
 except ImportError:
-    sys.path.insert(0, os.path.abspath("."))
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from src.pipeline.retriever import SIPRetriever
-    from src.pipeline.agent_core import (
-        OFF_TOPIC_MESSAGE,
-        check_query_scope,
-        rewrite_query_with_history,
-        expand_query,
-        format_reviews_for_prompt,
-        build_system_prompt,
-        linkify_citations,
-        get_source_label
-    )
+    import src.pipeline.agent_core as agent_core_mod
+    agent_core_mod = importlib.reload(agent_core_mod)
+    OFF_TOPIC_MESSAGE = getattr(agent_core_mod, "OFF_TOPIC_MESSAGE")
+    check_query_scope = getattr(agent_core_mod, "check_query_scope")
+    rewrite_query_with_history = getattr(agent_core_mod, "rewrite_query_with_history")
+    expand_query = getattr(agent_core_mod, "expand_query", lambda q, c=None: [q])
+    format_reviews_for_prompt = getattr(agent_core_mod, "format_reviews_for_prompt")
+    build_system_prompt = getattr(agent_core_mod, "build_system_prompt")
+    linkify_citations = getattr(agent_core_mod, "linkify_citations")
+    get_source_label = getattr(agent_core_mod, "get_source_label")
 
 # Ensure UTF-8 output
 sys.stdout.reconfigure(encoding='utf-8')
