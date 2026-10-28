@@ -318,6 +318,7 @@ st.markdown("""
         transition: all 0.2s ease !important;
         max-width: 760px !important;
         margin: 0 auto !important;
+        pointer-events: auto !important;
     }
     div[data-testid="stChatInput"]:focus-within {
         border-color: #1A73E8 !important;
@@ -518,8 +519,7 @@ st.markdown("""
         z-index: 999 !important;
     }
     .chat-input-disabled,
-    div[data-testid="stChatInput"]:has(textarea:disabled),
-    div[data-testid="stChatInput"]:has(button:disabled) {
+    div[data-testid="stChatInput"]:has(textarea:disabled) {
         opacity: 0.65 !important;
         pointer-events: none !important;
         filter: grayscale(0.2) !important;
@@ -1074,18 +1074,13 @@ def get_retriever(_version: str = RETRIEVER_VERSION):
 retriever = get_retriever(RETRIEVER_VERSION)
 
 # Initialize Session State
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-if "recent_chats" not in st.session_state:
-    st.session_state.recent_chats = []
-if "current_chat_id" not in st.session_state:
-    st.session_state.current_chat_id = None
-if "current_view" not in st.session_state:
-    st.session_state.current_view = "new_chat"
-if "input_query" not in st.session_state:
-    st.session_state.input_query = ""
-if "is_answering" not in st.session_state:
-    st.session_state.is_answering = False
+st.session_state.setdefault("messages", [])
+st.session_state.setdefault("recent_chats", [])
+st.session_state.setdefault("current_chat_id", None)
+st.session_state.setdefault("current_view", "new_chat")
+st.session_state.setdefault("input_query", "")
+st.session_state.setdefault("active_prompt_query", None)
+st.session_state.setdefault("is_answering", False)
 
 
 # ------------------------------------------------------------------
@@ -1113,6 +1108,8 @@ with st.sidebar:
         st.session_state.messages = []
         st.session_state.current_chat_id = None
         st.session_state.input_query = ""
+        st.session_state.active_prompt_query = None
+        st.session_state.is_answering = False
         st.session_state.current_view = "new_chat"
         st.rerun()
 
